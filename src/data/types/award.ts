@@ -75,3 +75,11 @@ export interface PayCalculation {
     penalties: Record<string, number>;
   };
 }
+
+export interface EmployeeDetails {
+  id: string;
+  name: string;
+  level: number;
+  employmentType: 'casual' | 'part-time' | 'full-time';
+  allowances: Allowance[];
+}
