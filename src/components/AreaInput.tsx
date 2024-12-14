@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { CategorySelect } from './CategorySelect';
 import { TaskList } from './TaskList';
 import { getRateById } from '@/data/rates/ratesManager';
+import { AreaHeader } from './area/AreaHeader';
+import { IndustrySelect } from './area/IndustrySelect';
+import { AreaMetrics } from './area/AreaMetrics';
+import { TimeDisplay } from './area/TimeDisplay';
 
 interface AreaInputProps {
   onAreaChange: (area: { 
     squareMeters: number; 
     spaceType: string;
+    industryType: string;
     selectedTasks: Array<{
       taskId: string;
       quantity: number;
@@ -39,6 +43,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
   }>>([]);
   const [squareMeters, setSquareMeters] = useState<number>(0);
   const [category, setCategory] = useState<string>("Carpet Maintenance - Spraying and Spotting");
+  const [industryType, setIndustryType] = useState<string>("");
 
   const calculateTimeRequired = (
     taskId: string, 
@@ -75,10 +80,11 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
     onAreaChange({
       squareMeters: squareMeters || 0,
       spaceType: 'carpet',
+      industryType,
       selectedTasks: validTasks,
       totalTime
     });
-  }, [selectedTasks, squareMeters]);
+  }, [selectedTasks, squareMeters, industryType]);
 
   const handleTaskSelection = (taskId: string, isSelected: boolean) => {
     if (isSelected) {
@@ -160,13 +166,16 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Area & Task Details</CardTitle>
-      </CardHeader>
+      <AreaHeader />
       <CardContent>
         <div className="grid gap-4">
+          <IndustrySelect 
+            value={industryType}
+            onValueChange={setIndustryType}
+          />
+
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="category">Task Category</Label>
             <CategorySelect value={category} onValueChange={setCategory} />
           </div>
 
@@ -184,26 +193,12 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="squareMeters">Total Area (Square Meters)</Label>
-            <Input
-              id="squareMeters"
-              type="number"
-              placeholder="Enter total area in square meters"
-              value={squareMeters || ''}
-              onChange={(e) => {
-                const value = parseFloat(e.target.value) || 0;
-                setSquareMeters(value);
-              }}
-            />
-          </div>
+          <AreaMetrics 
+            squareMeters={squareMeters}
+            onSquareMetersChange={setSquareMeters}
+          />
 
-          {selectedTasks.length > 0 && (
-            <div className="p-4 bg-gray-50 rounded">
-              <h3 className="font-medium mb-2">Total Monthly Time Required</h3>
-              <p>{(selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0) * 60).toFixed(1)} minutes</p>
-            </div>
-          )}
+          <TimeDisplay selectedTasks={selectedTasks} />
         </div>
       </CardContent>
     </Card>

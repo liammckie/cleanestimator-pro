@@ -11,12 +11,17 @@ import { IndustryList } from './IndustryList';
 interface CategorySelectProps {
   value: string;
   onValueChange: (value: string) => void;
+  defaultTab?: 'categories' | 'industries';
 }
 
-export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueChange }) => {
+export const CategorySelect: React.FC<CategorySelectProps> = ({ 
+  value, 
+  onValueChange,
+  defaultTab = 'categories'
+}) => {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'categories' | 'industries'>('categories');
+  const [activeTab, setActiveTab] = useState<'categories' | 'industries'>(defaultTab);
 
   const handleSelect = (selectedValue: string) => {
     onValueChange(selectedValue);
@@ -32,14 +37,14 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {value || "Select a category..."}
+          {value || "Select..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
         <Command>
           <CommandInput 
-            placeholder="Search categories..." 
+            placeholder="Search..." 
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
