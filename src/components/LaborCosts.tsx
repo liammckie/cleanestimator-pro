@@ -7,6 +7,7 @@ import { OnCostsManager } from './OnCostsManager';
 import { OnCostsState } from '@/data/types/onCosts';
 import { EmploymentTypeSelector } from './labor/EmploymentTypeSelector';
 import { DirectEmploymentOptions } from './labor/DirectEmploymentOptions';
+import { AwardIncreaseManager } from './labor/AwardIncreaseManager';
 
 interface LaborCostsProps {
   onLaborCostChange: (costs: { 
@@ -49,6 +50,7 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
   const [awardLevel, setAwardLevel] = useState<number>(1);
   const [shiftType, setShiftType] = useState<string>('standard');
   const [onCosts, setOnCosts] = useState<OnCostsState>(defaultOnCosts);
+  const [awardIncrease, setAwardIncrease] = useState<number>(0);
 
   const handleEmploymentTypeChange = (value: 'contracted' | 'direct') => {
     setEmploymentType(value);
@@ -66,6 +68,10 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
     }
   };
 
+  const calculateAdjustedRate = (baseRate: number): number => {
+    return baseRate * (1 + (awardIncrease / 100));
+  };
+
   const updateLaborCosts = (type: 'contracted' | 'direct' = employmentType) => {
     if (type === 'contracted') {
       onLaborCostChange({
@@ -74,8 +80,11 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
       });
     } else {
       const selectedLevel = cleaningAwardLevels.find(level => level.level === awardLevel);
+      const baseRate = selectedLevel?.payRates[shiftType as keyof typeof selectedLevel.payRates] || 0;
+      const adjustedRate = calculateAdjustedRate(baseRate);
+      
       onLaborCostChange({
-        hourlyRate: selectedLevel?.payRates[shiftType as keyof typeof selectedLevel.payRates] || 0,
+        hourlyRate: adjustedRate,
         employmentType: type,
         awardLevel,
         shiftType,
@@ -106,6 +115,13 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
     }
   };
 
+  const handleAwardIncreaseChange = (increase: number) => {
+    setAwardIncrease(increase);
+    if (employmentType === 'direct') {
+      updateLaborCosts();
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="w-full">
@@ -130,12 +146,18 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
                 />
               </div>
             ) : (
-              <DirectEmploymentOptions
-                awardLevel={awardLevel}
-                shiftType={shiftType}
-                onAwardLevelChange={handleAwardLevelChange}
-                onShiftTypeChange={handleShiftTypeChange}
-              />
+              <>
+                <DirectEmploymentOptions
+                  awardLevel={awardLevel}
+                  shiftType={shiftType}
+                  onAwardLevelChange={handleAwardLevelChange}
+                  onShiftTypeChange={handleShiftTypeChange}
+                />
+                <AwardIncreaseManager
+                  currentIncrease={awardIncrease}
+                  onAwardIncreaseChange={handleAwardIncreaseChange}
+                />
+              </>
             )}
           </div>
         </CardContent>
