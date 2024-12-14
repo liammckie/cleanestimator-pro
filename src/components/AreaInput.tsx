@@ -18,6 +18,7 @@ interface AreaInputProps {
         timesPerWeek: number;
         timesPerMonth: number;
       };
+      productivityOverride?: number;
     }>;
     totalTime: number;
   }) => void;
@@ -32,6 +33,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
       timesPerWeek: number;
       timesPerMonth: number;
     };
+    productivityOverride?: number;
   }>>([]);
   const [squareFeet, setSquareFeet] = useState(0);
   const [category, setCategory] = useState("Carpet Maintenance - Spraying and Spotting");
@@ -43,15 +45,19 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
     handleInputChange();
   }, [selectedTasks, squareFeet]);
 
-  const calculateTimeRequired = (taskId: string, quantity: number, frequency: { timesPerWeek: number; timesPerMonth: number }) => {
+  const calculateTimeRequired = (taskId: string, quantity: number, frequency: { timesPerWeek: number; timesPerMonth: number }, productivityOverride?: number) => {
     const rate = getProductivityRate(taskId);
     if (!rate) return 0;
-    const baseTime = quantity / rate.ratePerHour;
+    const ratePerHour = productivityOverride || rate.ratePerHour;
+    const baseTime = quantity / ratePerHour;
     return baseTime * (frequency?.timesPerWeek || 1) * 4;
   };
 
   const handleTaskSelection = (taskId: string, isSelected: boolean) => {
     if (isSelected) {
+      const rate = getProductivityRate(taskId);
+      if (!rate) return;
+      
       const newTask = {
         taskId,
         quantity: 0,
@@ -70,7 +76,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
   const handleQuantityChange = (taskId: string, quantity: number) => {
     setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
-        const timeRequired = calculateTimeRequired(taskId, quantity, task.frequency);
+        const timeRequired = calculateTimeRequired(taskId, quantity, task.frequency, task.productivityOverride);
         return { ...task, quantity, timeRequired };
       }
       return task;
@@ -84,11 +90,25 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
           timesPerWeek,
           timesPerMonth: timesPerWeek * 4
         };
-        const timeRequired = calculateTimeRequired(taskId, task.quantity, frequency);
+        const timeRequired = calculateTimeRequired(taskId, task.quantity, frequency, task.productivityOverride);
         return { ...task, frequency, timeRequired };
       }
       return task;
     }));
+  };
+
+  const handleProductivityOverride = (taskId: string, override: number) => {
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        const timeRequired = calculateTimeRequired(taskId, task.quantity, task.frequency, override);
+        return { ...task, productivityOverride: override, timeRequired };
+      }
+      return task;
+    }));
+  };
+
+  const handleRemoveTask = (taskId: string) => {
+    setSelectedTasks(prev => prev.filter(task => task.taskId !== taskId));
   };
 
   const handleInputChange = () => {
@@ -140,6 +160,8 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
                     onTaskSelection={handleTaskSelection}
                     onQuantityChange={handleQuantityChange}
                     onFrequencyChange={handleFrequencyChange}
+                    onProductivityOverride={handleProductivityOverride}
+                    onRemoveTask={handleRemoveTask}
                   />
                 ))}
             </div>
