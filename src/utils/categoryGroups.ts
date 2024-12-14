@@ -66,7 +66,10 @@ export const industryGroups: IndustryGroup[] = [
       "Healthcare - Operating Theaters",
       "Healthcare - Common Areas",
       "Healthcare - Asset Management",
-      "Healthcare - Bundled Services"
+      "Healthcare - Bundled Services",
+      "Healthcare - Clinical Areas",
+      "Healthcare - Isolation Rooms",
+      "Healthcare - Emergency Departments"
     ]
   },
   {
@@ -76,7 +79,10 @@ export const industryGroups: IndustryGroup[] = [
       "Hotel Common Areas",
       "Restaurant Cleaning",
       "Event Spaces",
-      "Dorm Cleaning"
+      "Dorm Cleaning",
+      "Food Service Areas",
+      "Entertainment Venues",
+      "Lobby Maintenance"
     ]
   },
   {
@@ -86,7 +92,23 @@ export const industryGroups: IndustryGroup[] = [
       "Retail Spaces",
       "Industrial Facilities",
       "Educational Institutions",
-      "Correctional Facilities"
+      "Correctional Facilities",
+      "Manufacturing Plants",
+      "Warehouses",
+      "Data Centers"
+    ]
+  },
+  {
+    name: "Specialized Facilities",
+    categories: [
+      "Clean Rooms",
+      "Laboratories",
+      "Sports Facilities",
+      "Transportation Hubs",
+      "Religious Facilities",
+      "Government Buildings",
+      "Museums & Galleries",
+      "Child Care Centers"
     ]
   }
 ];
