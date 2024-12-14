@@ -63,75 +63,99 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen flex flex-col bg-[#F5F7FA]">
         <Header />
         
-        {/* Navigation Buttons */}
-        <div className="bg-white border-b">
-          <div className="max-w-[1920px] mx-auto px-6 py-4">
-            <div className="flex justify-center gap-4">
-              <Button
-                variant={activeView === 'sites' ? 'default' : 'outline'}
-                onClick={() => setActiveView('sites')}
-                className="flex items-center gap-2 min-w-[160px] justify-center"
-              >
-                <Building2 className="h-4 w-4" />
-                Sites
-              </Button>
-              <Button
-                variant={activeView === 'scope' ? 'default' : 'outline'}
-                onClick={() => setActiveView('scope')}
-                className="flex items-center gap-2 min-w-[160px] justify-center"
-              >
-                <ClipboardList className="h-4 w-4" />
-                Scope of Work
-              </Button>
-              <Button
-                variant={activeView === 'costs' ? 'default' : 'outline'}
-                onClick={() => setActiveView('costs')}
-                className="flex items-center gap-2 min-w-[160px] justify-center"
-              >
-                <Calculator className="h-4 w-4" />
-                Cost Calculator
-              </Button>
-              <Button
-                variant={activeView === 'roster' ? 'default' : 'outline'}
-                onClick={() => setActiveView('roster')}
-                className="flex items-center gap-2 min-w-[160px] justify-center"
-              >
-                <Users className="h-4 w-4" />
-                Roster
-              </Button>
+        {/* Modern Navigation Bar */}
+        <nav className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="max-w-[1920px] mx-auto px-8">
+            <div className="flex justify-center items-center h-16 gap-2">
+              <div className="grid grid-cols-4 gap-2 w-full max-w-4xl">
+                <Button
+                  variant={activeView === 'sites' ? 'default' : 'outline'}
+                  onClick={() => setActiveView('sites')}
+                  className={`h-12 w-full transition-all ${
+                    activeView === 'sites' 
+                      ? 'bg-primary shadow-md' 
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <Building2 className="mr-2 h-5 w-5" />
+                  <span className="font-medium">Sites</span>
+                </Button>
+
+                <Button
+                  variant={activeView === 'scope' ? 'default' : 'outline'}
+                  onClick={() => setActiveView('scope')}
+                  className={`h-12 w-full transition-all ${
+                    activeView === 'scope' 
+                      ? 'bg-primary shadow-md' 
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <ClipboardList className="mr-2 h-5 w-5" />
+                  <span className="font-medium">Scope</span>
+                </Button>
+
+                <Button
+                  variant={activeView === 'costs' ? 'default' : 'outline'}
+                  onClick={() => setActiveView('costs')}
+                  className={`h-12 w-full transition-all ${
+                    activeView === 'costs' 
+                      ? 'bg-primary shadow-md' 
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <Calculator className="mr-2 h-5 w-5" />
+                  <span className="font-medium">Costs</span>
+                </Button>
+
+                <Button
+                  variant={activeView === 'roster' ? 'default' : 'outline'}
+                  onClick={() => setActiveView('roster')}
+                  className={`h-12 w-full transition-all ${
+                    activeView === 'roster' 
+                      ? 'bg-primary shadow-md' 
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <Users className="mr-2 h-5 w-5" />
+                  <span className="font-medium">Roster</span>
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        </nav>
 
-        {/* Content Area */}
-        <div className="flex-1 w-full">
-          <div className="max-w-[1920px] mx-auto p-6 h-full">
-            {activeView === 'sites' && (
-              <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-12rem)]">
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-4">Sites Overview</h2>
+        {/* Content Area with Modern Styling */}
+        <main className="flex-1 w-full bg-[#F5F7FA]">
+          <div className="max-w-[1920px] mx-auto p-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 min-h-[calc(100vh-12rem)]">
+              {activeView === 'sites' && (
+                <div className="p-8">
+                  <h1 className="text-2xl font-semibold text-gray-900 mb-6">Sites Overview</h1>
                   <SiteManager onSitesChange={setSites} />
                 </div>
-              </div>
-            )}
+              )}
 
-            {activeView === 'scope' && (
-              <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-12rem)]">
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-4">Scope of Work</h2>
-                  <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
+              {activeView === 'scope' && (
+                <div className="p-8">
+                  <h1 className="text-2xl font-semibold text-gray-900 mb-6">Scope of Work</h1>
+                  <ScopeOfWorkSidebar 
+                    selectedTasks={sites.flatMap(site => 
+                      site.area.selectedTasks.map(task => ({
+                        ...task,
+                        siteName: site.name
+                      }))
+                    )} 
+                  />
                 </div>
-              </div>
-            )}
+              )}
 
-            {activeView === 'costs' && (
-              <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-12rem)]">
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-4">Cost Calculator</h2>
-                  <div className="grid gap-6">
+              {activeView === 'costs' && (
+                <div className="p-8">
+                  <h1 className="text-2xl font-semibold text-gray-900 mb-6">Cost Calculator</h1>
+                  <div className="grid gap-8">
                     <LaborCosts onLaborCostChange={setLaborCosts} />
                     <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
                     <ProfitLoss
@@ -142,19 +166,17 @@ const Index = () => {
                     />
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {activeView === 'roster' && (
-              <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-12rem)]">
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-4">Roster Management</h2>
+              {activeView === 'roster' && (
+                <div className="p-8">
+                  <h1 className="text-2xl font-semibold text-gray-900 mb-6">Roster Management</h1>
                   <RosterManager />
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        </main>
       </div>
     </SidebarProvider>
   );
