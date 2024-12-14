@@ -34,26 +34,24 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             {category.name}
           </AccordionTrigger>
           <AccordionContent>
-            <CommandGroup>
-              {filteredSubcategories.map((subcategory) => (
-                <CommandItem
-                  key={subcategory}
-                  value={subcategory}
-                  onSelect={() => {
-                    onValueChange(subcategory);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === subcategory ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {subcategory}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {filteredSubcategories.map((subcategory) => (
+              <CommandItem
+                key={subcategory}
+                value={subcategory}
+                onSelect={() => {
+                  onValueChange(subcategory);
+                  setOpen(false);
+                }}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    value === subcategory ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {subcategory}
+              </CommandItem>
+            ))}
           </AccordionContent>
         </AccordionItem>
       );
@@ -78,26 +76,24 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             {group.name}
           </AccordionTrigger>
           <AccordionContent>
-            <CommandGroup>
-              {filteredCategories.map((category) => (
-                <CommandItem
-                  key={category}
-                  value={category}
-                  onSelect={() => {
-                    onValueChange(category);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === category ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {category}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {filteredCategories.map((category) => (
+              <CommandItem
+                key={category}
+                value={category}
+                onSelect={() => {
+                  onValueChange(category);
+                  setOpen(false);
+                }}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    value === category ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {category}
+              </CommandItem>
+            ))}
           </AccordionContent>
         </AccordionItem>
       );
@@ -144,23 +140,25 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
-          <div className="max-h-[300px] overflow-y-auto">
-            <Accordion type="single" collapsible className="w-full">
-              {Array.isArray(categoryGroups) && categoryGroups.map(group => (
-                <AccordionItem key={group.name} value={group.name}>
-                  <AccordionTrigger className="font-semibold">
-                    {group.name}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Accordion type="single" collapsible className="w-full">
-                      {renderCategories(group.categories)}
-                    </Accordion>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-              {renderIndustryGroups()}
-            </Accordion>
-          </div>
+          <CommandGroup>
+            <div className="max-h-[300px] overflow-y-auto">
+              <Accordion type="single" collapsible className="w-full">
+                {Array.isArray(categoryGroups) && categoryGroups.map(group => (
+                  <AccordionItem key={group.name} value={group.name}>
+                    <AccordionTrigger className="font-semibold">
+                      {group.name}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <Accordion type="single" collapsible className="w-full">
+                        {renderCategories(group.categories)}
+                      </Accordion>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+                {renderIndustryGroups()}
+              </Accordion>
+            </div>
+          </CommandGroup>
           {!hasResults() && (
             <div className="py-6 text-center text-sm">
               <CommandEmpty>No category found.</CommandEmpty>
