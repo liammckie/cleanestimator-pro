@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { TaskList } from './TaskList';
 import { getRateById } from '@/data/rates/ratesManager';
 import { AreaHeader } from './area/AreaHeader';
 import { CategoryPanel } from './area/CategoryPanel';
 import { IndustryPanel } from './area/IndustryPanel';
 import { AreaMetrics } from './area/AreaMetrics';
 import { TimeDisplay } from './area/TimeDisplay';
+import { TaskManager } from './area/TaskManager';
 
 interface AreaInputProps {
   onAreaChange: (area: { 
@@ -179,18 +179,16 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
             />
           </div>
 
-          <div className="space-y-2">
-            <TaskList
-              category={category}
-              selectedTasks={selectedTasks}
-              onTaskSelection={handleTaskSelection}
-              onQuantityChange={handleQuantityChange}
-              onFrequencyChange={handleFrequencyChange}
-              onProductivityOverride={handleProductivityOverride}
-              onRemoveTask={(taskId) => handleTaskSelection(taskId, false)}
-              onToolChange={handleToolChange}
-            />
-          </div>
+          <TaskManager
+            category={category}
+            selectedTasks={selectedTasks}
+            onTaskSelection={handleTaskSelection}
+            onQuantityChange={handleQuantityChange}
+            onFrequencyChange={handleFrequencyChange}
+            onProductivityOverride={handleProductivityOverride}
+            onRemoveTask={(taskId) => handleTaskSelection(taskId, false)}
+            onToolChange={handleToolChange}
+          />
 
           <AreaMetrics 
             squareMeters={squareMeters}
