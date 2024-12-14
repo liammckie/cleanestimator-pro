@@ -33,34 +33,28 @@ export const ShiftTimingSchema = z.object({
 
 export type ShiftTiming = z.infer<typeof ShiftTimingSchema>;
 
-export interface WeeklyAllowance {
+interface BaseAllowance {
+  name: string;
+  amount: number;
+  enabled: boolean;
+}
+
+export interface WeeklyAllowance extends BaseAllowance {
   type: AllowanceType.WEEKLY;
-  name: string;
-  amount: number;
-  enabled: boolean;
 }
 
-export interface HourlyAllowance {
+export interface HourlyAllowance extends BaseAllowance {
   type: AllowanceType.HOURLY;
-  name: string;
-  amount: number;
-  enabled: boolean;
 }
 
-export interface DailyAllowance {
+export interface DailyAllowance extends BaseAllowance {
   type: AllowanceType.DAILY;
-  name: string;
-  amount: number;
   maxWeekly: number;
-  enabled: boolean;
 }
 
-export interface KilometerAllowance {
+export interface KilometerAllowance extends BaseAllowance {
   type: AllowanceType.PER_KM;
-  name: string;
-  amount: number;
   vehicleType: VehicleType;
-  enabled: boolean;
 }
 
 export type Allowance = WeeklyAllowance | HourlyAllowance | DailyAllowance | KilometerAllowance;
@@ -80,12 +74,4 @@ export interface PayCalculation {
     allowances: Record<string, number>;
     penalties: Record<string, number>;
   };
-}
-
-export interface EmployeeDetails {
-  id: string;
-  name: string;
-  level: number;
-  employmentType: 'casual' | 'part-time' | 'full-time';
-  allowances: Allowance[];
 }

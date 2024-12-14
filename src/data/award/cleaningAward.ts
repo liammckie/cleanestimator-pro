@@ -1,4 +1,4 @@
-import { AwardLevel, AllowanceType, VehicleType, ShiftTiming, PayCalculation } from '../types/award';
+import { AwardLevel, AllowanceType, VehicleType, ShiftTiming, PayCalculation, Allowance } from '../types/award';
 
 export const cleaningAwardLevels: AwardLevel[] = [
   {
