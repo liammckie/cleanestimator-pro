@@ -64,73 +64,52 @@ const Index = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
         
-        <div className="flex-1 flex">
-          {/* Sites Panel - Left */}
-          <div className="w-[320px] min-w-[320px] border-r bg-primary/5">
-            <div className="p-6 h-full overflow-y-auto">
-              <h2 className="text-xl font-semibold mb-6">Sites Overview</h2>
-              <SiteManager onSitesChange={setSites} />
-            </div>
+        <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-4 p-4">
+          {/* Panel 1 - Sites */}
+          <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto">
+            <h2 className="text-xl font-semibold mb-4">Sites Overview</h2>
+            <SiteManager onSitesChange={setSites} />
           </div>
 
-          {/* Scope Panel - Middle */}
-          <div className="w-[400px] min-w-[400px] border-r bg-primary/5">
+          {/* Panel 2 - Scope of Work */}
+          <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto">
+            <h2 className="text-xl font-semibold mb-4">Scope of Work</h2>
             <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
           </div>
 
-          {/* Main Content - Right */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="max-w-[900px] mx-auto p-8">
-              <div className="mb-8">
-                <h1 className="text-3xl font-bold text-center">
-                  Commercial Cleaning Calculator
-                </h1>
-              </div>
+          {/* Panel 3 - Costs Calculator */}
+          <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto">
+            <h2 className="text-xl font-semibold mb-4">Cost Calculator</h2>
+            <Tabs defaultValue="labor" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="labor">Labor</TabsTrigger>
+                <TabsTrigger value="equipment">Equipment</TabsTrigger>
+                <TabsTrigger value="summary">Summary</TabsTrigger>
+              </TabsList>
 
-              <Tabs defaultValue="labor" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="labor">Labor Costs</TabsTrigger>
-                  <TabsTrigger value="equipment">Equipment</TabsTrigger>
-                  <TabsTrigger value="roster">Roster</TabsTrigger>
-                  <TabsTrigger value="summary">Summary</TabsTrigger>
-                </TabsList>
+              <TabsContent value="labor" className="mt-0">
+                <LaborCosts onLaborCostChange={setLaborCosts} />
+              </TabsContent>
 
-                <div className="bg-card rounded-lg shadow-lg border p-6">
-                  <TabsContent value="labor" className="mt-0">
-                    <LaborCosts onLaborCostChange={setLaborCosts} />
-                  </TabsContent>
+              <TabsContent value="equipment" className="mt-0">
+                <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+              </TabsContent>
 
-                  <TabsContent value="equipment" className="mt-0">
-                    <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-                  </TabsContent>
+              <TabsContent value="summary" className="mt-0">
+                <ProfitLoss
+                  revenue={monthlyRevenue}
+                  laborCost={laborCost}
+                  equipmentCost={equipmentCosts.monthly}
+                  overhead={overhead}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
 
-                  <TabsContent value="roster" className="mt-0">
-                    <RosterManager />
-                  </TabsContent>
-
-                  <TabsContent value="summary" className="mt-0">
-                    <div className="space-y-6">
-                      <ProfitLoss
-                        revenue={monthlyRevenue}
-                        laborCost={laborCost}
-                        equipmentCost={equipmentCosts.monthly}
-                        overhead={overhead}
-                      />
-                      
-                      <div className="mt-6 p-4 bg-muted rounded-lg text-sm space-y-2">
-                        <p>• Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
-                        {totalTime > 0 && (
-                          <p>• Total time required: {(totalTime * 60).toFixed(1)} minutes</p>
-                        )}
-                        {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
-                          <p>• On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
-                        )}
-                      </div>
-                    </div>
-                  </TabsContent>
-                </div>
-              </Tabs>
-            </div>
+          {/* Panel 4 - Roster */}
+          <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto">
+            <h2 className="text-xl font-semibold mb-4">Roster Management</h2>
+            <RosterManager />
           </div>
         </div>
       </div>
