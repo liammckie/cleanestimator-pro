@@ -5,16 +5,20 @@ import { PayCalculator } from './PayCalculator';
 import { AllowancesSelector } from './AllowancesSelector';
 import { PaySummary } from './PaySummary';
 import { useToast } from "@/hooks/use-toast";
-import { Employee, PayCalculation } from '@/data/types/award';
+import { EmployeeDetails as IEmployeeDetails, PayCalculation } from '@/data/types/award';
 
 export const AwardEngine = () => {
   const { toast } = useToast();
   const [calculation, setCalculation] = React.useState<PayCalculation>({
-    grossWeeklyPay: 0,
-    totalAllowances: 0,
-    totalPenaltyRates: 0,
-    netPay: 0,
-    totalHours: 0
+    basePayRate: 0,
+    totalPay: 0,
+    superannuation: 0,
+    allowancesTotal: 0,
+    total: 0,
+    breakdowns: {
+      allowances: {},
+      penalties: {}
+    }
   });
 
   const handleCalculationUpdate = (newCalculation: PayCalculation) => {

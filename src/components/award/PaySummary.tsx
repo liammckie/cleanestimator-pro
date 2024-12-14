@@ -15,24 +15,24 @@ export const PaySummary: React.FC<PaySummaryProps> = ({ calculation }) => {
           <CardContent className="pt-6">
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span>Gross Weekly Pay:</span>
-                <span className="font-semibold">${calculation.grossWeeklyPay.toFixed(2)}</span>
+                <span>Base Pay Rate:</span>
+                <span className="font-semibold">${calculation.basePayRate.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Total Pay:</span>
+                <span className="font-semibold">${calculation.totalPay.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Total Allowances:</span>
-                <span className="font-semibold">${calculation.totalAllowances.toFixed(2)}</span>
+                <span className="font-semibold">${calculation.allowancesTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Total Penalty Rates:</span>
-                <span className="font-semibold">${calculation.totalPenaltyRates.toFixed(2)}</span>
+                <span>Superannuation:</span>
+                <span className="font-semibold">${calculation.superannuation.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Net Pay:</span>
-                <span className="font-semibold">${calculation.netPay.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Total Hours:</span>
-                <span className="font-semibold">{calculation.totalHours.toFixed(1)}</span>
+                <span>Total:</span>
+                <span className="font-semibold">${calculation.total.toFixed(2)}</span>
               </div>
             </div>
           </CardContent>

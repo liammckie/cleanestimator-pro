@@ -40,54 +40,66 @@ export const cleaningAllowances: Allowance[] = [
   {
     name: 'First Aid',
     amount: 15.56,
-    type: 'weekly'
+    type: 'weekly',
+    enabled: false
   },
   {
     name: 'Height (up to 22nd floor)',
     amount: 1.02,
-    type: 'hourly'
+    type: 'hourly',
+    enabled: false
   },
   {
     name: 'Height (above 22nd floor)',
     amount: 2.10,
-    type: 'hourly'
+    type: 'hourly',
+    enabled: false
   },
   {
     name: 'Broken Shift',
     amount: 4.35,
     type: 'daily',
-    maxWeekly: 21.73
+    maxWeekly: 21.73,
+    enabled: false
   },
   {
     name: 'Cold Places',
     amount: 0.64,
-    type: 'hourly'
+    type: 'hourly',
+    enabled: false
   },
   {
     name: 'Hot Places (46-54°C)',
     amount: 0.64,
-    type: 'hourly'
+    type: 'hourly',
+    enabled: false
   },
   {
     name: 'Hot Places (>54°C)',
     amount: 0.77,
-    type: 'hourly'
+    type: 'hourly',
+    enabled: false
   },
   {
     name: 'Toilet Cleaning',
     amount: 3.41,
     type: 'daily',
-    maxWeekly: 16.76
+    maxWeekly: 16.76,
+    enabled: false
   },
   {
     name: 'Vehicle (car)',
     amount: 0.99,
-    type: 'perKm'
+    type: 'perKm',
+    vehicleType: 'motorVehicle',
+    enabled: false
   },
   {
     name: 'Vehicle (motorcycle)',
     amount: 0.33,
-    type: 'perKm'
+    type: 'perKm',
+    vehicleType: 'motorCycle',
+    enabled: false
   }
 ];
 
@@ -130,18 +142,12 @@ export const calculatePayRate = (
   hours: number,
   allowances: string[],
   distance?: number
-): {
-  basePayRate: number;
-  totalPay: number;
-  superannuation: number;
-  allowancesTotal: number;
-  total: number;
-} => {
+): PayCalculation => {
   const awardLevel = cleaningAwardLevels.find(l => l.level === level);
   if (!awardLevel) throw new Error('Invalid level');
 
   const basePayRate = awardLevel.payRates[shiftType];
-  const basePay = basePayRate * hours;
+  const totalPay = basePayRate * hours;
   
   // Calculate allowances
   const allowancesTotal = allowances.reduce((total, allowanceName) => {
@@ -162,14 +168,18 @@ export const calculatePayRate = (
     }
   }, 0);
 
-  const superannuation = basePay * SUPERANNUATION_RATE;
-  const total = basePay + allowancesTotal + superannuation;
+  const superannuation = totalPay * SUPERANNUATION_RATE;
+  const total = totalPay + allowancesTotal + superannuation;
 
   return {
     basePayRate,
-    totalPay: basePay,
+    totalPay,
     superannuation,
     allowancesTotal,
-    total
+    total,
+    breakdowns: {
+      allowances: {},
+      penalties: {}
+    }
   };
 };
