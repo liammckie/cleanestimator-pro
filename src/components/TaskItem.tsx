@@ -79,8 +79,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     }
   };
 
-  // For this example, we'll use a simple array of tools
-  // In a real application, this would likely come from a database or API
+  // Define available tools based on common cleaning equipment
   const availableTools = [
     'Vacuum Cleaner',
     'Mop',
@@ -88,7 +87,19 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     'Steam Cleaner',
     'Pressure Washer',
     'Broom',
-    'Duster'
+    'Duster',
+    'Extractor',
+    'Chemical Sprayer',
+    'Brush',
+    'Cloth',
+    'Bucket',
+    'Wringer',
+    'Squeegee',
+    'Telescopic Pole',
+    'Microfiber Tools',
+    'Floor Machine',
+    'Air Mover',
+    'Dehumidifier'
   ];
 
   return (
