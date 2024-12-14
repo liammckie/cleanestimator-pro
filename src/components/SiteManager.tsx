@@ -17,7 +17,7 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
     id: uuidv4(),
     name: 'Site 1',
     area: {
-      squareFeet: 0,
+      squareMeters: 0,
       spaceType: 'office',
       selectedTasks: [],
       totalTime: 0
@@ -29,7 +29,7 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
       id: uuidv4(),
       name: `Site ${sites.length + 1}`,
       area: {
-        squareFeet: 0,
+        squareMeters: 0,
         spaceType: 'office',
         selectedTasks: [],
         totalTime: 0

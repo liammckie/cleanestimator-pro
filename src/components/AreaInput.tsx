@@ -8,7 +8,7 @@ import { TaskItem } from './TaskItem';
 
 interface AreaInputProps {
   onAreaChange: (area: { 
-    squareFeet: number; 
+    squareMeters: number; 
     spaceType: string;
     selectedTasks: Array<{
       taskId: string;
@@ -37,7 +37,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
     productivityOverride?: number;
     selectedTool?: string;
   }>>([]);
-  const [squareFeet, setSquareFeet] = useState(0);
+  const [squareMeters, setSquareMeters] = useState(0);
   const [category, setCategory] = useState("Carpet Maintenance - Spraying and Spotting");
 
   const productivityRates = getAllProductivityRates();
@@ -45,7 +45,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
 
   useEffect(() => {
     handleInputChange();
-  }, [selectedTasks, squareFeet]);
+  }, [selectedTasks, squareMeters]);
 
   const calculateTimeRequired = (taskId: string, quantity: number, frequency: { timesPerWeek: number; timesPerMonth: number }, productivityOverride?: number) => {
     const rate = getProductivityRate(taskId);
@@ -125,7 +125,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
   const handleInputChange = () => {
     const totalTime = selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0);
     onAreaChange({
-      squareFeet,
+      squareMeters,
       spaceType: 'carpet',
       selectedTasks,
       totalTime
@@ -180,15 +180,15 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="squareFeet">Total Area Square Feet</Label>
+            <Label htmlFor="squareMeters">Total Area (Square Meters)</Label>
             <Input
-              id="squareFeet"
+              id="squareMeters"
               type="number"
-              placeholder="Enter total square footage"
-              value={squareFeet || ''}
+              placeholder="Enter total area in square meters"
+              value={squareMeters || ''}
               onChange={(e) => {
                 const value = parseFloat(e.target.value) || 0;
-                setSquareFeet(value);
+                setSquareMeters(value);
               }}
             />
           </div>

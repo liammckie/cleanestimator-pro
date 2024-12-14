@@ -3,7 +3,7 @@ export interface Site {
   name: string;
   address?: string;
   area: {
-    squareFeet: number;
+    squareMeters: number;
     spaceType: string;
     selectedTasks: Array<{
       taskId: string;
