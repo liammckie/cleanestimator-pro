@@ -65,104 +65,108 @@ const Index = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
         
-        {/* Navigation Buttons */}
+        {/* Navigation Buttons - Now centered and full-width */}
         <div className="bg-white border-b">
-          <div className="max-w-[1920px] mx-auto px-6 py-4 flex gap-4">
-            <Button
-              variant={activeView === 'sites' ? 'default' : 'outline'}
-              onClick={() => setActiveView('sites')}
-              className="flex items-center gap-2"
-            >
-              <Building2 className="h-4 w-4" />
-              Sites
-            </Button>
-            <Button
-              variant={activeView === 'scope' ? 'default' : 'outline'}
-              onClick={() => setActiveView('scope')}
-              className="flex items-center gap-2"
-            >
-              <ClipboardList className="h-4 w-4" />
-              Scope of Work
-            </Button>
-            <Button
-              variant={activeView === 'costs' ? 'default' : 'outline'}
-              onClick={() => setActiveView('costs')}
-              className="flex items-center gap-2"
-            >
-              <Calculator className="h-4 w-4" />
-              Cost Calculator
-            </Button>
-            <Button
-              variant={activeView === 'roster' ? 'default' : 'outline'}
-              onClick={() => setActiveView('roster')}
-              className="flex items-center gap-2"
-            >
-              <Users className="h-4 w-4" />
-              Roster
-            </Button>
+          <div className="max-w-[1920px] mx-auto px-6 py-4">
+            <div className="flex justify-center gap-4">
+              <Button
+                variant={activeView === 'sites' ? 'default' : 'outline'}
+                onClick={() => setActiveView('sites')}
+                className="flex items-center gap-2 min-w-[160px] justify-center"
+              >
+                <Building2 className="h-4 w-4" />
+                Sites
+              </Button>
+              <Button
+                variant={activeView === 'scope' ? 'default' : 'outline'}
+                onClick={() => setActiveView('scope')}
+                className="flex items-center gap-2 min-w-[160px] justify-center"
+              >
+                <ClipboardList className="h-4 w-4" />
+                Scope of Work
+              </Button>
+              <Button
+                variant={activeView === 'costs' ? 'default' : 'outline'}
+                onClick={() => setActiveView('costs')}
+                className="flex items-center gap-2 min-w-[160px] justify-center"
+              >
+                <Calculator className="h-4 w-4" />
+                Cost Calculator
+              </Button>
+              <Button
+                variant={activeView === 'roster' ? 'default' : 'outline'}
+                onClick={() => setActiveView('roster')}
+                className="flex items-center gap-2 min-w-[160px] justify-center"
+              >
+                <Users className="h-4 w-4" />
+                Roster
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 max-w-[1920px] mx-auto w-full p-6">
-          {activeView === 'sites' && (
-            <div className="bg-white rounded-lg shadow-lg overflow-auto h-[calc(100vh-12rem)]">
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Sites Overview</h2>
-                <SiteManager onSitesChange={setSites} />
+        {/* Content Area - Now with better spacing and full-width utilization */}
+        <div className="flex-1 w-full">
+          <div className="max-w-[1920px] mx-auto p-6 h-full">
+            {activeView === 'sites' && (
+              <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-12rem)]">
+                <div className="p-6">
+                  <h2 className="text-xl font-semibold mb-4">Sites Overview</h2>
+                  <SiteManager onSitesChange={setSites} />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {activeView === 'scope' && (
-            <div className="bg-white rounded-lg shadow-lg overflow-auto h-[calc(100vh-12rem)]">
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Scope of Work</h2>
-                <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
+            {activeView === 'scope' && (
+              <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-12rem)]">
+                <div className="p-6">
+                  <h2 className="text-xl font-semibold mb-4">Scope of Work</h2>
+                  <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {activeView === 'costs' && (
-            <div className="bg-white rounded-lg shadow-lg overflow-auto h-[calc(100vh-12rem)]">
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Cost Calculator</h2>
-                <Tabs defaultValue="labor" className="space-y-4">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="labor">Labor</TabsTrigger>
-                    <TabsTrigger value="equipment">Equipment</TabsTrigger>
-                    <TabsTrigger value="summary">Summary</TabsTrigger>
-                  </TabsList>
+            {activeView === 'costs' && (
+              <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-12rem)]">
+                <div className="p-6">
+                  <h2 className="text-xl font-semibold mb-4">Cost Calculator</h2>
+                  <Tabs defaultValue="labor" className="space-y-4">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="labor">Labor</TabsTrigger>
+                      <TabsTrigger value="equipment">Equipment</TabsTrigger>
+                      <TabsTrigger value="summary">Summary</TabsTrigger>
+                    </TabsList>
 
-                  <TabsContent value="labor" className="mt-0">
-                    <LaborCosts onLaborCostChange={setLaborCosts} />
-                  </TabsContent>
+                    <TabsContent value="labor" className="mt-0">
+                      <LaborCosts onLaborCostChange={setLaborCosts} />
+                    </TabsContent>
 
-                  <TabsContent value="equipment" className="mt-0">
-                    <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-                  </TabsContent>
+                    <TabsContent value="equipment" className="mt-0">
+                      <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+                    </TabsContent>
 
-                  <TabsContent value="summary" className="mt-0">
-                    <ProfitLoss
-                      revenue={monthlyRevenue}
-                      laborCost={laborCost}
-                      equipmentCost={equipmentCosts.monthly}
-                      overhead={overhead}
-                    />
-                  </TabsContent>
-                </Tabs>
+                    <TabsContent value="summary" className="mt-0">
+                      <ProfitLoss
+                        revenue={monthlyRevenue}
+                        laborCost={laborCost}
+                        equipmentCost={equipmentCosts.monthly}
+                        overhead={overhead}
+                      />
+                    </TabsContent>
+                  </Tabs>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {activeView === 'roster' && (
-            <div className="bg-white rounded-lg shadow-lg overflow-auto h-[calc(100vh-12rem)]">
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Roster Management</h2>
-                <RosterManager />
+            {activeView === 'roster' && (
+              <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-12rem)]">
+                <div className="p-6">
+                  <h2 className="text-xl font-semibold mb-4">Roster Management</h2>
+                  <RosterManager />
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </SidebarProvider>
