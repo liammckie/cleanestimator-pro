@@ -50,6 +50,13 @@ export const MainContent: React.FC<MainContentProps> = ({
     }
   };
 
+  const selectedTasks = sites.flatMap(site => 
+    site.area?.selectedTasks?.map(task => ({
+      ...task,
+      siteName: site.name
+    })) || []
+  );
+
   return (
     <>
       <TabsContent value="scope" className="space-y-6">
