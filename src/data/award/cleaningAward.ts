@@ -1,4 +1,4 @@
-import { AwardLevel, Allowance, ShiftTiming } from '../types/award';
+import { AwardLevel, Allowance, ShiftTiming, PayCalculation } from '../types/award';
 
 export const cleaningAwardLevels: AwardLevel[] = [
   {
@@ -149,7 +149,6 @@ export const calculatePayRate = (
   const basePayRate = awardLevel.payRates[shiftType];
   const totalPay = basePayRate * hours;
   
-  // Calculate allowances
   const allowancesTotal = allowances.reduce((total, allowanceName) => {
     const allowance = cleaningAllowances.find(a => a.name === allowanceName);
     if (!allowance) return total;
@@ -169,14 +168,23 @@ export const calculatePayRate = (
   }, 0);
 
   const superannuation = totalPay * SUPERANNUATION_RATE;
-  const total = totalPay + allowancesTotal + superannuation;
+  const grossWeeklyPay = totalPay * 5; // Assuming 5-day work week
+  const totalAllowances = allowancesTotal;
+  const totalPenaltyRates = totalPay - (basePayRate * hours);
+  const netPay = totalPay + allowancesTotal;
+  const totalHours = hours;
 
   return {
     basePayRate,
     totalPay,
     superannuation,
     allowancesTotal,
-    total,
+    total: totalPay + allowancesTotal + superannuation,
+    grossWeeklyPay,
+    totalAllowances,
+    totalPenaltyRates,
+    netPay,
+    totalHours,
     breakdowns: {
       allowances: {},
       penalties: {}

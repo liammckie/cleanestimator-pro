@@ -56,7 +56,12 @@ export interface PayCalculation {
   superannuation: number;
   allowancesTotal: number;
   total: number;
-  breakdowns?: {
+  grossWeeklyPay: number;
+  totalAllowances: number;
+  totalPenaltyRates: number;
+  netPay: number;
+  totalHours: number;
+  breakdowns: {
     allowances: Record<string, number>;
     penalties: Record<string, number>;
   };
