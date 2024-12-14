@@ -1,39 +1,23 @@
 import React, { useState } from 'react';
-import { LaborCosts } from '@/components/LaborCosts';
-import { EquipmentCosts } from '@/components/EquipmentCosts';
-import { ProfitLoss } from '@/components/ProfitLoss';
-import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
+import { DynamicMenu } from '@/components/ui/dynamic-menu';
+import { Tabs } from "@/components/ui/tabs";
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { OnCostsState } from '@/data/types/onCosts';
-import { Site } from '@/data/types/site';
-import { SiteManager } from '@/components/SiteManager';
-import { RosterManager } from '@/components/roster/RosterManager';
-import { DynamicMenu, MenuOption } from '@/components/ui/dynamic-menu';
-import { CostSummary } from '@/components/CostSummary';
 import { calculateCosts } from '@/utils/costCalculations';
-import { ContractData } from '@/components/ContractData';
-import { ContractForecast } from '@/components/ContractForecast';
-import { AwardSettings } from '@/components/settings/AwardSettings';
+import { MainNavigation } from '@/components/navigation/MainNavigation';
+import { getMenuOptions } from '@/components/navigation/MenuOptions';
+import { MainContent } from '@/components/layout/MainContent';
+import { SettingsProvider } from '@/contexts/SettingsContext';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
 const Index = () => {
-  const [sites, setSites] = useState<Site[]>([]);
+  const [sites, setSites] = useState([]);
   const [activeTab, setActiveTab] = useState('scope');
-  const [awardIncrease, setAwardIncrease] = useState(0);
-  const [laborCosts, setLaborCosts] = useState<{ 
-    hourlyRate: number;
-    employmentType: 'contracted' | 'direct';
-    awardLevel?: number;
-    shiftType?: string;
-    onCosts?: OnCostsState;
-  }>({ 
+  const [laborCosts, setLaborCosts] = useState({ 
     hourlyRate: 0,
-    employmentType: 'contracted'
+    employmentType: 'contracted' as const
   });
   const [equipmentCosts, setEquipmentCosts] = useState({ monthly: 0 });
-
   const [contractDetails, setContractDetails] = useState({
     lengthYears: 1,
     cpiIncreases: {
@@ -43,181 +27,51 @@ const Index = () => {
     },
   });
 
-  const calculateTotalOnCosts = () => {
-    if (laborCosts.employmentType !== 'direct' || !laborCosts.onCosts) return 0;
-
-    const baseRate = laborCosts.hourlyRate;
-    let totalOnCostPercentage = 0;
-
-    Object.values(laborCosts.onCosts).forEach(category => {
-      category.forEach(onCost => {
-        if (onCost.isEnabled) {
-          totalOnCostPercentage += onCost.rate;
-        }
-      });
-    });
-
-    return (baseRate * totalOnCostPercentage) / 100;
-  };
-
-  const onCostsPerHour = calculateTotalOnCosts();
-  const totalHourlyRate = laborCosts.hourlyRate + onCostsPerHour;
-  
-  const costBreakdown = calculateCosts(sites, totalHourlyRate);
+  const costBreakdown = calculateCosts(sites, laborCosts.hourlyRate);
   const monthlyRevenue = costBreakdown.totalMonthlyCost * 1.5;
   const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
 
-  const allSelectedTasks = sites.flatMap(site => 
-    site.area.selectedTasks.map(task => ({
-      ...task,
-      siteName: site.name
-    }))
-  );
-
-  const menuOptions: MenuOption[] = [
-    { 
-      id: 'scope', 
-      label: 'Scope & Tasks', 
-      icon: "list",
-      onClick: () => setActiveTab('scope')
-    },
-    { 
-      id: 'labor', 
-      label: 'Labor Costs', 
-      icon: "menu",
-      onClick: () => setActiveTab('labor')
-    },
-    { 
-      id: 'equipment', 
-      label: 'Equipment', 
-      icon: "grid",
-      onClick: () => setActiveTab('equipment')
-    },
-    { 
-      id: 'roster', 
-      label: 'Roster', 
-      icon: "menu",
-      onClick: () => setActiveTab('roster')
-    },
-    {
-      id: 'contract',
-      label: 'Contract',
-      icon: "menu",
-      onClick: () => setActiveTab('contract')
-    },
-    { 
-      id: 'summary', 
-      label: 'Summary', 
-      icon: "settings",
-      onClick: () => setActiveTab('summary')
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: "settings",
-      onClick: () => setActiveTab('settings')
-    },
-  ];
-
-  const handleAwardIncreaseChange = (increase: number) => {
-    setAwardIncrease(increase);
-    // Update labor costs with new award increase
-    if (laborCosts.employmentType === 'direct') {
-      setLaborCosts(prev => ({
-        ...prev,
-        hourlyRate: prev.hourlyRate * (1 + (increase / 100))
-      }));
-    }
-  };
+  const menuOptions = getMenuOptions(setActiveTab);
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
-        <div className="flex-1 py-8">
-          <div className="container mx-auto px-4">
-            <h1 className="text-3xl font-bold text-primary mb-8">
-              Commercial Cleaning Estimation Tool
-            </h1>
-            
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <div className="grid grid-cols-[250px,1fr] gap-6">
-                <DynamicMenu 
-                  options={menuOptions} 
-                  className="bg-card rounded-lg border border-border"
-                />
-                <div className="space-y-6">
-                  <TabsList className="grid w-full grid-cols-7">
-                    <TabsTrigger value="scope">Scope & Tasks</TabsTrigger>
-                    <TabsTrigger value="labor">Labor Costs</TabsTrigger>
-                    <TabsTrigger value="equipment">Equipment</TabsTrigger>
-                    <TabsTrigger value="roster">Roster</TabsTrigger>
-                    <TabsTrigger value="contract">Contract</TabsTrigger>
-                    <TabsTrigger value="summary">Summary</TabsTrigger>
-                    <TabsTrigger value="settings">Settings</TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="scope" className="space-y-6">
-                    <SiteManager onSitesChange={setSites} />
-                  </TabsContent>
-
-                  <TabsContent value="labor" className="space-y-6">
-                    <LaborCosts onLaborCostChange={setLaborCosts} />
-                  </TabsContent>
-
-                  <TabsContent value="equipment" className="space-y-6">
-                    <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-                  </TabsContent>
-
-                  <TabsContent value="roster" className="space-y-6">
-                    <RosterManager />
-                    <CostSummary costs={costBreakdown} />
-                  </TabsContent>
-
-                  <TabsContent value="contract" className="space-y-6">
-                    <ContractData onContractChange={setContractDetails} />
-                    <ContractForecast
-                      baseRevenue={monthlyRevenue}
-                      laborCost={costBreakdown.totalMonthlyCost}
-                      equipmentCost={equipmentCosts.monthly}
-                      overhead={overhead}
-                      contractLength={contractDetails.lengthYears}
-                      cpiIncreases={contractDetails.cpiIncreases}
-                    />
-                  </TabsContent>
-
-                  <TabsContent value="summary" className="space-y-6">
-                    <ProfitLoss
-                      revenue={monthlyRevenue}
-                      laborCost={costBreakdown.totalMonthlyCost}
-                      equipmentCost={equipmentCosts.monthly}
+    <SettingsProvider>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <div className="flex-1 py-8">
+            <div className="container mx-auto px-4">
+              <h1 className="text-3xl font-bold text-primary mb-8">
+                Commercial Cleaning Estimation Tool
+              </h1>
+              
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                <div className="grid grid-cols-[250px,1fr] gap-6">
+                  <DynamicMenu 
+                    options={menuOptions} 
+                    className="bg-card rounded-lg border border-border"
+                  />
+                  <div className="space-y-6">
+                    <MainNavigation />
+                    <MainContent
+                      sites={sites}
+                      onSitesChange={setSites}
+                      laborCosts={laborCosts}
+                      setLaborCosts={setLaborCosts}
+                      equipmentCosts={equipmentCosts}
+                      setEquipmentCosts={setEquipmentCosts}
+                      contractDetails={contractDetails}
+                      setContractDetails={setContractDetails}
+                      costBreakdown={costBreakdown}
+                      monthlyRevenue={monthlyRevenue}
                       overhead={overhead}
                     />
-                    
-                    <div className="mt-6 text-sm text-muted-foreground">
-                      <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
-                      {costBreakdown.totalMonthlyMinutes > 0 && (
-                        <p>* Total time required: {Math.round(costBreakdown.totalMonthlyMinutes)} minutes</p>
-                      )}
-                      {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
-                        <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
-                      )}
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="settings" className="space-y-6">
-                    <AwardSettings
-                      currentIncrease={awardIncrease}
-                      onAwardIncreaseChange={handleAwardIncreaseChange}
-                    />
-                  </TabsContent>
+                  </div>
                 </div>
-              </div>
-            </Tabs>
+              </Tabs>
+            </div>
           </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </SettingsProvider>
   );
 };
 
