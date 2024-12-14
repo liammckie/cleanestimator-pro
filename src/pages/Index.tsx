@@ -15,14 +15,9 @@ import { calculateCosts } from '@/utils/costCalculations';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
-type MenuOption = {
-  id: string;
-  label: string;
-  icon: "list" | "menu" | "grid" | "settings";
-};
-
 const Index = () => {
   const [sites, setSites] = useState<Site[]>([]);
+  const [activeTab, setActiveTab] = useState('scope');
   const [laborCosts, setLaborCosts] = useState<{ 
     hourlyRate: number;
     employmentType: 'contracted' | 'direct';
@@ -66,12 +61,37 @@ const Index = () => {
     }))
   );
 
-  const menuOptions: MenuOption[] = [
-    { id: 'scope', label: 'Scope & Tasks', icon: "list" },
-    { id: 'labor', label: 'Labor Costs', icon: "menu" },
-    { id: 'equipment', label: 'Equipment', icon: "grid" },
-    { id: 'roster', label: 'Roster', icon: "menu" },
-    { id: 'summary', label: 'Summary', icon: "settings" },
+  const menuOptions = [
+    { 
+      id: 'scope', 
+      label: 'Scope & Tasks', 
+      icon: "list",
+      onClick: () => setActiveTab('scope')
+    },
+    { 
+      id: 'labor', 
+      label: 'Labor Costs', 
+      icon: "menu",
+      onClick: () => setActiveTab('labor')
+    },
+    { 
+      id: 'equipment', 
+      label: 'Equipment', 
+      icon: "grid",
+      onClick: () => setActiveTab('equipment')
+    },
+    { 
+      id: 'roster', 
+      label: 'Roster', 
+      icon: "menu",
+      onClick: () => setActiveTab('roster')
+    },
+    { 
+      id: 'summary', 
+      label: 'Summary', 
+      icon: "settings",
+      onClick: () => setActiveTab('summary')
+    },
   ];
 
   return (
@@ -84,7 +104,7 @@ const Index = () => {
               Commercial Cleaning Estimation Tool
             </h1>
             
-            <Tabs defaultValue="scope" className="space-y-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
               <div className="grid grid-cols-[250px,1fr] gap-6">
                 <DynamicMenu 
                   options={menuOptions} 
