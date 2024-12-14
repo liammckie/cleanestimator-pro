@@ -5,16 +5,9 @@ export const Header = () => {
   return (
     <header className="h-16 border-b bg-primary shadow-md">
       <div className="h-full max-w-screen-2xl mx-auto px-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <img 
-            src="/logo.png" 
-            alt="SCS Group Logo" 
-            className="h-8 w-auto"
-          />
-          <span className="text-lg font-semibold text-primary-foreground">
-            SCS Group
-          </span>
-        </div>
+        <span className="text-lg font-semibold text-primary-foreground">
+          SCS Group
+        </span>
 
         <NavigationMenu>
           <NavigationMenuList>

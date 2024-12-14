@@ -65,11 +65,11 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col bg-[#F5F7FA]">
+      <div className="min-h-screen flex flex-col">
         <Header />
         
-        <main className="flex-1 w-full flex justify-center">
-          <div className="w-full max-w-[1400px] px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-1 flex flex-col items-center bg-[#F5F7FA]">
+          <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
             {/* Progress Indicator */}
             <div className="mb-8 flex justify-center">
               <div className="flex items-center gap-4 max-w-3xl w-full justify-between">
