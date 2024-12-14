@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getAllProductivityRates, getProductivityRate } from '@/data/productivityRates';
-import { TaskItem } from './TaskItem';
+import { CategorySelect } from './CategorySelect';
+import { TaskList } from './TaskList';
+import { getProductivityRate } from '@/data/productivityRates';
 
 interface AreaInputProps {
   onAreaChange: (area: { 
@@ -39,9 +39,6 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
   }>>([]);
   const [squareMeters, setSquareMeters] = useState(0);
   const [category, setCategory] = useState("Carpet Maintenance - Spraying and Spotting");
-
-  const productivityRates = getAllProductivityRates();
-  const categories = Array.from(new Set(productivityRates.map(rate => rate.category)));
 
   useEffect(() => {
     handleInputChange();
@@ -141,42 +138,21 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
         <div className="grid gap-4">
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
-            <Select
-              value={category}
-              onValueChange={(value) => setCategory(value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CategorySelect value={category} onValueChange={setCategory} />
           </div>
 
           <div className="space-y-2">
             <Label>Tasks</Label>
-            <div className="grid gap-2">
-              {productivityRates
-                .filter(rate => rate.category === category)
-                .map((rate) => (
-                  <TaskItem
-                    key={rate.id}
-                    rate={rate}
-                    selectedTask={selectedTasks.find(task => task.taskId === rate.id)}
-                    onTaskSelection={handleTaskSelection}
-                    onQuantityChange={handleQuantityChange}
-                    onFrequencyChange={handleFrequencyChange}
-                    onProductivityOverride={handleProductivityOverride}
-                    onRemoveTask={handleRemoveTask}
-                    onToolChange={handleToolChange}
-                  />
-                ))}
-            </div>
+            <TaskList
+              category={category}
+              selectedTasks={selectedTasks}
+              onTaskSelection={handleTaskSelection}
+              onQuantityChange={handleQuantityChange}
+              onFrequencyChange={handleFrequencyChange}
+              onProductivityOverride={handleProductivityOverride}
+              onRemoveTask={handleRemoveTask}
+              onToolChange={handleToolChange}
+            />
           </div>
 
           <div className="space-y-2">
