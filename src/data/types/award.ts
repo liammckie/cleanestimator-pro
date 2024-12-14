@@ -10,14 +10,14 @@ export interface PayRates {
 export interface AwardLevel {
   level: number;
   payRates: PayRates;
-  description?: string;  // Added for better documentation
+  description?: string;
 }
 
 export interface AllowanceBase {
   name: string;
   amount: number;
-  description?: string;  // Added for better documentation
-  enabled: boolean;      // Added to track if allowance is active
+  description?: string;
+  enabled: boolean;
 }
 
 export interface HourlyAllowance extends AllowanceBase {
@@ -47,7 +47,7 @@ export interface ShiftTiming {
   startTime?: string;
   endTime?: string;
   loading: number;
-  description?: string;  // Added for better documentation
+  description?: string;
 }
 
 export interface PayCalculation {
@@ -65,22 +65,6 @@ export interface PayCalculation {
     allowances: Record<string, number>;
     penalties: Record<string, number>;
   };
-}
-
-export interface Allowances {
-  brokenShift: boolean;
-  coldPlaces: boolean;
-  firstAid: boolean;
-  heightUnder22: boolean;
-  heightAbove22: boolean;
-  hotPlaces46: boolean;
-  hotPlaces54: boolean;
-  leadingHand: boolean;
-  mealAllowance: boolean;
-  refuseCollection: boolean;
-  toiletCleaning: boolean;
-  motorVehicle: boolean;
-  motorCycle: boolean;
 }
 
 export interface EmployeeDetails {

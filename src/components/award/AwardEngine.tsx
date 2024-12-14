@@ -15,6 +15,11 @@ export const AwardEngine = () => {
     superannuation: 0,
     allowancesTotal: 0,
     total: 0,
+    grossWeeklyPay: 0,
+    totalAllowances: 0,
+    totalPenaltyRates: 0,
+    netPay: 0,
+    totalHours: 0,
     breakdowns: {
       allowances: {},
       penalties: {}
