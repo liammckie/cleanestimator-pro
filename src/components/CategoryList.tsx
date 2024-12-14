@@ -70,6 +70,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({
     <Accordion type="single" collapsible className="w-full">
       {groups.map(group => {
         if (!group?.name || !Array.isArray(group?.categories)) return null;
+        
         return (
           <AccordionItem key={group.name} value={group.name}>
             <AccordionTrigger className="font-semibold">
