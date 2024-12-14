@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { calculateTaskProductivity } from '@/utils/productivityCalculations';
 import { Card } from "@/components/ui/card";
 import { ProductivityCard } from './task/ProductivityCard';
@@ -53,18 +53,38 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     ) : null,
   [rate.id, selectedTask]);
 
+  const handleTaskSelection = useCallback((taskId: string, checked: boolean) => {
+    onTaskSelection(taskId, checked);
+  }, [onTaskSelection]);
+
+  const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
+    onQuantityChange(taskId, quantity);
+  }, [onQuantityChange]);
+
+  const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
+    onFrequencyChange(taskId, timesPerWeek);
+  }, [onFrequencyChange]);
+
+  const handleProductivityOverride = useCallback((taskId: string, override: number) => {
+    onProductivityOverride(taskId, override);
+  }, [onProductivityOverride]);
+
+  const handleToolChange = useCallback((taskId: string, tool: string) => {
+    onToolChange(taskId, tool);
+  }, [onToolChange]);
+
   return (
     <div key={rate.id} className="flex flex-col gap-2 p-2 border rounded">
       <TaskHeader
         taskId={rate.id}
         taskName={rate.task}
         isSelected={!!selectedTask}
-        onTaskSelection={onTaskSelection}
+        onTaskSelection={handleTaskSelection}
         onRemoveTask={onRemoveTask}
       />
 
       {selectedTask && (
-        <div className="ml-6 space-y-2">
+        <div className="ml-6 space-y-4">
           <TaskControls
             taskId={rate.id}
             quantity={selectedTask.quantity}
@@ -73,10 +93,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             selectedTool={selectedTask.selectedTool}
             unit={rate.unit}
             ratePerHour={rate.ratePerHour}
-            onQuantityChange={onQuantityChange}
-            onFrequencyChange={onFrequencyChange}
-            onProductivityOverride={onProductivityOverride}
-            onToolChange={onToolChange}
+            onQuantityChange={handleQuantityChange}
+            onFrequencyChange={handleFrequencyChange}
+            onProductivityOverride={handleProductivityOverride}
+            onToolChange={handleToolChange}
           />
 
           {productivity && (

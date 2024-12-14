@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToolSelect } from '../ToolSelect';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 
 interface TaskControlsProps {
   taskId: string;
@@ -20,7 +27,7 @@ interface TaskControlsProps {
   onToolChange: (taskId: string, tool: string) => void;
 }
 
-export const TaskControls: React.FC<TaskControlsProps> = ({
+export const TaskControls = memo(({
   taskId,
   quantity,
   frequency,
@@ -32,7 +39,7 @@ export const TaskControls: React.FC<TaskControlsProps> = ({
   onFrequencyChange,
   onProductivityOverride,
   onToolChange,
-}) => {
+}: TaskControlsProps) => {
   const getQuantityLabel = () => {
     switch (unit.toLowerCase()) {
       case 'm²':
@@ -68,7 +75,7 @@ export const TaskControls: React.FC<TaskControlsProps> = ({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <ToolSelect
         taskId={taskId}
         currentTool={selectedTool}
@@ -76,9 +83,21 @@ export const TaskControls: React.FC<TaskControlsProps> = ({
       />
       
       <div>
-        <Label htmlFor={`quantity-${taskId}`}>
-          {getQuantityLabel()}
-        </Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor={`quantity-${taskId}`}>
+            {getQuantityLabel()}
+          </Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Enter the total quantity or area to be cleaned</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <Input
           id={`quantity-${taskId}`}
           type="number"
@@ -92,9 +111,21 @@ export const TaskControls: React.FC<TaskControlsProps> = ({
       </div>
 
       <div>
-        <Label htmlFor={`frequency-${taskId}`}>
-          Times per Week
-        </Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor={`frequency-${taskId}`}>
+            Times per Week
+          </Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Select how many times per week this task needs to be performed</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <Select
           value={frequency?.timesPerWeek?.toString() || "1"}
           onValueChange={(value) => onFrequencyChange(taskId, parseInt(value))}
@@ -113,9 +144,21 @@ export const TaskControls: React.FC<TaskControlsProps> = ({
       </div>
 
       <div>
-        <Label htmlFor={`productivity-${taskId}`}>
-          {getProductivityLabel()}
-        </Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor={`productivity-${taskId}`}>
+            {getProductivityLabel()}
+          </Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Override the default productivity rate if needed</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <Input
           id={`productivity-${taskId}`}
           type="number"
@@ -129,4 +172,6 @@ export const TaskControls: React.FC<TaskControlsProps> = ({
       </div>
     </div>
   );
-};
+});
+
+TaskControls.displayName = 'TaskControls';
