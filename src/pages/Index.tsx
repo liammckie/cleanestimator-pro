@@ -4,7 +4,6 @@ import { EquipmentCosts } from '@/components/EquipmentCosts';
 import { ProfitLoss } from '@/components/ProfitLoss';
 import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OnCostsState } from '@/data/types/onCosts';
 import { Site } from '@/data/types/site';
 import { SiteManager } from '@/components/SiteManager';
@@ -12,6 +11,8 @@ import { RosterManager } from '@/components/roster/RosterManager';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Building2, ClipboardList, Calculator, Users } from 'lucide-react';
+
+type View = 'sites' | 'scope' | 'costs' | 'roster';
 
 const Index = () => {
   const [sites, setSites] = useState<Site[]>([]);
@@ -26,7 +27,7 @@ const Index = () => {
     employmentType: 'contracted'
   });
   const [equipmentCosts, setEquipmentCosts] = useState({ monthly: 0 });
-  const [activeView, setActiveView] = useState<'sites' | 'scope' | 'costs' | 'roster'>('sites');
+  const [activeView, setActiveView] = useState<View>('sites');
 
   const calculateTotalOnCosts = () => {
     if (laborCosts.employmentType !== 'direct' || !laborCosts.onCosts) return 0;
@@ -65,7 +66,7 @@ const Index = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
         
-        {/* Navigation Buttons - Now centered and full-width */}
+        {/* Navigation Buttons */}
         <div className="bg-white border-b">
           <div className="max-w-[1920px] mx-auto px-6 py-4">
             <div className="flex justify-center gap-4">
@@ -105,7 +106,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Content Area - Now with better spacing and full-width utilization */}
+        {/* Content Area */}
         <div className="flex-1 w-full">
           <div className="max-w-[1920px] mx-auto p-6 h-full">
             {activeView === 'sites' && (
@@ -130,30 +131,16 @@ const Index = () => {
               <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-12rem)]">
                 <div className="p-6">
                   <h2 className="text-xl font-semibold mb-4">Cost Calculator</h2>
-                  <Tabs defaultValue="labor" className="space-y-4">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="labor">Labor</TabsTrigger>
-                      <TabsTrigger value="equipment">Equipment</TabsTrigger>
-                      <TabsTrigger value="summary">Summary</TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="labor" className="mt-0">
-                      <LaborCosts onLaborCostChange={setLaborCosts} />
-                    </TabsContent>
-
-                    <TabsContent value="equipment" className="mt-0">
-                      <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-                    </TabsContent>
-
-                    <TabsContent value="summary" className="mt-0">
-                      <ProfitLoss
-                        revenue={monthlyRevenue}
-                        laborCost={laborCost}
-                        equipmentCost={equipmentCosts.monthly}
-                        overhead={overhead}
-                      />
-                    </TabsContent>
-                  </Tabs>
+                  <div className="grid gap-6">
+                    <LaborCosts onLaborCostChange={setLaborCosts} />
+                    <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+                    <ProfitLoss
+                      revenue={monthlyRevenue}
+                      laborCost={laborCost}
+                      equipmentCost={equipmentCosts.monthly}
+                      overhead={overhead}
+                    />
+                  </div>
                 </div>
               </div>
             )}
