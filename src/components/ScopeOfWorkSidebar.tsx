@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { getProductivityRate } from '@/data/productivityRates';
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
-import { Clock, BarChart2, MapPin, Building, Calendar, Tool } from "lucide-react";
+import { Clock, BarChart2, MapPin, Building, Calendar, Wrench } from "lucide-react";
 import { Site } from '@/data/types/site';
 import { Badge } from "@/components/ui/badge";
 
@@ -110,7 +110,7 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selected
                                 {task.frequency.timesPerWeek}x/week
                               </Badge>
                               <Badge variant="outline" className="text-xs">
-                                <Tool className="w-3 h-3 mr-1" />
+                                <Wrench className="w-3 h-3 mr-1" />
                                 {task.selectedTool || task.rate.tool}
                               </Badge>
                             </div>
