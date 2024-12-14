@@ -27,6 +27,12 @@ export const OnCostsManager: React.FC<OnCostsManagerProps> = ({
     onOnCostsChange(newOnCosts);
   };
 
+  const handleNameChange = (category: keyof OnCostsState, index: number, value: string) => {
+    const newOnCosts = { ...onCosts };
+    newOnCosts[category][index].name = value;
+    onOnCostsChange(newOnCosts);
+  };
+
   const handleAddItem = (category: keyof OnCostsState) => {
     const newOnCosts = { ...onCosts };
     const newItem: OnCost = {
@@ -67,6 +73,7 @@ export const OnCostsManager: React.FC<OnCostsManagerProps> = ({
             items={onCosts[key]}
             onItemToggle={(index) => handleOnCostToggle(key, index)}
             onRateChange={(index, value) => handleRateChange(key, index, value)}
+            onNameChange={(index, value) => handleNameChange(key, index, value)}
             onAddItem={() => handleAddItem(key)}
           />
         ))}
