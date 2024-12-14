@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cleaningAwardLevels } from '@/data/award/cleaningAward';
 import { OnCostsManager } from './OnCostsManager';
 import { OnCostsState } from '@/data/types/onCosts';
+import { EmploymentTypeSelector } from './labor/EmploymentTypeSelector';
+import { DirectEmploymentOptions } from './labor/DirectEmploymentOptions';
 
 interface LaborCostsProps {
   onLaborCostChange: (costs: { 
@@ -52,21 +52,7 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
 
   const handleEmploymentTypeChange = (value: 'contracted' | 'direct') => {
     setEmploymentType(value);
-    if (value === 'contracted') {
-      onLaborCostChange({
-        hourlyRate: contractedRate,
-        employmentType: value
-      });
-    } else {
-      const selectedLevel = cleaningAwardLevels.find(level => level.level === awardLevel);
-      onLaborCostChange({
-        hourlyRate: selectedLevel?.payRates[shiftType as keyof typeof selectedLevel.payRates] || 0,
-        employmentType: value,
-        awardLevel,
-        shiftType,
-        onCosts
-      });
-    }
+    updateLaborCosts(value);
   };
 
   const handleContractedRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,46 +66,43 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
     }
   };
 
+  const updateLaborCosts = (type: 'contracted' | 'direct' = employmentType) => {
+    if (type === 'contracted') {
+      onLaborCostChange({
+        hourlyRate: contractedRate,
+        employmentType: type
+      });
+    } else {
+      const selectedLevel = cleaningAwardLevels.find(level => level.level === awardLevel);
+      onLaborCostChange({
+        hourlyRate: selectedLevel?.payRates[shiftType as keyof typeof selectedLevel.payRates] || 0,
+        employmentType: type,
+        awardLevel,
+        shiftType,
+        onCosts
+      });
+    }
+  };
+
   const handleAwardLevelChange = (value: string) => {
     const level = parseInt(value);
     setAwardLevel(level);
     if (employmentType === 'direct') {
-      const selectedLevel = cleaningAwardLevels.find(l => l.level === level);
-      onLaborCostChange({
-        hourlyRate: selectedLevel?.payRates[shiftType as keyof typeof selectedLevel.payRates] || 0,
-        employmentType,
-        awardLevel: level,
-        shiftType,
-        onCosts
-      });
+      updateLaborCosts();
     }
   };
 
   const handleShiftTypeChange = (value: string) => {
     setShiftType(value);
     if (employmentType === 'direct') {
-      const selectedLevel = cleaningAwardLevels.find(level => level.level === awardLevel);
-      onLaborCostChange({
-        hourlyRate: selectedLevel?.payRates[value as keyof typeof selectedLevel.payRates] || 0,
-        employmentType,
-        awardLevel,
-        shiftType: value,
-        onCosts
-      });
+      updateLaborCosts();
     }
   };
 
   const handleOnCostsChange = (newOnCosts: OnCostsState) => {
     setOnCosts(newOnCosts);
     if (employmentType === 'direct') {
-      const selectedLevel = cleaningAwardLevels.find(level => level.level === awardLevel);
-      onLaborCostChange({
-        hourlyRate: selectedLevel?.payRates[shiftType as keyof typeof selectedLevel.payRates] || 0,
-        employmentType,
-        awardLevel,
-        shiftType,
-        onCosts: newOnCosts
-      });
+      updateLaborCosts();
     }
   };
 
@@ -131,23 +114,10 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
         </CardHeader>
         <CardContent>
           <div className="grid gap-6">
-            <div className="space-y-2">
-              <Label>Employment Type</Label>
-              <RadioGroup
-                defaultValue="contracted"
-                onValueChange={handleEmploymentTypeChange}
-                className="flex flex-col space-y-1"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="contracted" id="contracted" />
-                  <Label htmlFor="contracted">Contracted (All-Inclusive Rate)</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="direct" id="direct" />
-                  <Label htmlFor="direct">Direct Employment (Award Rates)</Label>
-                </div>
-              </RadioGroup>
-            </div>
+            <EmploymentTypeSelector
+              value={employmentType}
+              onChange={handleEmploymentTypeChange}
+            />
 
             {employmentType === 'contracted' ? (
               <div className="space-y-2">
@@ -160,40 +130,12 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
                 />
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="awardLevel">Award Level</Label>
-                  <Select onValueChange={handleAwardLevelChange} defaultValue="1">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cleaningAwardLevels.map((level) => (
-                        <SelectItem key={level.level} value={level.level.toString()}>
-                          Level {level.level}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="shiftType">Shift Type</Label>
-                  <Select onValueChange={handleShiftTypeChange} defaultValue="standard">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select shift type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="standard">Weekday (Standard)</SelectItem>
-                      <SelectItem value="earlyLate">Early/Late (+15%)</SelectItem>
-                      <SelectItem value="night">Night (+25%)</SelectItem>
-                      <SelectItem value="saturday">Saturday (+50%)</SelectItem>
-                      <SelectItem value="sunday">Sunday (+100%)</SelectItem>
-                      <SelectItem value="publicHoliday">Public Holiday (+150%)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <DirectEmploymentOptions
+                awardLevel={awardLevel}
+                shiftType={shiftType}
+                onAwardLevelChange={handleAwardLevelChange}
+                onShiftTypeChange={handleShiftTypeChange}
+              />
             )}
           </div>
         </CardContent>
