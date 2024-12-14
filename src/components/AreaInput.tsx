@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { CategorySelect } from './CategorySelect';
 import { TaskList } from './TaskList';
 import { getRateById } from '@/data/rates/ratesManager';
 import { AreaHeader } from './area/AreaHeader';
-import { IndustrySelect } from './area/IndustrySelect';
+import { CategoryPanel } from './area/CategoryPanel';
+import { IndustryPanel } from './area/IndustryPanel';
 import { AreaMetrics } from './area/AreaMetrics';
 import { TimeDisplay } from './area/TimeDisplay';
 
@@ -168,19 +167,19 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
     <Card className="w-full">
       <AreaHeader />
       <CardContent>
-        <div className="grid gap-4">
-          <IndustrySelect 
-            value={industryType}
-            onValueChange={setIndustryType}
-          />
-
-          <div className="space-y-2">
-            <Label htmlFor="category">Task Category</Label>
-            <CategorySelect value={category} onValueChange={setCategory} />
+        <div className="grid gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <IndustryPanel 
+              value={industryType}
+              onValueChange={setIndustryType}
+            />
+            <CategoryPanel 
+              value={category}
+              onValueChange={setCategory}
+            />
           </div>
 
           <div className="space-y-2">
-            <Label>Tasks</Label>
             <TaskList
               category={category}
               selectedTasks={selectedTasks}
