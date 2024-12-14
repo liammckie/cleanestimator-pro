@@ -21,6 +21,8 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
   const safeIndustryGroups = industryGroups || [];
 
   const renderGeneralGroups = () => {
+    if (!Array.isArray(safeGeneralGroups)) return null;
+
     return safeGeneralGroups.map((group) => {
       if (!group?.categories?.length) return null;
       
@@ -54,6 +56,8 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
   };
 
   const renderIndustryGroups = () => {
+    if (!Array.isArray(safeIndustryGroups)) return null;
+
     return safeIndustryGroups.map((group) => {
       if (!group?.categories?.length) return null;
       
