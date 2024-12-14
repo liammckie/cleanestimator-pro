@@ -34,24 +34,26 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             {category.name}
           </AccordionTrigger>
           <AccordionContent>
-            {filteredSubcategories.map((subcategory) => (
-              <CommandItem
-                key={subcategory}
-                value={subcategory}
-                onSelect={() => {
-                  onValueChange(subcategory);
-                  setOpen(false);
-                }}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === subcategory ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {subcategory}
-              </CommandItem>
-            ))}
+            <CommandGroup>
+              {filteredSubcategories.map((subcategory) => (
+                <CommandItem
+                  key={subcategory}
+                  value={subcategory}
+                  onSelect={() => {
+                    onValueChange(subcategory);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === subcategory ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {subcategory}
+                </CommandItem>
+              ))}
+            </CommandGroup>
           </AccordionContent>
         </AccordionItem>
       );
@@ -76,24 +78,26 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             {group.name}
           </AccordionTrigger>
           <AccordionContent>
-            {filteredCategories.map((category) => (
-              <CommandItem
-                key={category}
-                value={category}
-                onSelect={() => {
-                  onValueChange(category);
-                  setOpen(false);
-                }}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === category ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {category}
-              </CommandItem>
-            ))}
+            <CommandGroup>
+              {filteredCategories.map((category) => (
+                <CommandItem
+                  key={category}
+                  value={category}
+                  onSelect={() => {
+                    onValueChange(category);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === category ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {category}
+                </CommandItem>
+              ))}
+            </CommandGroup>
           </AccordionContent>
         </AccordionItem>
       );
@@ -160,9 +164,9 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             </div>
           </CommandGroup>
           {!hasResults() && (
-            <div className="py-6 text-center text-sm">
-              <CommandEmpty>No category found.</CommandEmpty>
-            </div>
+            <CommandEmpty className="py-6 text-center text-sm">
+              No category found.
+            </CommandEmpty>
           )}
         </Command>
       </PopoverContent>
