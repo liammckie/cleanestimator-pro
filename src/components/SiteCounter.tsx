@@ -8,7 +8,7 @@ interface SiteCounterProps {
 
 export const SiteCounter: React.FC<SiteCounterProps> = ({ sites }) => {
   return (
-    <Card className="fixed right-4 top-4 w-64">
+    <Card className="fixed left-4 top-4 w-64">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">Sites Overview</CardTitle>
       </CardHeader>
