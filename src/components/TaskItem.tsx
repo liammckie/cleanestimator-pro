@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { getProductivityRate } from '@/data/productivityRates';
 import { Trash2 } from "lucide-react";
+import { ToolSelect } from './ToolSelect';
 
 interface TaskItemProps {
   rate: {
@@ -24,12 +25,14 @@ interface TaskItemProps {
       timesPerMonth: number;
     };
     productivityOverride?: number;
+    selectedTool?: string;
   } | undefined;
   onTaskSelection: (taskId: string, checked: boolean) => void;
   onQuantityChange: (taskId: string, quantity: number) => void;
   onFrequencyChange: (taskId: string, timesPerWeek: number) => void;
   onProductivityOverride: (taskId: string, override: number) => void;
   onRemoveTask: (taskId: string) => void;
+  onToolChange: (taskId: string, tool: string) => void;
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({
@@ -40,6 +43,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onFrequencyChange,
   onProductivityOverride,
   onRemoveTask,
+  onToolChange,
 }) => {
   const getQuantityLabel = () => {
     switch (rate.unit.toLowerCase()) {
@@ -75,6 +79,18 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     }
   };
 
+  // For this example, we'll use a simple array of tools
+  // In a real application, this would likely come from a database or API
+  const availableTools = [
+    'Vacuum Cleaner',
+    'Mop',
+    'Scrubber',
+    'Steam Cleaner',
+    'Pressure Washer',
+    'Broom',
+    'Duster'
+  ];
+
   return (
     <div key={rate.id} className="flex flex-col gap-2 p-2 border rounded">
       <div className="flex items-center justify-between gap-2">
@@ -85,7 +101,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               onTaskSelection(rate.id, checked as boolean)
             }
           />
-          <span>{rate.task} ({rate.tool})</span>
+          <span>{rate.task}</span>
         </div>
         {selectedTask && (
           <Button
@@ -100,6 +116,12 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       </div>
       {selectedTask && (
         <div className="ml-6 space-y-2">
+          <ToolSelect
+            taskId={rate.id}
+            currentTool={selectedTask.selectedTool || rate.tool}
+            availableTools={availableTools}
+            onToolChange={onToolChange}
+          />
           <div>
             <Label htmlFor={`quantity-${rate.id}`}>
               {getQuantityLabel()}
