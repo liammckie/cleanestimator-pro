@@ -41,6 +41,40 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onProductivityOverride,
   onRemoveTask,
 }) => {
+  const getQuantityLabel = () => {
+    switch (rate.unit.toLowerCase()) {
+      case 'm²':
+      case 'square meter':
+      case 'square meters':
+        return 'Area (Square Meters)';
+      case 'each':
+      case 'item':
+      case 'toilet':
+      case 'urinal':
+      case 'spot':
+        return `Number of ${rate.unit}s`;
+      default:
+        return `Quantity (${rate.unit})`;
+    }
+  };
+
+  const getProductivityLabel = () => {
+    switch (rate.unit.toLowerCase()) {
+      case 'm²':
+      case 'square meter':
+      case 'square meters':
+        return 'Square Meters per Hour';
+      case 'each':
+      case 'item':
+      case 'toilet':
+      case 'urinal':
+      case 'spot':
+        return `${rate.unit}s per Hour`;
+      default:
+        return `${rate.unit} per Hour`;
+    }
+  };
+
   return (
     <div key={rate.id} className="flex flex-col gap-2 p-2 border rounded">
       <div className="flex items-center justify-between gap-2">
@@ -68,7 +102,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         <div className="ml-6 space-y-2">
           <div>
             <Label htmlFor={`quantity-${rate.id}`}>
-              {rate.unit === 'spot' ? 'Number of Spots' : `Quantity (${rate.unit})`}
+              {getQuantityLabel()}
             </Label>
             <Input
               id={`quantity-${rate.id}`}
@@ -103,7 +137,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           </div>
           <div>
             <Label htmlFor={`productivity-${rate.id}`}>
-              Productivity Rate Override (per hour)
+              {getProductivityLabel()}
             </Label>
             <Input
               id={`productivity-${rate.id}`}
