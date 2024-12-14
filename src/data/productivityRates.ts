@@ -10,15 +10,19 @@ import { furnitureRates } from './rates/furnitureRates';
 import { specialistRates } from './rates/specialistRates';
 import { stairwellRates, railingRates, escalatorRailRates } from './rates/stairwellRates';
 import { toolCleaningRates } from './rates/toolCleaningRates';
+import { trashBarrelRates } from './rates/trashBarrelRates';
+import { windowsGlassRates, windowBlindsRates, glassCleaningRates } from './rates/windowsGlassRates';
+import { correctionalRates } from './rates/correctionalRates';
 import { dormRates } from './rates/dormRates';
 import { 
-  healthcareAssetRates, 
-  healthcareBundledRates, 
+  healthcareAssetRates,
+  healthcareBundledRates,
   healthcareGeneralCleaningRates,
   healthcareVacuumingRates,
   healthcarePhoneRates,
   healthcareTrashRates 
-} from './rates/healthcareRates';
+} from './rates/healthcareGeneralRates';
+import { hotelRates } from './rates/hotelRates';
 
 export const getAllProductivityRates = (): ProductivityRate[] => {
   return [
@@ -35,13 +39,19 @@ export const getAllProductivityRates = (): ProductivityRate[] => {
     ...railingRates,
     ...escalatorRailRates,
     ...toolCleaningRates,
+    ...trashBarrelRates,
+    ...windowsGlassRates,
+    ...windowBlindsRates,
+    ...glassCleaningRates,
+    ...correctionalRates,
     ...dormRates,
     ...healthcareAssetRates,
     ...healthcareBundledRates,
     ...healthcareGeneralCleaningRates,
     ...healthcareVacuumingRates,
     ...healthcarePhoneRates,
-    ...healthcareTrashRates
+    ...healthcareTrashRates,
+    ...hotelRates
   ];
 };
 

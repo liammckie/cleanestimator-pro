@@ -7,7 +7,7 @@ export const dormRates: ProductivityRate[] = [
     task: "Clean bathroom without showers",
     tool: "Restroom cart, trash liners, consumable supplies, chemical, cleaning cloths, broom, and dustpan",
     unit: "Fixture",
-    ratePerHour: 20 // 60 min / 3 min per fixture
+    ratePerHour: 20 // 60 min / 3 min per unit
   },
   {
     id: "RDC-2M",
