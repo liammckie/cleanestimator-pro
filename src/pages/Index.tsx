@@ -5,6 +5,7 @@ import { EquipmentCosts } from '@/components/EquipmentCosts';
 import { ProfitLoss } from '@/components/ProfitLoss';
 import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { OnCostsState } from '@/data/types/onCosts';
 
 const OVERHEAD_PERCENTAGE = 0.15; // 15% overhead
 
@@ -15,11 +16,39 @@ const Index = () => {
     selectedTasks: [],
     totalTime: 0
   });
-  const [laborCosts, setLaborCosts] = useState({ hourlyRate: 0 });
+  const [laborCosts, setLaborCosts] = useState<{ 
+    hourlyRate: number;
+    employmentType: 'contracted' | 'direct';
+    awardLevel?: number;
+    shiftType?: string;
+    onCosts?: OnCostsState;
+  }>({ 
+    hourlyRate: 0,
+    employmentType: 'contracted'
+  });
   const [equipmentCosts, setEquipmentCosts] = useState({ monthly: 0 });
 
+  const calculateTotalOnCosts = () => {
+    if (laborCosts.employmentType !== 'direct' || !laborCosts.onCosts) return 0;
+
+    const baseRate = laborCosts.hourlyRate;
+    let totalOnCostPercentage = 0;
+
+    Object.values(laborCosts.onCosts).forEach(category => {
+      category.forEach(onCost => {
+        if (onCost.isEnabled) {
+          totalOnCostPercentage += onCost.rate;
+        }
+      });
+    });
+
+    return (baseRate * totalOnCostPercentage) / 100;
+  };
+
   // Calculate costs based on total time from all tasks
-  const laborCost = area.totalTime * laborCosts.hourlyRate;
+  const onCostsPerHour = calculateTotalOnCosts();
+  const totalHourlyRate = laborCosts.hourlyRate + onCostsPerHour;
+  const laborCost = area.totalTime * totalHourlyRate;
   const monthlyRevenue = laborCost * 1.5; // 50% markup for example
   const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
 
@@ -52,6 +81,9 @@ const Index = () => {
               <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
               {area.totalTime > 0 && (
                 <p>* Total time required: {(area.totalTime * 60).toFixed(1)} minutes</p>
+              )}
+              {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
+                <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
               )}
             </div>
           </div>
