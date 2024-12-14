@@ -13,36 +13,69 @@ export interface IndustryGroup {
 
 export const categoryGroups: CategoryGroup[] = [
   {
-    name: "General Cleaning",
+    name: "Floor Care",
     categories: [
       {
-        name: "Floor Care",
+        name: "Carpet Care",
         subcategories: [
           "Carpet Maintenance - Spraying and Spotting",
-          "Carpet Steam Cleaning",
-          "Carpet Vacuuming",
-          "Hard Floor Cleaning",
-          "Floor Stripping and Sealing"
+          "Carpet Maintenance - Vacuum",
+          "Carpet Maintenance - Steam Cleaning",
+          "Carpet Deep Clean"
         ]
       },
       {
-        name: "Surface Care",
+        name: "Hard Floors",
         subcategories: [
-          "Ceiling and Wall Cleaning",
-          "Windows & Glass",
-          "Window Blinds",
-          "Glass Cleaning",
-          "Surface Disinfection"
+          "Hard Floor Sweeping",
+          "Hard Floor Mopping",
+          "Hard Floor Buffing",
+          "Hard Floor Stripping",
+          "Hard Floor Sealing"
+        ]
+      }
+    ]
+  },
+  {
+    name: "Surface Care",
+    categories: [
+      {
+        name: "General Surfaces",
+        subcategories: [
+          "Dusting",
+          "Wiping",
+          "Sanitizing",
+          "Polishing"
         ]
       },
       {
-        name: "Specialized Areas",
+        name: "Special Surfaces",
+        subcategories: [
+          "Glass Cleaning",
+          "Stainless Steel Care",
+          "Wood Care",
+          "Stone Care"
+        ]
+      }
+    ]
+  },
+  {
+    name: "Specialized Areas",
+    categories: [
+      {
+        name: "Washrooms",
         subcategories: [
           "Restroom Cleaning",
-          "Kitchen Cleaning",
-          "Office Space Cleaning",
-          "Reception Area Maintenance",
-          "Common Area Cleaning"
+          "Restroom Sanitizing",
+          "Restroom Deep Clean"
+        ]
+      },
+      {
+        name: "Kitchen Areas",
+        subcategories: [
+          "Kitchen Surface Cleaning",
+          "Kitchen Equipment Cleaning",
+          "Kitchen Deep Clean"
         ]
       }
     ]
@@ -51,136 +84,43 @@ export const categoryGroups: CategoryGroup[] = [
 
 export const industryGroups: IndustryGroup[] = [
   {
-    name: "Office and Corporate",
-    categories: [
-      "Corporate Offices",
-      "Shared Workspaces",
-      "Business Parks",
-      "Call Centers",
-      "Legal and Corporate Offices"
-    ]
-  },
-  {
     name: "Healthcare",
     categories: [
       "Hospitals",
-      "Dental Clinics",
-      "Veterinary Clinics",
-      "Aged Care Centers",
-      "Medical Laboratories",
-      "Research Labs",
-      "Cleanrooms"
+      "Medical Clinics",
+      "Dental Offices",
+      "Aged Care Facilities",
+      "Medical Laboratories"
+    ]
+  },
+  {
+    name: "Commercial",
+    categories: [
+      "Office Buildings",
+      "Retail Stores",
+      "Shopping Centers",
+      "Banks",
+      "Hotels"
     ]
   },
   {
     name: "Education",
     categories: [
       "Primary Schools",
-      "Secondary Schools",
+      "High Schools",
       "Universities",
-      "Colleges",
-      "Childcare Centers",
-      "Vocational Training Centers"
+      "Training Centers",
+      "Libraries"
     ]
   },
   {
-    name: "Industrial and Manufacturing",
+    name: "Industrial",
     categories: [
-      "Factories",
-      "Workshops",
-      "Assembly Lines",
-      "Food Processing Plants",
-      "Pharmaceutical Manufacturing",
       "Warehouses",
+      "Manufacturing Plants",
+      "Food Processing",
+      "Pharmaceutical",
       "Distribution Centers"
-    ]
-  },
-  {
-    name: "Retail and Commercial",
-    categories: [
-      "Shopping Malls",
-      "Retail Stores",
-      "Supermarkets",
-      "Convenience Stores",
-      "Car Dealerships",
-      "Showrooms"
-    ]
-  },
-  {
-    name: "Hospitality and Entertainment",
-    categories: [
-      "Hotels and Resorts",
-      "Restaurants and Cafes",
-      "Event Venues",
-      "Conference Centers",
-      "Cinemas",
-      "Theaters",
-      "Casinos"
-    ]
-  },
-  {
-    name: "Government and Public Facilities",
-    categories: [
-      "Local Council Offices",
-      "Government Buildings",
-      "Police Stations",
-      "Post Offices",
-      "Military Bases",
-      "Defense Facilities"
-    ]
-  },
-  {
-    name: "Food and Beverage",
-    categories: [
-      "Bakeries",
-      "Breweries",
-      "Wineries",
-      "Bottling Plants",
-      "Commercial Kitchens"
-    ]
-  },
-  {
-    name: "Sports and Recreation",
-    categories: [
-      "Gyms",
-      "Fitness Centers",
-      "Sports Stadiums",
-      "Aquatic Centers",
-      "Golf Clubs",
-      "Recreation Centers"
-    ]
-  },
-  {
-    name: "Transport and Logistics",
-    categories: [
-      "Airports",
-      "Terminals",
-      "Train Stations",
-      "Bus Depots",
-      "Shipping Yards",
-      "Fleet Facilities"
-    ]
-  },
-  {
-    name: "Specialized Facilities",
-    categories: [
-      "Data Centers",
-      "Server Rooms",
-      "Research Facilities",
-      "Art Galleries",
-      "Museums",
-      "Cultural Centers"
-    ]
-  },
-  {
-    name: "Construction and Industrial",
-    categories: [
-      "Construction Sites",
-      "Post-Construction",
-      "Demolition Sites",
-      "Mining Facilities",
-      "Power Plants",
-      "Manufacturing Plants"
     ]
   }
 ];

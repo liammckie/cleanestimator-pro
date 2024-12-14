@@ -5,6 +5,7 @@ import { specialistRates } from './categories/specialist';
 import { healthcareRates } from './categories/healthcare';
 import { kitchenRates } from './categories/kitchen';
 import { windowRates } from './categories/windows';
+import { bundledRates } from './bundledRates';
 
 class RatesManager {
   private static instance: RatesManager;
@@ -32,6 +33,7 @@ class RatesManager {
     this.ratesCache.set('healthcare', [...healthcareRates.patientRooms, ...healthcareRates.clinicalAreas]);
     this.ratesCache.set('kitchen', [...kitchenRates.commercial, ...kitchenRates.industrial]);
     this.ratesCache.set('windows', [...windowRates.interior, ...windowRates.exterior]);
+    this.ratesCache.set('bundles', bundledRates);
   }
 
   public getRatesByCategory(category: string): ProductivityRate[] {
@@ -60,6 +62,10 @@ class RatesManager {
       rate.category.toLowerCase().includes(searchTerm)
     );
   }
+
+  public getBundledRates(): ProductivityRate[] {
+    return this.ratesCache.get('bundles') || [];
+  }
 }
 
 export const ratesManager = RatesManager.getInstance();
@@ -68,3 +74,4 @@ export const getRatesByCategory = (category: string) => ratesManager.getRatesByC
 export const getRateById = (id: string) => ratesManager.getRateById(id);
 export const getAllRates = () => ratesManager.getAllRates();
 export const searchRates = (query: string) => ratesManager.searchRates(query);
+export const getBundledRates = () => ratesManager.getBundledRates();
