@@ -1,13 +1,10 @@
-import React from 'react';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Trash2, Activity } from "lucide-react";
-import { ToolSelect } from './ToolSelect';
+import React, { useMemo } from 'react';
 import { calculateTaskProductivity } from '@/utils/productivityCalculations';
 import { Card } from "@/components/ui/card";
+import { ProductivityCard } from './task/ProductivityCard';
+import { TimeDisplay } from './task/TimeDisplay';
+import { TaskControls } from './task/TaskControls';
+import { TaskHeader } from './task/TaskHeader';
 
 interface TaskItemProps {
   rate: {
@@ -46,156 +43,51 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onRemoveTask,
   onToolChange,
 }) => {
-  const getQuantityLabel = () => {
-    switch (rate.unit.toLowerCase()) {
-      case 'm²':
-      case 'square meter':
-      case 'square meters':
-        return 'Area (Square Meters)';
-      case 'each':
-      case 'item':
-      case 'toilet':
-      case 'urinal':
-      case 'spot':
-        return `Number of ${rate.unit}s`;
-      default:
-        return `Quantity (${rate.unit})`;
-    }
-  };
-
-  const getProductivityLabel = () => {
-    switch (rate.unit.toLowerCase()) {
-      case 'm²':
-      case 'square meter':
-      case 'square meters':
-        return 'Square Meters per Hour';
-      case 'each':
-      case 'item':
-      case 'toilet':
-      case 'urinal':
-      case 'spot':
-        return `${rate.unit}s per Hour`;
-      default:
-        return `${rate.unit} per Hour`;
-    }
-  };
-
-  const productivity = selectedTask ? calculateTaskProductivity(
-    rate.id,
-    selectedTask.quantity,
-    selectedTask.selectedTool,
-    selectedTask.frequency,
-    selectedTask.quantity // Using quantity as area size for this calculation
-  ) : null;
+  const productivity = useMemo(() => 
+    selectedTask ? calculateTaskProductivity(
+      rate.id,
+      selectedTask.quantity,
+      selectedTask.selectedTool,
+      selectedTask.frequency,
+      selectedTask.quantity
+    ) : null,
+  [rate.id, selectedTask]);
 
   return (
     <div key={rate.id} className="flex flex-col gap-2 p-2 border rounded">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            checked={!!selectedTask}
-            onCheckedChange={(checked) => 
-              onTaskSelection(rate.id, checked as boolean)
-            }
-          />
-          <span>{rate.task}</span>
-        </div>
-        {selectedTask && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onRemoveTask(rate.id)}
-            className="h-8 w-8 text-red-500 hover:text-red-700"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
+      <TaskHeader
+        taskId={rate.id}
+        taskName={rate.task}
+        isSelected={!!selectedTask}
+        onTaskSelection={onTaskSelection}
+        onRemoveTask={onRemoveTask}
+      />
 
       {selectedTask && (
         <div className="ml-6 space-y-2">
-          <ToolSelect
+          <TaskControls
             taskId={rate.id}
-            currentTool={selectedTask.selectedTool || rate.tool}
+            quantity={selectedTask.quantity}
+            frequency={selectedTask.frequency}
+            productivityOverride={selectedTask.productivityOverride}
+            selectedTool={selectedTask.selectedTool}
+            unit={rate.unit}
+            ratePerHour={rate.ratePerHour}
+            onQuantityChange={onQuantityChange}
+            onFrequencyChange={onFrequencyChange}
+            onProductivityOverride={onProductivityOverride}
             onToolChange={onToolChange}
           />
-          
-          <div>
-            <Label htmlFor={`quantity-${rate.id}`}>
-              {getQuantityLabel()}
-            </Label>
-            <Input
-              id={`quantity-${rate.id}`}
-              type="number"
-              value={selectedTask.quantity || ''}
-              onChange={(e) => {
-                const value = parseFloat(e.target.value) || 0;
-                onQuantityChange(rate.id, value);
-              }}
-              className="mt-1"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor={`frequency-${rate.id}`}>
-              Times per Week
-            </Label>
-            <Select
-              value={selectedTask.frequency?.timesPerWeek?.toString() || "1"}
-              onValueChange={(value) => onFrequencyChange(rate.id, parseInt(value))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select frequency" />
-              </SelectTrigger>
-              <SelectContent>
-                {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
-                  <SelectItem key={freq} value={freq.toString()}>
-                    {freq} {freq === 1 ? 'time' : 'times'} per week
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor={`productivity-${rate.id}`}>
-              {getProductivityLabel()}
-            </Label>
-            <Input
-              id={`productivity-${rate.id}`}
-              type="number"
-              value={selectedTask.productivityOverride || rate.ratePerHour}
-              onChange={(e) => {
-                const value = parseFloat(e.target.value) || rate.ratePerHour;
-                onProductivityOverride(rate.id, value);
-              }}
-              className="mt-1"
-            />
-          </div>
 
           {productivity && (
-            <Card className="p-3 bg-slate-50">
-              <div className="flex items-center gap-2 mb-2">
-                <Activity className="h-4 w-4 text-blue-500" />
-                <span className="font-medium">Productivity Analysis</span>
-              </div>
-              <div className="text-sm space-y-1">
-                <p>Base Rate: {productivity.baseRate.toFixed(2)} units/hour</p>
-                <p>Adjusted Rate: {productivity.adjustedRate.toFixed(2)} units/hour</p>
-                <p className="text-muted-foreground">
-                  Factors: Tool ({(productivity.factors.toolEfficiency * 100).toFixed()}%),
-                  Area ({(productivity.factors.areaSize * 100).toFixed()}%),
-                  Frequency ({(productivity.factors.frequency * 100).toFixed()}%)
-                </p>
-              </div>
-            </Card>
+            <ProductivityCard productivity={productivity} />
           )}
 
           {selectedTask.timeRequired > 0 && (
-            <div className="text-sm text-gray-600 mt-1">
-              <p>Time per service: {((selectedTask.timeRequired / (selectedTask.frequency?.timesPerWeek || 1)) / 4 * 60).toFixed(1)} minutes</p>
-              <p>Monthly time: {(selectedTask.timeRequired * 60).toFixed(1)} minutes</p>
-            </div>
+            <TimeDisplay
+              timeRequired={selectedTask.timeRequired}
+              frequency={selectedTask.frequency}
+            />
           )}
         </div>
       )}
