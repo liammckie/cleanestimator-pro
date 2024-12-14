@@ -13,22 +13,71 @@ interface SiteManagerProps {
 }
 
 export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
-  const [sites, setSites] = useState<Site[]>([{
-    id: uuidv4(),
-    name: 'Site 1',
-    address: {
-      street: '',
-      suburb: '',
-      state: '',
-      postcode: ''
+  const [sites, setSites] = useState<Site[]>([
+    {
+      id: uuidv4(),
+      name: 'Corporate Office Building',
+      address: {
+        street: '123 Business Avenue',
+        suburb: 'Central Business District',
+        state: 'NSW',
+        postcode: '2000'
+      },
+      area: {
+        squareMeters: 2500,
+        spaceType: 'office',
+        industryType: 'corporate',
+        selectedTasks: [
+          {
+            taskId: 'vacuum-carpet',
+            quantity: 1,
+            timeRequired: 2,
+            frequency: {
+              timesPerWeek: 5,
+              timesPerMonth: 20
+            }
+          },
+          {
+            taskId: 'clean-bathrooms',
+            quantity: 4,
+            timeRequired: 1.5,
+            frequency: {
+              timesPerWeek: 5,
+              timesPerMonth: 20
+            }
+          }
+        ],
+        totalTime: 70
+      }
     },
-    area: {
-      squareMeters: 0,
-      spaceType: 'office',
-      selectedTasks: [],
-      totalTime: 0
+    {
+      id: uuidv4(),
+      name: 'Medical Center',
+      address: {
+        street: '45 Health Street',
+        suburb: 'Westfield',
+        state: 'NSW',
+        postcode: '2145'
+      },
+      area: {
+        squareMeters: 1200,
+        spaceType: 'medical',
+        industryType: 'healthcare',
+        selectedTasks: [
+          {
+            taskId: 'sanitize-surfaces',
+            quantity: 1,
+            timeRequired: 3,
+            frequency: {
+              timesPerWeek: 7,
+              timesPerMonth: 28
+            }
+          }
+        ],
+        totalTime: 84
+      }
     }
-  }]);
+  ]);
 
   const addSite = () => {
     const newSite: Site = {
@@ -43,6 +92,7 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
       area: {
         squareMeters: 0,
         spaceType: 'office',
+        industryType: 'corporate',
         selectedTasks: [],
         totalTime: 0
       }
