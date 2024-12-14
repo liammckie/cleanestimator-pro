@@ -16,11 +16,13 @@ export const categoryGroups: CategoryGroup[] = [
     name: "General Cleaning",
     categories: [
       {
-        name: "Carpet Care",
+        name: "Floor Care",
         subcategories: [
           "Carpet Maintenance - Spraying and Spotting",
           "Carpet Steam Cleaning",
-          "Carpet Vacuuming"
+          "Carpet Vacuuming",
+          "Hard Floor Cleaning",
+          "Floor Stripping and Sealing"
         ]
       },
       {
@@ -28,24 +30,28 @@ export const categoryGroups: CategoryGroup[] = [
         subcategories: [
           "Ceiling and Wall Cleaning",
           "Windows & Glass",
-          "Window Blinds"
+          "Window Blinds",
+          "Glass Cleaning",
+          "Surface Disinfection"
         ]
       },
       {
-        name: "Area Specific",
+        name: "Specialized Areas",
         subcategories: [
           "Restroom Cleaning",
-          "Restroom Deep Clean",
-          "Restroom Disinfection",
-          "Kitchen Cleaning"
+          "Kitchen Cleaning",
+          "Office Space Cleaning",
+          "Reception Area Maintenance",
+          "Common Area Cleaning"
         ]
       },
       {
-        name: "Maintenance",
+        name: "Equipment & Furniture",
         subcategories: [
-          "Restorative",
+          "Furniture Maintenance",
           "Tool Cleaning",
-          "Furniture Maintenance"
+          "Equipment Sanitization",
+          "Trash and Recycle Management"
         ]
       }
     ]
@@ -56,7 +62,9 @@ export const industryGroups: IndustryGroup[] = [
   {
     name: "Healthcare",
     categories: [
-      "Healthcare - General",
+      "Healthcare - Patient Rooms",
+      "Healthcare - Operating Theaters",
+      "Healthcare - Common Areas",
       "Healthcare - Asset Management",
       "Healthcare - Bundled Services"
     ]
@@ -64,14 +72,21 @@ export const industryGroups: IndustryGroup[] = [
   {
     name: "Hospitality",
     categories: [
-      "Hotel Cleaning",
+      "Hotel Rooms",
+      "Hotel Common Areas",
+      "Restaurant Cleaning",
+      "Event Spaces",
       "Dorm Cleaning"
     ]
   },
   {
-    name: "Specialized Facilities",
+    name: "Commercial & Industrial",
     categories: [
-      "Correctional Facility"
+      "Office Buildings",
+      "Retail Spaces",
+      "Industrial Facilities",
+      "Educational Institutions",
+      "Correctional Facilities"
     ]
   }
 ];
