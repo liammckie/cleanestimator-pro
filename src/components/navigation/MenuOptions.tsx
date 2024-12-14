@@ -1,7 +1,13 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import { Calendar, Home, Inbox, Search, Settings, Globe } from "lucide-react";
 import { MenuOption } from "@/components/ui/dynamic-menu";
 
 export const getMenuOptions = (setActiveTab: (tab: string) => void): MenuOption[] => [
+  {
+    id: 'overview',
+    label: 'Site Overview',
+    icon: "globe",
+    onClick: () => setActiveTab('overview')
+  },
   {
     id: 'scope',
     label: 'Scope & Tasks',
