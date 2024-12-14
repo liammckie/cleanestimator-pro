@@ -10,8 +10,16 @@ import { Site } from '@/data/types/site';
 import { SiteManager } from '@/components/SiteManager';
 import { RosterManager } from '@/components/roster/RosterManager';
 import { DynamicMenu } from '@/components/ui/dynamic-menu';
+import { CostSummary } from '@/components/CostSummary';
+import { calculateCosts } from '@/utils/costCalculations';
 
 const OVERHEAD_PERCENTAGE = 0.15;
+
+type MenuOption = {
+  id: string;
+  label: string;
+  icon: "list" | "menu" | "grid" | "settings";
+};
 
 const Index = () => {
   const [sites, setSites] = useState<Site[]>([]);
@@ -47,13 +55,10 @@ const Index = () => {
   const onCostsPerHour = calculateTotalOnCosts();
   const totalHourlyRate = laborCosts.hourlyRate + onCostsPerHour;
   
-  // Calculate total time and labor cost across all sites
-  const totalTime = sites.reduce((sum, site) => sum + site.area.totalTime, 0);
-  const laborCost = totalTime * totalHourlyRate;
-  const monthlyRevenue = laborCost * 1.5;
+  const costBreakdown = calculateCosts(sites, totalHourlyRate);
+  const monthlyRevenue = costBreakdown.totalMonthlyCost * 1.5;
   const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
 
-  // Get all selected tasks from all sites for the sidebar
   const allSelectedTasks = sites.flatMap(site => 
     site.area.selectedTasks.map(task => ({
       ...task,
@@ -61,12 +66,12 @@ const Index = () => {
     }))
   );
 
-  const menuOptions = [
-    { id: 'scope', label: 'Scope & Tasks', icon: 'list' },
-    { id: 'labor', label: 'Labor Costs', icon: 'menu' },
-    { id: 'equipment', label: 'Equipment', icon: 'grid' },
-    { id: 'roster', label: 'Roster', icon: 'menu' },
-    { id: 'summary', label: 'Summary', icon: 'settings' },
+  const menuOptions: MenuOption[] = [
+    { id: 'scope', label: 'Scope & Tasks', icon: "list" },
+    { id: 'labor', label: 'Labor Costs', icon: "menu" },
+    { id: 'equipment', label: 'Equipment', icon: "grid" },
+    { id: 'roster', label: 'Roster', icon: "menu" },
+    { id: 'summary', label: 'Summary', icon: "settings" },
   ];
 
   return (
@@ -108,20 +113,21 @@ const Index = () => {
 
                   <TabsContent value="roster" className="space-y-6">
                     <RosterManager />
+                    <CostSummary costs={costBreakdown} />
                   </TabsContent>
 
                   <TabsContent value="summary" className="space-y-6">
                     <ProfitLoss
                       revenue={monthlyRevenue}
-                      laborCost={laborCost}
+                      laborCost={costBreakdown.totalMonthlyCost}
                       equipmentCost={equipmentCosts.monthly}
                       overhead={overhead}
                     />
                     
                     <div className="mt-6 text-sm text-muted-foreground">
                       <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
-                      {totalTime > 0 && (
-                        <p>* Total time required: {(totalTime * 60).toFixed(1)} minutes</p>
+                      {costBreakdown.totalMonthlyMinutes > 0 && (
+                        <p>* Total time required: {Math.round(costBreakdown.totalMonthlyMinutes)} minutes</p>
                       )}
                       {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
                         <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
