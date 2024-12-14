@@ -68,11 +68,11 @@ const Index = () => {
       <div className="min-h-screen flex flex-col bg-[#F5F7FA]">
         <Header />
         
-        <main className="flex-1 w-full">
-          <div className="max-w-[1400px] mx-auto p-8">
+        <main className="flex-1 w-full flex justify-center">
+          <div className="w-full max-w-[1400px] px-4 sm:px-6 lg:px-8 py-8">
             {/* Progress Indicator */}
-            <div className="mb-8">
-              <div className="flex items-center justify-center gap-4">
+            <div className="mb-8 flex justify-center">
+              <div className="flex items-center gap-4 max-w-3xl w-full justify-between">
                 {['sites', 'scope', 'costs', 'roster'].map((step, index) => (
                   <React.Fragment key={step}>
                     <div 
@@ -90,10 +90,10 @@ const Index = () => {
                       `}>
                         {index + 1}
                       </div>
-                      <span className="ml-2 capitalize">{step}</span>
+                      <span className="ml-2 capitalize hidden sm:inline">{step}</span>
                     </div>
                     {index < 3 && (
-                      <div className={`w-24 h-0.5 ${
+                      <div className={`w-16 sm:w-24 h-0.5 ${
                         index < ['sites', 'scope', 'costs', 'roster'].indexOf(activeView)
                           ? 'bg-primary'
                           : 'bg-gray-200'
@@ -108,7 +108,7 @@ const Index = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 min-h-[calc(100vh-12rem)]">
               <div className="p-8">
                 {activeView === 'sites' && (
-                  <div className="max-w-4xl mx-auto space-y-6">
+                  <div className="max-w-3xl mx-auto space-y-6">
                     <div className="flex justify-between items-center">
                       <h1 className="text-2xl font-semibold text-gray-900">Site Details</h1>
                       {sites.length > 0 && (
@@ -126,7 +126,7 @@ const Index = () => {
                 )}
 
                 {activeView === 'scope' && (
-                  <div className="max-w-4xl mx-auto space-y-6">
+                  <div className="max-w-3xl mx-auto space-y-6">
                     <div className="flex justify-between items-center">
                       <h1 className="text-2xl font-semibold text-gray-900">Scope of Work</h1>
                       <Button
@@ -142,7 +142,7 @@ const Index = () => {
                 )}
 
                 {activeView === 'costs' && (
-                  <div className="max-w-4xl mx-auto space-y-6">
+                  <div className="max-w-3xl mx-auto space-y-6">
                     <div className="flex justify-between items-center">
                       <h1 className="text-2xl font-semibold text-gray-900">Cost Calculator</h1>
                       <Button
@@ -167,7 +167,7 @@ const Index = () => {
                 )}
 
                 {activeView === 'roster' && (
-                  <div className="max-w-4xl mx-auto space-y-6">
+                  <div className="max-w-3xl mx-auto space-y-6">
                     <div className="flex justify-between items-center">
                       <h1 className="text-2xl font-semibold text-gray-900">Roster Management</h1>
                     </div>
