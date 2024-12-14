@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { OnCostsState } from '@/data/types/onCosts';
 import { Site } from '@/data/types/site';
-import { Header } from '@/components/Header';
-import { Button } from '@/components/ui/button';
+import { MainNav } from '@/components/navigation/MainNav';
 import { SitesView } from '@/views/SitesView';
 import { ScopeView } from '@/views/ScopeView';
 import { CostsView } from '@/views/CostsView';
 import { RosterView } from '@/views/RosterView';
 
-type View = 'sites' | 'scope' | 'costs' | 'roster';
-
 const Index = () => {
   const [sites, setSites] = useState<Site[]>([]);
+  const [activeView, setActiveView] = useState('sites');
   const [laborCosts, setLaborCosts] = useState<{ 
     hourlyRate: number;
     employmentType: 'contracted' | 'direct';
@@ -24,7 +22,6 @@ const Index = () => {
     employmentType: 'contracted'
   });
   const [equipmentCosts, setEquipmentCosts] = useState({ monthly: 0 });
-  const [activeView, setActiveView] = useState<View>('sites');
 
   const calculateTotalOnCosts = () => {
     if (laborCosts.employmentType !== 'direct' || !laborCosts.onCosts) return 0;
@@ -81,29 +78,12 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <main className="flex-1 w-full">
-          <div className="max-w-[1400px] mx-auto px-6 py-8 w-full">
-            <div className="mb-8">
-              <div className="max-w-3xl mx-auto">
-                <div className="flex items-center justify-between">
-                  {['sites', 'scope', 'costs', 'roster'].map((step, index) => (
-                    <Button
-                      key={step}
-                      variant={activeView === step ? "default" : "outline"}
-                      onClick={() => setActiveView(step as View)}
-                      className="w-full mx-2 first:ml-0 last:mr-0"
-                    >
-                      <span className="capitalize">{step}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
+        <MainNav activeView={activeView} onViewChange={setActiveView} />
+        <main className="flex-1 w-full pt-16">
+          <div className="container mx-auto px-4 py-8">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
               <div className="p-8">
-                <div className="max-w-3xl mx-auto">
+                <div className="max-w-5xl mx-auto">
                   {renderView()}
                 </div>
               </div>
