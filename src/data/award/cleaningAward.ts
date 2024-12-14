@@ -1,4 +1,4 @@
-import { AwardLevel, Allowance, ShiftTiming, PayCalculation } from '../types/award';
+import { AwardLevel, AllowanceType, VehicleType, ShiftTiming, PayCalculation } from '../types/award';
 
 export const cleaningAwardLevels: AwardLevel[] = [
   {
@@ -40,65 +40,65 @@ export const cleaningAllowances: Allowance[] = [
   {
     name: 'First Aid',
     amount: 15.56,
-    type: 'weekly',
+    type: AllowanceType.WEEKLY,
     enabled: false
   },
   {
     name: 'Height (up to 22nd floor)',
     amount: 1.02,
-    type: 'hourly',
+    type: AllowanceType.HOURLY,
     enabled: false
   },
   {
     name: 'Height (above 22nd floor)',
     amount: 2.10,
-    type: 'hourly',
+    type: AllowanceType.HOURLY,
     enabled: false
   },
   {
     name: 'Broken Shift',
     amount: 4.35,
-    type: 'daily',
+    type: AllowanceType.DAILY,
     maxWeekly: 21.73,
     enabled: false
   },
   {
     name: 'Cold Places',
     amount: 0.64,
-    type: 'hourly',
+    type: AllowanceType.HOURLY,
     enabled: false
   },
   {
     name: 'Hot Places (46-54°C)',
     amount: 0.64,
-    type: 'hourly',
+    type: AllowanceType.HOURLY,
     enabled: false
   },
   {
     name: 'Hot Places (>54°C)',
     amount: 0.77,
-    type: 'hourly',
+    type: AllowanceType.HOURLY,
     enabled: false
   },
   {
     name: 'Toilet Cleaning',
     amount: 3.41,
-    type: 'daily',
+    type: AllowanceType.DAILY,
     maxWeekly: 16.76,
     enabled: false
   },
   {
     name: 'Vehicle (car)',
     amount: 0.99,
-    type: 'perKm',
-    vehicleType: 'motorVehicle',
+    type: AllowanceType.PER_KM,
+    vehicleType: VehicleType.CAR,
     enabled: false
   },
   {
     name: 'Vehicle (motorcycle)',
     amount: 0.33,
-    type: 'perKm',
-    vehicleType: 'motorCycle',
+    type: AllowanceType.PER_KM,
+    vehicleType: VehicleType.MOTORCYCLE,
     enabled: false
   }
 ];
