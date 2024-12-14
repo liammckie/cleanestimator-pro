@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OnCostsState } from '@/data/types/onCosts';
 import { Site } from '@/data/types/site';
 import { SiteManager } from '@/components/SiteManager';
+import { RosterManager } from '@/components/roster/RosterManager';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -70,10 +71,11 @@ const Index = () => {
             </h1>
             
             <Tabs defaultValue="scope" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="scope">Scope & Tasks</TabsTrigger>
                 <TabsTrigger value="labor">Labor Costs</TabsTrigger>
                 <TabsTrigger value="equipment">Equipment</TabsTrigger>
+                <TabsTrigger value="roster">Roster</TabsTrigger>
                 <TabsTrigger value="summary">Summary</TabsTrigger>
               </TabsList>
 
@@ -87,6 +89,10 @@ const Index = () => {
 
               <TabsContent value="equipment" className="space-y-6">
                 <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+              </TabsContent>
+
+              <TabsContent value="roster" className="space-y-6">
+                <RosterManager />
               </TabsContent>
 
               <TabsContent value="summary" className="space-y-6">
