@@ -28,45 +28,6 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
     setOpen(false);
   };
 
-  const renderContent = () => {
-    if (!searchQuery) {
-      return (
-        <CommandEmpty className="py-6 text-center text-sm">
-          Start typing to search...
-        </CommandEmpty>
-      );
-    }
-
-    return (
-      <div className="border-t pt-2">
-        <Tabs value={activeTab} onValueChange={(value: 'categories' | 'industries') => setActiveTab(value)}>
-          <TabsList className="w-full">
-            <TabsTrigger value="categories" className="flex-1">Categories</TabsTrigger>
-            <TabsTrigger value="industries" className="flex-1">Industries</TabsTrigger>
-          </TabsList>
-          <div className="mt-2 max-h-[300px] overflow-y-auto">
-            <TabsContent value="categories">
-              <CategoryList
-                groups={categoryGroups}
-                selectedValue={value}
-                searchQuery={searchQuery}
-                onSelect={handleSelect}
-              />
-            </TabsContent>
-            <TabsContent value="industries">
-              <IndustryList
-                groups={industryGroups}
-                selectedValue={value}
-                searchQuery={searchQuery}
-                onSelect={handleSelect}
-              />
-            </TabsContent>
-          </div>
-        </Tabs>
-      </div>
-    );
-  };
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -87,7 +48,44 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
-          {renderContent()}
+          <div className="border-t pt-2">
+            <Tabs value={activeTab} onValueChange={(value: 'categories' | 'industries') => setActiveTab(value)}>
+              <TabsList className="w-full">
+                <TabsTrigger value="categories" className="flex-1">Categories</TabsTrigger>
+                <TabsTrigger value="industries" className="flex-1">Industries</TabsTrigger>
+              </TabsList>
+              <div className="mt-2 max-h-[300px] overflow-y-auto">
+                <TabsContent value="categories">
+                  {searchQuery === '' ? (
+                    <CommandEmpty className="py-6 text-center text-sm">
+                      Start typing to search...
+                    </CommandEmpty>
+                  ) : (
+                    <CategoryList
+                      groups={categoryGroups}
+                      selectedValue={value}
+                      searchQuery={searchQuery}
+                      onSelect={handleSelect}
+                    />
+                  )}
+                </TabsContent>
+                <TabsContent value="industries">
+                  {searchQuery === '' ? (
+                    <CommandEmpty className="py-6 text-center text-sm">
+                      Start typing to search...
+                    </CommandEmpty>
+                  ) : (
+                    <IndustryList
+                      groups={industryGroups}
+                      selectedValue={value}
+                      searchQuery={searchQuery}
+                      onSelect={handleSelect}
+                    />
+                  )}
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
         </Command>
       </PopoverContent>
     </Popover>

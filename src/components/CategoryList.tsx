@@ -19,7 +19,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({
   onSelect,
 }) => {
   const renderCategories = (categories: Array<{ name: string; subcategories: string[] }> = []) => {
-    if (!Array.isArray(categories)) return [];
+    if (!Array.isArray(categories)) return null;
 
     return categories
       .filter(category => category && typeof category === 'object')
@@ -45,6 +45,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({
                     key={subcategory}
                     value={subcategory}
                     onSelect={() => onSelect(subcategory)}
+                    className="cursor-pointer"
                   >
                     <Check
                       className={cn(
@@ -63,9 +64,11 @@ export const CategoryList: React.FC<CategoryListProps> = ({
       .filter(Boolean);
   };
 
+  if (!Array.isArray(groups)) return null;
+
   return (
     <Accordion type="single" collapsible className="w-full">
-      {Array.isArray(groups) && groups.map(group => (
+      {groups.map(group => (
         <AccordionItem key={group.name} value={group.name}>
           <AccordionTrigger className="font-semibold">
             {group.name}

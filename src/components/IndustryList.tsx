@@ -49,6 +49,7 @@ export const IndustryList: React.FC<IndustryListProps> = ({
                       key={category}
                       value={category}
                       onSelect={() => onSelect(category)}
+                      className="cursor-pointer"
                     >
                       <Check
                         className={cn(
