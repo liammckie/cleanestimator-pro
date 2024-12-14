@@ -1,26 +1,15 @@
 import React, { useState } from 'react';
-import { LaborCosts } from '@/components/LaborCosts';
-import { EquipmentCosts } from '@/components/EquipmentCosts';
-import { ProfitLoss } from '@/components/ProfitLoss';
-import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { OnCostsState } from '@/data/types/onCosts';
 import { Site } from '@/data/types/site';
-import { SiteManager } from '@/components/SiteManager';
-import { RosterManager } from '@/components/roster/RosterManager';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import { BuilderMenu, builderElements } from '@/components/BuilderMenu';
-import { useToast } from '@/components/ui/use-toast';
+import { SitesView } from '@/views/SitesView';
+import { ScopeView } from '@/views/ScopeView';
+import { CostsView } from '@/views/CostsView';
+import { RosterView } from '@/views/RosterView';
 
 type View = 'sites' | 'scope' | 'costs' | 'roster';
-
-interface ElementPosition {
-  id: string;
-  x: number;
-  y: number;
-}
 
 const Index = () => {
   const [sites, setSites] = useState<Site[]>([]);
@@ -36,8 +25,6 @@ const Index = () => {
   });
   const [equipmentCosts, setEquipmentCosts] = useState({ monthly: 0 });
   const [activeView, setActiveView] = useState<View>('sites');
-  const [elementPositions, setElementPositions] = useState<ElementPosition[]>([]);
-  const { toast } = useToast();
 
   const calculateTotalOnCosts = () => {
     if (laborCosts.employmentType !== 'direct' || !laborCosts.onCosts) return 0;
@@ -67,38 +54,27 @@ const Index = () => {
     }))
   );
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    const elementId = e.dataTransfer.getData('text/plain');
-    if (!elementId) return;
-
-    // Calculate snap positions (grid of 20px)
-    const snapX = Math.round(e.clientX / 20) * 20;
-    const snapY = Math.round(e.clientY / 20) * 20;
-
-    // Update element position
-    setElementPositions(prev => {
-      const existingIndex = prev.findIndex(pos => pos.id === elementId);
-      if (existingIndex >= 0) {
-        const newPositions = [...prev];
-        newPositions[existingIndex] = { id: elementId, x: snapX, y: snapY };
-        return newPositions;
-      }
-      return [...prev, { id: elementId, x: snapX, y: snapY }];
-    });
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const elementId = e.dataTransfer.getData('text/plain');
-    if (!elementId) return;
-
-    const element = builderElements.find(el => el.id === elementId);
-    if (element) {
-      toast({
-        title: "Element Added",
-        description: `${element.label} has been placed on the canvas`,
-      });
+  const renderView = () => {
+    switch (activeView) {
+      case 'sites':
+        return <SitesView onSitesChange={setSites} />;
+      case 'scope':
+        return <ScopeView selectedTasks={allSelectedTasks} />;
+      case 'costs':
+        return (
+          <CostsView
+            onLaborCostChange={setLaborCosts}
+            onEquipmentCostChange={setEquipmentCosts}
+            monthlyRevenue={monthlyRevenue}
+            laborCost={laborCost}
+            equipmentCosts={equipmentCosts}
+            overhead={overhead}
+          />
+        );
+      case 'roster':
+        return <RosterView />;
+      default:
+        return null;
     }
   };
 
@@ -106,121 +82,29 @@ const Index = () => {
     <SidebarProvider>
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
-        <BuilderMenu />
-        
-        <main 
-          className="flex-1 w-full"
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
+        <main className="flex-1 w-full">
           <div className="max-w-[1400px] mx-auto px-6 py-8 w-full">
-            {/* Progress Steps */}
             <div className="mb-8">
               <div className="max-w-3xl mx-auto">
                 <div className="flex items-center justify-between">
                   {['sites', 'scope', 'costs', 'roster'].map((step, index) => (
-                    <React.Fragment key={step}>
-                      <div 
-                        className={`flex items-center ${
-                          activeView === step 
-                            ? 'text-primary font-semibold' 
-                            : 'text-gray-400'
-                        }`}
-                      >
-                        <div className={`
-                          w-10 h-10 rounded-full flex items-center justify-center
-                          ${activeView === step 
-                            ? 'bg-primary text-white' 
-                            : 'bg-gray-100 text-gray-400'}
-                        `}>
-                          {index + 1}
-                        </div>
-                        <span className="ml-2 capitalize hidden sm:inline">{step}</span>
-                      </div>
-                      {index < 3 && (
-                        <div className={`w-16 sm:w-24 h-0.5 ${
-                          index < ['sites', 'scope', 'costs', 'roster'].indexOf(activeView)
-                            ? 'bg-primary'
-                            : 'bg-gray-200'
-                        }`} />
-                      )}
-                    </React.Fragment>
+                    <Button
+                      key={step}
+                      variant={activeView === step ? "default" : "outline"}
+                      onClick={() => setActiveView(step as View)}
+                      className="w-full mx-2 first:ml-0 last:mr-0"
+                    >
+                      <span className="capitalize">{step}</span>
+                    </Button>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Main Content Area */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
               <div className="p-8">
                 <div className="max-w-3xl mx-auto">
-                  {activeView === 'sites' && (
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-center">
-                        <h1 className="text-2xl font-semibold text-gray-900">Site Details</h1>
-                        {sites.length > 0 && (
-                          <Button
-                            onClick={() => setActiveView('scope')}
-                            className="flex items-center gap-2"
-                          >
-                            Next: Scope of Work
-                            <ArrowRight className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
-                      <SiteManager onSitesChange={setSites} />
-                    </div>
-                  )}
-
-                  {activeView === 'scope' && (
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-center">
-                        <h1 className="text-2xl font-semibold text-gray-900">Scope of Work</h1>
-                        <Button
-                          onClick={() => setActiveView('costs')}
-                          className="flex items-center gap-2"
-                        >
-                          Next: Cost Calculator
-                          <ArrowRight className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
-                    </div>
-                  )}
-
-                  {activeView === 'costs' && (
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-center">
-                        <h1 className="text-2xl font-semibold text-gray-900">Cost Calculator</h1>
-                        <Button
-                          onClick={() => setActiveView('roster')}
-                          className="flex items-center gap-2"
-                        >
-                          Next: Roster Management
-                          <ArrowRight className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      <div className="grid gap-8">
-                        <LaborCosts onLaborCostChange={setLaborCosts} />
-                        <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-                        <ProfitLoss
-                          revenue={monthlyRevenue}
-                          laborCost={laborCost}
-                          equipmentCost={equipmentCosts.monthly}
-                          overhead={overhead}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {activeView === 'roster' && (
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-center">
-                        <h1 className="text-2xl font-semibold text-gray-900">Roster Management</h1>
-                      </div>
-                      <RosterManager />
-                    </div>
-                  )}
+                  {renderView()}
                 </div>
               </div>
             </div>
