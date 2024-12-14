@@ -63,15 +63,15 @@ const Index = () => {
     <SidebarProvider>
       <div className="min-h-screen flex flex-col bg-primary">
         <Header />
-        <div className="flex flex-1">
+        <div className="flex flex-1 bg-primary/95">
           <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
-          <main className="flex-1 p-6 max-w-[1600px] mx-auto w-full">
-            <div className="space-y-6">
-              <h1 className="text-3xl font-bold text-white">
+          <main className="flex-1 p-8">
+            <div className="max-w-[1200px] mx-auto">
+              <h1 className="text-3xl font-bold text-white mb-8">
                 Commercial Cleaning Estimation Tool
               </h1>
               
-              <Tabs defaultValue="scope" className="space-y-6">
+              <Tabs defaultValue="scope" className="space-y-8">
                 <TabsList className="grid w-full grid-cols-5 bg-primary/20">
                   <TabsTrigger 
                     value="scope"
@@ -105,23 +105,23 @@ const Index = () => {
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="scope" className="space-y-6">
+                <TabsContent value="scope" className="space-y-6 bg-accent/5 p-6 rounded-lg">
                   <SiteManager onSitesChange={setSites} />
                 </TabsContent>
 
-                <TabsContent value="labor" className="space-y-6">
+                <TabsContent value="labor" className="space-y-6 bg-accent/5 p-6 rounded-lg">
                   <LaborCosts onLaborCostChange={setLaborCosts} />
                 </TabsContent>
 
-                <TabsContent value="equipment" className="space-y-6">
+                <TabsContent value="equipment" className="space-y-6 bg-accent/5 p-6 rounded-lg">
                   <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
                 </TabsContent>
 
-                <TabsContent value="roster" className="space-y-6">
+                <TabsContent value="roster" className="space-y-6 bg-accent/5 p-6 rounded-lg">
                   <RosterManager />
                 </TabsContent>
 
-                <TabsContent value="summary" className="space-y-6">
+                <TabsContent value="summary" className="space-y-6 bg-accent/5 p-6 rounded-lg">
                   <ProfitLoss
                     revenue={monthlyRevenue}
                     laborCost={laborCost}
