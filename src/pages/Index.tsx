@@ -12,6 +12,8 @@ import { RosterManager } from '@/components/roster/RosterManager';
 import { DynamicMenu, MenuOption } from '@/components/ui/dynamic-menu';
 import { CostSummary } from '@/components/CostSummary';
 import { calculateCosts } from '@/utils/costCalculations';
+import { ContractData } from '@/components/ContractData';
+import { ContractForecast } from '@/components/ContractForecast';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -29,6 +31,15 @@ const Index = () => {
     employmentType: 'contracted'
   });
   const [equipmentCosts, setEquipmentCosts] = useState({ monthly: 0 });
+
+  const [contractDetails, setContractDetails] = useState({
+    lengthYears: 1,
+    cpiIncreases: {
+      yearOne: 0,
+      yearTwo: 0,
+      yearThree: 0,
+    },
+  });
 
   const calculateTotalOnCosts = () => {
     if (laborCosts.employmentType !== 'direct' || !laborCosts.onCosts) return 0;
@@ -86,6 +97,12 @@ const Index = () => {
       icon: "menu",
       onClick: () => setActiveTab('roster')
     },
+    {
+      id: 'contract',
+      label: 'Contract',
+      icon: "file-text",
+      onClick: () => setActiveTab('contract')
+    },
     { 
       id: 'summary', 
       label: 'Summary', 
@@ -111,11 +128,12 @@ const Index = () => {
                   className="bg-card rounded-lg border border-border"
                 />
                 <div className="space-y-6">
-                  <TabsList className="grid w-full grid-cols-5">
+                  <TabsList className="grid w-full grid-cols-6">
                     <TabsTrigger value="scope">Scope & Tasks</TabsTrigger>
                     <TabsTrigger value="labor">Labor Costs</TabsTrigger>
                     <TabsTrigger value="equipment">Equipment</TabsTrigger>
                     <TabsTrigger value="roster">Roster</TabsTrigger>
+                    <TabsTrigger value="contract">Contract</TabsTrigger>
                     <TabsTrigger value="summary">Summary</TabsTrigger>
                   </TabsList>
 
@@ -134,6 +152,18 @@ const Index = () => {
                   <TabsContent value="roster" className="space-y-6">
                     <RosterManager />
                     <CostSummary costs={costBreakdown} />
+                  </TabsContent>
+
+                  <TabsContent value="contract" className="space-y-6">
+                    <ContractData onContractChange={setContractDetails} />
+                    <ContractForecast
+                      baseRevenue={monthlyRevenue}
+                      laborCost={costBreakdown.totalMonthlyCost}
+                      equipmentCost={equipmentCosts.monthly}
+                      overhead={overhead}
+                      contractLength={contractDetails.lengthYears}
+                      cpiIncreases={contractDetails.cpiIncreases}
+                    />
                   </TabsContent>
 
                   <TabsContent value="summary" className="space-y-6">
