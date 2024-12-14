@@ -10,8 +10,8 @@ import { Site } from '@/data/types/site';
 import { SiteManager } from '@/components/SiteManager';
 import { RosterManager } from '@/components/roster/RosterManager';
 import { Header } from '@/components/Header';
-
-const OVERHEAD_PERCENTAGE = 0.15;
+import { Button } from '@/components/ui/button';
+import { Building2, ClipboardList, Calculator, Users } from 'lucide-react';
 
 const Index = () => {
   const [sites, setSites] = useState<Site[]>([]);
@@ -26,6 +26,7 @@ const Index = () => {
     employmentType: 'contracted'
   });
   const [equipmentCosts, setEquipmentCosts] = useState({ monthly: 0 });
+  const [activeView, setActiveView] = useState<'sites' | 'scope' | 'costs' | 'roster'>('sites');
 
   const calculateTotalOnCosts = () => {
     if (laborCosts.employmentType !== 'direct' || !laborCosts.onCosts) return 0;
@@ -50,7 +51,7 @@ const Index = () => {
   const totalTime = sites.reduce((sum, site) => sum + site.area.totalTime, 0);
   const laborCost = totalTime * totalHourlyRate;
   const monthlyRevenue = laborCost * 1.5;
-  const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
+  const overhead = monthlyRevenue * 0.15;
 
   const allSelectedTasks = sites.flatMap(site => 
     site.area.selectedTasks.map(task => ({
@@ -64,61 +65,104 @@ const Index = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
         
-        <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-6 p-6 max-w-[1920px] mx-auto h-[calc(100vh-4rem)]">
-          {/* Panel 1 - Sites */}
-          <div className="bg-white rounded-lg shadow-lg overflow-auto">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Sites Overview</h2>
-              <SiteManager onSitesChange={setSites} />
-            </div>
+        {/* Navigation Buttons */}
+        <div className="bg-white border-b">
+          <div className="max-w-[1920px] mx-auto px-6 py-4 flex gap-4">
+            <Button
+              variant={activeView === 'sites' ? 'default' : 'outline'}
+              onClick={() => setActiveView('sites')}
+              className="flex items-center gap-2"
+            >
+              <Building2 className="h-4 w-4" />
+              Sites
+            </Button>
+            <Button
+              variant={activeView === 'scope' ? 'default' : 'outline'}
+              onClick={() => setActiveView('scope')}
+              className="flex items-center gap-2"
+            >
+              <ClipboardList className="h-4 w-4" />
+              Scope of Work
+            </Button>
+            <Button
+              variant={activeView === 'costs' ? 'default' : 'outline'}
+              onClick={() => setActiveView('costs')}
+              className="flex items-center gap-2"
+            >
+              <Calculator className="h-4 w-4" />
+              Cost Calculator
+            </Button>
+            <Button
+              variant={activeView === 'roster' ? 'default' : 'outline'}
+              onClick={() => setActiveView('roster')}
+              className="flex items-center gap-2"
+            >
+              <Users className="h-4 w-4" />
+              Roster
+            </Button>
           </div>
+        </div>
 
-          {/* Panel 2 - Scope of Work */}
-          <div className="bg-white rounded-lg shadow-lg overflow-auto">
-            <div className="p-6 h-full">
-              <h2 className="text-xl font-semibold mb-4">Scope of Work</h2>
-              <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
+        {/* Content Area */}
+        <div className="flex-1 max-w-[1920px] mx-auto w-full p-6">
+          {activeView === 'sites' && (
+            <div className="bg-white rounded-lg shadow-lg overflow-auto h-[calc(100vh-12rem)]">
+              <div className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Sites Overview</h2>
+                <SiteManager onSitesChange={setSites} />
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Panel 3 - Costs Calculator */}
-          <div className="bg-white rounded-lg shadow-lg overflow-auto">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Cost Calculator</h2>
-              <Tabs defaultValue="labor" className="space-y-4">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="labor">Labor</TabsTrigger>
-                  <TabsTrigger value="equipment">Equipment</TabsTrigger>
-                  <TabsTrigger value="summary">Summary</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="labor" className="mt-0">
-                  <LaborCosts onLaborCostChange={setLaborCosts} />
-                </TabsContent>
-
-                <TabsContent value="equipment" className="mt-0">
-                  <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-                </TabsContent>
-
-                <TabsContent value="summary" className="mt-0">
-                  <ProfitLoss
-                    revenue={monthlyRevenue}
-                    laborCost={laborCost}
-                    equipmentCost={equipmentCosts.monthly}
-                    overhead={overhead}
-                  />
-                </TabsContent>
-              </Tabs>
+          {activeView === 'scope' && (
+            <div className="bg-white rounded-lg shadow-lg overflow-auto h-[calc(100vh-12rem)]">
+              <div className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Scope of Work</h2>
+                <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Panel 4 - Roster */}
-          <div className="bg-white rounded-lg shadow-lg overflow-auto">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Roster Management</h2>
-              <RosterManager />
+          {activeView === 'costs' && (
+            <div className="bg-white rounded-lg shadow-lg overflow-auto h-[calc(100vh-12rem)]">
+              <div className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Cost Calculator</h2>
+                <Tabs defaultValue="labor" className="space-y-4">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="labor">Labor</TabsTrigger>
+                    <TabsTrigger value="equipment">Equipment</TabsTrigger>
+                    <TabsTrigger value="summary">Summary</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="labor" className="mt-0">
+                    <LaborCosts onLaborCostChange={setLaborCosts} />
+                  </TabsContent>
+
+                  <TabsContent value="equipment" className="mt-0">
+                    <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+                  </TabsContent>
+
+                  <TabsContent value="summary" className="mt-0">
+                    <ProfitLoss
+                      revenue={monthlyRevenue}
+                      laborCost={laborCost}
+                      equipmentCost={equipmentCosts.monthly}
+                      overhead={overhead}
+                    />
+                  </TabsContent>
+                </Tabs>
+              </div>
             </div>
-          </div>
+          )}
+
+          {activeView === 'roster' && (
+            <div className="bg-white rounded-lg shadow-lg overflow-auto h-[calc(100vh-12rem)]">
+              <div className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Roster Management</h2>
+                <RosterManager />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </SidebarProvider>
