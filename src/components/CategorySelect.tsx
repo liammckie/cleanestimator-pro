@@ -16,6 +16,10 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
 
+  // Ensure we have arrays even if the imports are undefined
+  const safeGeneralGroups = categoryGroups || [];
+  const safeIndustryGroups = industryGroups || [];
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -43,7 +47,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             <Command>
               <CommandInput placeholder="Search categories..." />
               <CommandEmpty>No category found.</CommandEmpty>
-              {(categoryGroups || []).map((group) => (
+              {safeGeneralGroups.map((group) => (
                 <React.Fragment key={group.name}>
                   {(group.categories || []).map((category) => (
                     <CommandGroup key={category.name} heading={category.name}>
@@ -76,7 +80,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             <Command>
               <CommandInput placeholder="Search industry categories..." />
               <CommandEmpty>No category found.</CommandEmpty>
-              {(industryGroups || []).map((group) => (
+              {safeIndustryGroups.map((group) => (
                 <CommandGroup key={group.name} heading={group.name}>
                   {(group.categories || []).map((category) => (
                     <CommandItem
