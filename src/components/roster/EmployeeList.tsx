@@ -14,10 +14,21 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
   employees, 
   onEmployeeUpdate 
 }) => {
+  const getNextEmployeeNumber = () => {
+    const existingNumbers = employees
+      .map(emp => {
+        const match = emp.name.match(/Cleaner(\d+)/);
+        return match ? parseInt(match[1]) : 0;
+      })
+      .filter(num => !isNaN(num));
+
+    return existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+  };
+
   const addEmployee = () => {
     const newEmployee: Employee = {
       id: crypto.randomUUID(),
-      name: '',
+      name: `Cleaner${getNextEmployeeNumber()}`,
       level: 1,
       employmentType: 'casual',
       isContractor: false,
