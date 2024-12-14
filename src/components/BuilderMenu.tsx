@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { DragHandle } from "lucide-react";
+import { GripVertical } from "lucide-react";
 
 export const builderElements = [
   { id: 'task-list', label: 'Task List' },
@@ -25,7 +25,7 @@ export const BuilderMenu = () => {
             }}
           >
             {element.label}
-            <DragHandle className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <GripVertical className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
           </Button>
         ))}
       </div>
