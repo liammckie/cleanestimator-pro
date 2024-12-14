@@ -9,6 +9,7 @@ import { OnCostsState } from '@/data/types/onCosts';
 import { Site } from '@/data/types/site';
 import { SiteManager } from '@/components/SiteManager';
 import { RosterManager } from '@/components/roster/RosterManager';
+import { Header } from '@/components/Header';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -62,58 +63,86 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
-        <div className="flex-1 bg-gray-50 py-8">
-          <div className="container mx-auto px-4">
-            <h1 className="text-3xl font-bold text-primary mb-8">
-              Commercial Cleaning Estimation Tool
-            </h1>
-            
-            <Tabs defaultValue="scope" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="scope">Scope & Tasks</TabsTrigger>
-                <TabsTrigger value="labor">Labor Costs</TabsTrigger>
-                <TabsTrigger value="equipment">Equipment</TabsTrigger>
-                <TabsTrigger value="roster">Roster</TabsTrigger>
-                <TabsTrigger value="summary">Summary</TabsTrigger>
-              </TabsList>
+      <div className="min-h-screen flex flex-col bg-primary">
+        <Header />
+        <div className="flex flex-1">
+          <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
+          <div className="flex-1 bg-primary/95 py-8">
+            <div className="container mx-auto px-4">
+              <h1 className="text-3xl font-bold text-white mb-8">
+                Commercial Cleaning Estimation Tool
+              </h1>
+              
+              <Tabs defaultValue="scope" className="space-y-6">
+                <TabsList className="grid w-full grid-cols-5 bg-primary/20">
+                  <TabsTrigger 
+                    value="scope"
+                    className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
+                  >
+                    Scope & Tasks
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="labor"
+                    className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
+                  >
+                    Labor Costs
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="equipment"
+                    className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
+                  >
+                    Equipment
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="roster"
+                    className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
+                  >
+                    Roster
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="summary"
+                    className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
+                  >
+                    Summary
+                  </TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="scope" className="space-y-6">
-                <SiteManager onSitesChange={setSites} />
-              </TabsContent>
+                <TabsContent value="scope" className="space-y-6 bg-accent/5 p-6 rounded-lg">
+                  <SiteManager onSitesChange={setSites} />
+                </TabsContent>
 
-              <TabsContent value="labor" className="space-y-6">
-                <LaborCosts onLaborCostChange={setLaborCosts} />
-              </TabsContent>
+                <TabsContent value="labor" className="space-y-6 bg-accent/5 p-6 rounded-lg">
+                  <LaborCosts onLaborCostChange={setLaborCosts} />
+                </TabsContent>
 
-              <TabsContent value="equipment" className="space-y-6">
-                <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-              </TabsContent>
+                <TabsContent value="equipment" className="space-y-6 bg-accent/5 p-6 rounded-lg">
+                  <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+                </TabsContent>
 
-              <TabsContent value="roster" className="space-y-6">
-                <RosterManager />
-              </TabsContent>
+                <TabsContent value="roster" className="space-y-6 bg-accent/5 p-6 rounded-lg">
+                  <RosterManager />
+                </TabsContent>
 
-              <TabsContent value="summary" className="space-y-6">
-                <ProfitLoss
-                  revenue={monthlyRevenue}
-                  laborCost={laborCost}
-                  equipmentCost={equipmentCosts.monthly}
-                  overhead={overhead}
-                />
-                
-                <div className="mt-6 text-sm text-gray-600">
-                  <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
-                  {totalTime > 0 && (
-                    <p>* Total time required: {(totalTime * 60).toFixed(1)} minutes</p>
-                  )}
-                  {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
-                    <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
+                <TabsContent value="summary" className="space-y-6 bg-accent/5 p-6 rounded-lg">
+                  <ProfitLoss
+                    revenue={monthlyRevenue}
+                    laborCost={laborCost}
+                    equipmentCost={equipmentCosts.monthly}
+                    overhead={overhead}
+                  />
+                  
+                  <div className="mt-6 text-sm text-gray-400">
+                    <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
+                    {totalTime > 0 && (
+                      <p>* Total time required: {(totalTime * 60).toFixed(1)} minutes</p>
+                    )}
+                    {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
+                      <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
         </div>
       </div>
