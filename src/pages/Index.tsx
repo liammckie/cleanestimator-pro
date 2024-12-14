@@ -14,12 +14,14 @@ import { CostSummary } from '@/components/CostSummary';
 import { calculateCosts } from '@/utils/costCalculations';
 import { ContractData } from '@/components/ContractData';
 import { ContractForecast } from '@/components/ContractForecast';
+import { AwardSettings } from '@/components/settings/AwardSettings';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
 const Index = () => {
   const [sites, setSites] = useState<Site[]>([]);
   const [activeTab, setActiveTab] = useState('scope');
+  const [awardIncrease, setAwardIncrease] = useState(0);
   const [laborCosts, setLaborCosts] = useState<{ 
     hourlyRate: number;
     employmentType: 'contracted' | 'direct';
@@ -109,7 +111,24 @@ const Index = () => {
       icon: "settings",
       onClick: () => setActiveTab('summary')
     },
+    {
+      id: 'settings',
+      label: 'Settings',
+      icon: "settings",
+      onClick: () => setActiveTab('settings')
+    },
   ];
+
+  const handleAwardIncreaseChange = (increase: number) => {
+    setAwardIncrease(increase);
+    // Update labor costs with new award increase
+    if (laborCosts.employmentType === 'direct') {
+      setLaborCosts(prev => ({
+        ...prev,
+        hourlyRate: prev.hourlyRate * (1 + (increase / 100))
+      }));
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -128,13 +147,14 @@ const Index = () => {
                   className="bg-card rounded-lg border border-border"
                 />
                 <div className="space-y-6">
-                  <TabsList className="grid w-full grid-cols-6">
+                  <TabsList className="grid w-full grid-cols-7">
                     <TabsTrigger value="scope">Scope & Tasks</TabsTrigger>
                     <TabsTrigger value="labor">Labor Costs</TabsTrigger>
                     <TabsTrigger value="equipment">Equipment</TabsTrigger>
                     <TabsTrigger value="roster">Roster</TabsTrigger>
                     <TabsTrigger value="contract">Contract</TabsTrigger>
                     <TabsTrigger value="summary">Summary</TabsTrigger>
+                    <TabsTrigger value="settings">Settings</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="scope" className="space-y-6">
@@ -183,6 +203,13 @@ const Index = () => {
                         <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
                       )}
                     </div>
+                  </TabsContent>
+
+                  <TabsContent value="settings" className="space-y-6">
+                    <AwardSettings
+                      currentIncrease={awardIncrease}
+                      onAwardIncreaseChange={handleAwardIncreaseChange}
+                    />
                   </TabsContent>
                 </div>
               </div>
