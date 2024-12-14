@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { getAllProductivityRates, getProductivityRate } from '@/data/productivityRates';
+import { TaskItem } from './TaskItem';
 
 interface AreaInputProps {
   onAreaChange: (area: { 
@@ -46,8 +46,8 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
   const calculateTimeRequired = (taskId: string, quantity: number, frequency: { timesPerWeek: number; timesPerMonth: number }) => {
     const rate = getProductivityRate(taskId);
     if (!rate) return 0;
-    const baseTime = quantity / rate.ratePerHour; // Base time in hours
-    return baseTime * frequency.timesPerWeek * 4; // Monthly time considering frequency
+    const baseTime = quantity / rate.ratePerHour;
+    return baseTime * (frequency?.timesPerWeek || 1) * 4;
   };
 
   const handleTaskSelection = (taskId: string, isSelected: boolean) => {
@@ -92,7 +92,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
   };
 
   const handleInputChange = () => {
-    const totalTime = selectedTasks.reduce((sum, task) => sum + task.timeRequired, 0);
+    const totalTime = selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0);
     onAreaChange({
       squareFeet,
       spaceType: 'carpet',
@@ -132,67 +132,16 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
             <div className="grid gap-2">
               {productivityRates
                 .filter(rate => rate.category === category)
-                .map((rate) => {
-                  const selectedTask = selectedTasks.find(task => task.taskId === rate.id);
-                  return (
-                    <div key={rate.id} className="flex flex-col gap-2 p-2 border rounded">
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          checked={!!selectedTask}
-                          onCheckedChange={(checked) => 
-                            handleTaskSelection(rate.id, checked as boolean)
-                          }
-                        />
-                        <span>{rate.task} ({rate.tool})</span>
-                      </div>
-                      {selectedTask && (
-                        <div className="ml-6 space-y-2">
-                          <div>
-                            <Label htmlFor={`quantity-${rate.id}`}>
-                              {rate.unit === 'spot' ? 'Number of Spots' : `Quantity (${rate.unit})`}
-                            </Label>
-                            <Input
-                              id={`quantity-${rate.id}`}
-                              type="number"
-                              value={selectedTask.quantity || ''}
-                              onChange={(e) => {
-                                const value = parseFloat(e.target.value) || 0;
-                                handleQuantityChange(rate.id, value);
-                              }}
-                              className="mt-1"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`frequency-${rate.id}`}>
-                              Times per Week
-                            </Label>
-                            <Select
-                              value={selectedTask.frequency.timesPerWeek.toString()}
-                              onValueChange={(value) => handleFrequencyChange(rate.id, parseInt(value))}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select frequency" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
-                                  <SelectItem key={freq} value={freq.toString()}>
-                                    {freq} {freq === 1 ? 'time' : 'times'} per week
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          {selectedTask.timeRequired > 0 && (
-                            <div className="text-sm text-gray-600 mt-1">
-                              <p>Time per service: {(selectedTask.timeRequired / (selectedTask.frequency.timesPerWeek * 4) * 60).toFixed(1)} minutes</p>
-                              <p>Monthly time: {(selectedTask.timeRequired * 60).toFixed(1)} minutes</p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                .map((rate) => (
+                  <TaskItem
+                    key={rate.id}
+                    rate={rate}
+                    selectedTask={selectedTasks.find(task => task.taskId === rate.id)}
+                    onTaskSelection={handleTaskSelection}
+                    onQuantityChange={handleQuantityChange}
+                    onFrequencyChange={handleFrequencyChange}
+                  />
+                ))}
             </div>
           </div>
 
@@ -213,7 +162,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
           {selectedTasks.length > 0 && (
             <div className="p-4 bg-gray-50 rounded">
               <h3 className="font-medium mb-2">Total Monthly Time Required</h3>
-              <p>{(selectedTasks.reduce((sum, task) => sum + task.timeRequired, 0) * 60).toFixed(1)} minutes</p>
+              <p>{(selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0) * 60).toFixed(1)} minutes</p>
             </div>
           )}
         </div>
