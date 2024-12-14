@@ -64,9 +64,11 @@ const Index = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="flex-1 flex bg-primary">
-          <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
-          <main className="flex-1 overflow-auto">
-            <div className="container mx-auto px-8 py-6 max-w-7xl">
+          <div className="w-1/3 min-w-[400px]">
+            <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
+          </div>
+          <main className="flex-1 overflow-auto p-6">
+            <div className="max-w-[1200px] mx-auto">
               <div className="mb-8">
                 <h1 className="text-4xl font-bold text-white">
                   Commercial Cleaning Estimation Tool

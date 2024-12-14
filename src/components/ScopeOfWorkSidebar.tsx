@@ -23,7 +23,6 @@ interface ScopeOfWorkSidebarProps {
 }
 
 export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selectedTasks }) => {
-  // Calculate tools summary
   const toolsSummary = selectedTasks.reduce((acc, task) => {
     const tool = task.selectedTool || getProductivityRate(task.taskId)?.tool || 'Unknown Tool';
     if (!acc[tool]) {
@@ -39,56 +38,85 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selected
   }, {} as Record<string, { count: number; sites: Set<string> }>);
 
   return (
-    <Sidebar className="border-r">
-      <SidebarHeader className="border-b px-4 py-2">
-        <h2 className="text-lg font-semibold">Scope of Work</h2>
+    <Sidebar className="border-r h-[calc(100vh-4rem)]">
+      <SidebarHeader className="border-b px-6 py-4">
+        <h2 className="text-xl font-semibold text-white">Scope of Work</h2>
       </SidebarHeader>
       <SidebarContent>
-        <ScrollArea className="h-[calc(100vh-5rem)] px-4">
+        <ScrollArea className="h-full px-6">
           {selectedTasks.length === 0 ? (
             <p className="text-muted-foreground text-sm py-4">
               No tasks selected. Select tasks to build your scope of work.
             </p>
           ) : (
-            <div className="space-y-4 py-4">
+            <div className="space-y-6 py-4">
               {selectedTasks.map((task, index) => {
                 const rateInfo = getProductivityRate(task.taskId);
                 if (!rateInfo) return null;
 
                 return (
-                  <div key={`${task.taskId}-${index}`} className="border rounded-lg p-4 space-y-2">
-                    <div className="font-medium">{rateInfo.task}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {task.siteName && <p>Site: {task.siteName}</p>}
-                      <p>Category: {rateInfo.category}</p>
-                      <p>Tool: {task.selectedTool || rateInfo.tool}</p>
-                      <p>Quantity: {task.quantity} {rateInfo.unit}</p>
-                      <p>Frequency: {task.frequency?.timesPerWeek || 1} times per week</p>
-                      <p>Time per service: {((task.timeRequired / (task.frequency?.timesPerWeek || 1)) / 4 * 60).toFixed(1)} minutes</p>
-                      <p>Monthly time: {(task.timeRequired * 60).toFixed(1)} minutes</p>
+                  <div key={`${task.taskId}-${index}`} className="bg-accent/5 rounded-lg p-6 space-y-3">
+                    <div className="font-medium text-lg text-white">{rateInfo.task}</div>
+                    <div className="space-y-2 text-sm text-gray-300">
+                      {task.siteName && (
+                        <div className="flex justify-between">
+                          <span>Site:</span>
+                          <span className="font-medium">{task.siteName}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span>Category:</span>
+                        <span className="font-medium">{rateInfo.category}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Tool:</span>
+                        <span className="font-medium">{task.selectedTool || rateInfo.tool}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Quantity:</span>
+                        <span className="font-medium">{task.quantity} {rateInfo.unit}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Frequency:</span>
+                        <span className="font-medium">{task.frequency?.timesPerWeek || 1} times per week</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Time per service:</span>
+                        <span className="font-medium">{((task.timeRequired / (task.frequency?.timesPerWeek || 1)) / 4 * 60).toFixed(1)} minutes</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Monthly time:</span>
+                        <span className="font-medium">{(task.timeRequired * 60).toFixed(1)} minutes</span>
+                      </div>
                     </div>
                   </div>
                 );
               })}
 
-              <div className="border-t pt-4">
-                <p className="font-medium">Total Monthly Time Required:</p>
-                <p className="text-sm text-muted-foreground">
+              <Separator className="my-6" />
+
+              <div className="bg-accent/5 rounded-lg p-6 space-y-4">
+                <h3 className="font-semibold text-lg text-white">Total Monthly Time Required:</h3>
+                <p className="text-2xl font-bold text-secondary">
                   {(selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0) * 60).toFixed(1)} minutes
                 </p>
               </div>
 
-              <Separator className="my-4" />
+              <Separator className="my-6" />
 
-              <div className="space-y-2">
-                <h3 className="font-medium">Tools Required:</h3>
-                {Object.entries(toolsSummary).map(([tool, details]) => (
-                  <div key={tool} className="text-sm text-muted-foreground">
-                    <p className="font-medium">{tool}</p>
-                    <p>Used in {details.count} task{details.count !== 1 ? 's' : ''}</p>
-                    <p>Sites: {Array.from(details.sites).join(', ')}</p>
-                  </div>
-                ))}
+              <div className="bg-accent/5 rounded-lg p-6 space-y-4">
+                <h3 className="font-semibold text-lg text-white">Tools Required:</h3>
+                <div className="space-y-4">
+                  {Object.entries(toolsSummary).map(([tool, details]) => (
+                    <div key={tool} className="space-y-2">
+                      <p className="font-medium text-white">{tool}</p>
+                      <div className="text-sm text-gray-300">
+                        <p>Used in {details.count} task{details.count !== 1 ? 's' : ''}</p>
+                        <p>Sites: {Array.from(details.sites).join(', ')}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
