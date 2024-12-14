@@ -1,12 +1,7 @@
 export interface Site {
   id: string;
   name: string;
-  address: {
-    street: string;
-    suburb: string;
-    state: string;
-    postcode: string;
-  };
+  address?: string;
   area: {
     squareMeters: number;
     spaceType: string;

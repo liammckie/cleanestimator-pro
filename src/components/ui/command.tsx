@@ -9,7 +9,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive>
->(({ className, children, ...props }, ref) => (
+>(({ className, ...props }, ref) => (
   <CommandPrimitive
     ref={ref}
     className={cn(
@@ -17,9 +17,7 @@ const Command = React.forwardRef<
       className
     )}
     {...props}
-  >
-    {children}
-  </CommandPrimitive>
+  />
 ))
 Command.displayName = CommandPrimitive.displayName
 
@@ -59,14 +57,12 @@ CommandInput.displayName = CommandPrimitive.Input.displayName
 const CommandList = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
->(({ className, children, ...props }, ref) => (
+>(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
     className={cn("max-h-[300px] overflow-y-auto overflow-x-hidden", className)}
     {...props}
-  >
-    {children || null}
-  </CommandPrimitive.List>
+  />
 ))
 
 CommandList.displayName = CommandPrimitive.List.displayName
@@ -87,7 +83,7 @@ CommandEmpty.displayName = CommandPrimitive.Empty.displayName
 const CommandGroup = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Group>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
->(({ className, children, ...props }, ref) => (
+>(({ className, ...props }, ref) => (
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
@@ -95,9 +91,7 @@ const CommandGroup = React.forwardRef<
       className
     )}
     {...props}
-  >
-    {children || null}
-  </CommandPrimitive.Group>
+  />
 ))
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName
