@@ -2,7 +2,9 @@ export interface Employee {
   id: string;
   name: string;
   level: 1 | 2 | 3;
-  employmentType: 'casual' | 'part-time' | 'full-time';
+  employmentType: 'casual' | 'part-time' | 'full-time' | 'contractor';
+  isContractor: boolean;
+  contractorRate?: number;
   certifications: string[];
   availability: {
     [key: string]: { // day of week

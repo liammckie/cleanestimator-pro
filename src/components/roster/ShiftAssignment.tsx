@@ -2,7 +2,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Employee, Shift } from '@/data/types/roster';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
+import { cleaningAwardLevels } from '@/data/award/cleaningAward';
 
 interface ShiftAssignmentProps {
   unassignedShifts: Shift[];
@@ -21,6 +22,15 @@ export const ShiftAssignment: React.FC<ShiftAssignmentProps> = ({
     { label: 'Afternoon', value: '14:00-22:00' },
     { label: 'Night', value: '22:00-06:00' },
   ];
+
+  const getEmployeeRate = (employee: Employee, shiftType: string = 'standard'): number => {
+    if (employee.isContractor) {
+      return employee.contractorRate || 0;
+    }
+    
+    const awardLevel = cleaningAwardLevels.find(level => level.level === employee.level);
+    return awardLevel?.payRates[shiftType as keyof typeof awardLevel.payRates] || 0;
+  };
 
   return (
     <Card>
@@ -73,12 +83,15 @@ export const ShiftAssignment: React.FC<ShiftAssignmentProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     {employees
-                      .filter(employee => employee.level >= shift.requiredLevel)
-                      .map(employee => (
-                        <SelectItem key={employee.id} value={employee.id}>
-                          {employee.name} (Level {employee.level})
-                        </SelectItem>
-                      ))}
+                      .filter(employee => employee.isContractor || employee.level >= shift.requiredLevel)
+                      .map(employee => {
+                        const rate = getEmployeeRate(employee);
+                        return (
+                          <SelectItem key={employee.id} value={employee.id}>
+                            {employee.name} ({employee.isContractor ? 'Contractor' : `Level ${employee.level}`}) - ${rate}/hr
+                          </SelectItem>
+                        );
+                      })}
                   </SelectContent>
                 </Select>
               </div>

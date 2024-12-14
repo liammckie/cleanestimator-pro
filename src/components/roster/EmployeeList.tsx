@@ -20,6 +20,8 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
       name: '',
       level: 1,
       employmentType: 'casual',
+      isContractor: false,
+      contractorRate: 0,
       certifications: [],
       availability: {}
     };
@@ -44,34 +46,71 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
                 value={employee.name}
                 onChange={(e) => updateEmployee(index, { name: e.target.value })}
               />
+              
               <Select
-                value={employee.level.toString()}
-                onValueChange={(value) => updateEmployee(index, { level: parseInt(value) as 1 | 2 | 3 })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Level 1</SelectItem>
-                  <SelectItem value="2">Level 2</SelectItem>
-                  <SelectItem value="3">Level 3</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={employee.employmentType}
-                onValueChange={(value) => updateEmployee(index, { 
-                  employmentType: value as 'casual' | 'part-time' | 'full-time' 
-                })}
+                value={employee.isContractor ? 'contractor' : 'direct'}
+                onValueChange={(value) => {
+                  updateEmployee(index, { 
+                    isContractor: value === 'contractor',
+                    employmentType: value === 'contractor' ? 'contractor' : 'casual'
+                  });
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Employment Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="casual">Casual</SelectItem>
-                  <SelectItem value="part-time">Part Time</SelectItem>
-                  <SelectItem value="full-time">Full Time</SelectItem>
+                  <SelectItem value="direct">Direct Employee</SelectItem>
+                  <SelectItem value="contractor">Contractor</SelectItem>
                 </SelectContent>
               </Select>
+
+              {employee.isContractor ? (
+                <div className="space-y-2">
+                  <Input
+                    type="number"
+                    placeholder="Contractor Rate ($)"
+                    value={employee.contractorRate || ''}
+                    onChange={(e) => updateEmployee(index, { 
+                      contractorRate: parseFloat(e.target.value) || 0 
+                    })}
+                  />
+                </div>
+              ) : (
+                <>
+                  <Select
+                    value={employee.level.toString()}
+                    onValueChange={(value) => updateEmployee(index, { 
+                      level: parseInt(value) as 1 | 2 | 3 
+                    })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Level 1</SelectItem>
+                      <SelectItem value="2">Level 2</SelectItem>
+                      <SelectItem value="3">Level 3</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    value={employee.employmentType}
+                    onValueChange={(value) => updateEmployee(index, { 
+                      employmentType: value as 'casual' | 'part-time' | 'full-time' 
+                    })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Employment Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="casual">Casual</SelectItem>
+                      <SelectItem value="part-time">Part Time</SelectItem>
+                      <SelectItem value="full-time">Full Time</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </>
+              )}
             </CardContent>
           </Card>
         ))}
