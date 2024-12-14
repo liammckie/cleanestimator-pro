@@ -8,8 +8,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { getProductivityRate } from '@/data/productivityRates';
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
-import { Clock, BarChart2, MapPin, Building } from "lucide-react";
+import { Clock, BarChart2, MapPin, Building, Calendar, Tool } from "lucide-react";
 import { Site } from '@/data/types/site';
+import { Badge } from "@/components/ui/badge";
 
 interface ScopeOfWorkSidebarProps {
   selectedTasks: Array<{
@@ -27,23 +28,24 @@ interface ScopeOfWorkSidebarProps {
 }
 
 export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selectedTasks, sites = [] }) => {
-  // Calculate tools summary
-  const toolsSummary = selectedTasks.reduce((acc, task) => {
-    const tool = task.selectedTool || getProductivityRate(task.taskId)?.tool || 'Unknown Tool';
-    if (!acc[tool]) {
-      acc[tool] = {
-        count: 1,
-        sites: new Set([task.siteName || 'Default Site'])
-      };
-    } else {
-      acc[tool].count += 1;
-      acc[tool].sites.add(task.siteName || 'Default Site');
+  // Group tasks by category
+  const tasksByCategory = selectedTasks.reduce((acc, task) => {
+    const rate = getProductivityRate(task.taskId);
+    if (!rate) return acc;
+    
+    if (!acc[rate.category]) {
+      acc[rate.category] = [];
     }
+    acc[rate.category].push({ ...task, rate });
     return acc;
-  }, {} as Record<string, { count: number; sites: Set<string> }>);
+  }, {} as Record<string, Array<any>>);
 
   // Calculate total monthly time
-  const totalMonthlyTime = selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0) * 60;
+  const totalMonthlyTime = selectedTasks.reduce((sum, task) => 
+    sum + (task.timeRequired || 0), 0) * 60;
+
+  // Calculate total weekly hours
+  const weeklyHours = totalMonthlyTime / (4.33 * 60);
 
   // Group tasks by site
   const tasksBySite = selectedTasks.reduce((acc, task) => {
@@ -58,96 +60,87 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selected
   return (
     <Sidebar className="border-r w-96">
       <SidebarHeader className="border-b px-6 py-4 bg-accent">
-        <h2 className="text-2xl font-semibold text-primary-foreground">Scope of Work</h2>
+        <h2 className="text-2xl font-semibold text-primary">Scope Summary</h2>
       </SidebarHeader>
       <SidebarContent>
         <ScrollArea className="h-[calc(100vh-5rem)] px-6">
           <div className="space-y-6 py-6">
+            {/* Overview Cards */}
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="p-4 bg-accent/50">
+                <div className="flex items-center space-x-2">
+                  <Building className="w-4 h-4 text-primary" />
+                  <p className="text-sm font-medium">Sites</p>
+                </div>
+                <p className="text-2xl font-bold mt-2">{sites.length}</p>
+              </Card>
+              
+              <Card className="p-4 bg-accent/50">
+                <div className="flex items-center space-x-2">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <p className="text-sm font-medium">Weekly Hours</p>
+                </div>
+                <p className="text-2xl font-bold mt-2">{weeklyHours.toFixed(1)}</p>
+              </Card>
+            </div>
+
             {/* Sites Summary */}
-            <Card className="p-4 bg-accent/50">
-              <div className="flex items-center space-x-2 mb-2">
-                <Building className="w-5 h-5 text-primary" />
-                <h3 className="font-semibold text-lg">Sites Summary</h3>
-              </div>
-              <p className="text-muted-foreground">
-                Total Sites: {sites.length}
-              </p>
-              <div className="mt-2 space-y-1">
-                {sites.map((site) => (
-                  <p key={site.id} className="text-sm text-muted-foreground truncate">
-                    • {site.name}
-                  </p>
-                ))}
-              </div>
-            </Card>
+            {Object.entries(tasksBySite).map(([siteName, siteTasks]) => (
+              <Card key={siteName} className="p-4">
+                <div className="flex items-center space-x-2 mb-4">
+                  <MapPin className="w-5 h-5 text-primary" />
+                  <h3 className="font-semibold text-lg">{siteName}</h3>
+                </div>
+                
+                {/* Tasks by Category */}
+                <div className="space-y-4">
+                  {Object.entries(tasksByCategory).map(([category, tasks]) => {
+                    const siteCategoryTasks = tasks.filter(t => t.siteName === siteName);
+                    if (siteCategoryTasks.length === 0) return null;
 
-            {/* Time Summary */}
-            <Card className="p-4 bg-accent/50">
-              <div className="flex items-center space-x-2 mb-2">
-                <Clock className="w-5 h-5 text-primary" />
-                <h3 className="font-semibold text-lg">Time Summary</h3>
-              </div>
-              <p className="text-muted-foreground">
-                Total Monthly Time: {totalMonthlyTime.toFixed(1)} minutes
-              </p>
-            </Card>
+                    return (
+                      <div key={category} className="space-y-2">
+                        <h4 className="text-sm font-medium text-muted-foreground">{category}</h4>
+                        {siteCategoryTasks.map((task, index) => (
+                          <div key={`${task.taskId}-${index}`} className="pl-4 border-l-2 border-accent">
+                            <p className="text-sm font-medium">{task.rate.task}</p>
+                            <div className="flex flex-wrap gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs">
+                                <Calendar className="w-3 h-3 mr-1" />
+                                {task.frequency.timesPerWeek}x/week
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                <Tool className="w-3 h-3 mr-1" />
+                                {task.selectedTool || task.rate.tool}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
 
-            {selectedTasks.length === 0 ? (
-              <div className="flex flex-col items-center justify-center space-y-4 text-center">
+                {/* Site Time Summary */}
+                <div className="mt-4 pt-4 border-t">
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Monthly Time:</span>
+                    <span>
+                      {(siteTasks.reduce((sum, task) => 
+                        sum + (task.timeRequired || 0), 0) * 60).toFixed(1)} minutes
+                    </span>
+                  </div>
+                </div>
+              </Card>
+            ))}
+
+            {selectedTasks.length === 0 && (
+              <div className="flex flex-col items-center justify-center space-y-4 text-center p-8">
                 <BarChart2 className="w-12 h-12 text-muted-foreground" />
                 <p className="text-muted-foreground text-lg">
                   No tasks selected. Select tasks to build your scope of work.
                 </p>
               </div>
-            ) : (
-              <>
-                {/* Tasks by Site */}
-                {Object.entries(tasksBySite).map(([siteName, siteTasks]) => (
-                  <div key={siteName} className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="w-5 h-5 text-primary" />
-                      <h3 className="font-semibold text-lg">{siteName}</h3>
-                    </div>
-                    {siteTasks.map((task, index) => {
-                      const rateInfo = getProductivityRate(task.taskId);
-                      if (!rateInfo) return null;
-
-                      return (
-                        <Card key={`${task.taskId}-${index}`} className="p-4 bg-card/50 space-y-3">
-                          <div className="font-medium text-lg text-primary-foreground">{rateInfo.task}</div>
-                          <div className="space-y-2 text-sm text-muted-foreground">
-                            <p>Category: {rateInfo.category}</p>
-                            <p>Tool: {task.selectedTool || rateInfo.tool}</p>
-                            <p>Quantity: {task.quantity} {rateInfo.unit}</p>
-                            <p>Frequency: {task.frequency?.timesPerWeek || 1} times per week</p>
-                            <p>Time per service: {((task.timeRequired / (task.frequency?.timesPerWeek || 1)) / 4 * 60).toFixed(1)} minutes</p>
-                            <p>Monthly time: {(task.timeRequired * 60).toFixed(1)} minutes</p>
-                          </div>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                ))}
-
-                <Separator className="my-6" />
-
-                {/* Tools Summary */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <BarChart2 className="w-5 h-5 text-primary" />
-                    <h3 className="font-semibold text-lg">Tools Required</h3>
-                  </div>
-                  {Object.entries(toolsSummary).map(([tool, details]) => (
-                    <Card key={tool} className="p-4 bg-card/50">
-                      <p className="font-medium text-primary-foreground">{tool}</p>
-                      <div className="text-sm text-muted-foreground space-y-1">
-                        <p>Used in {details.count} task{details.count !== 1 ? 's' : ''}</p>
-                        <p>Sites: {Array.from(details.sites).join(', ')}</p>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </>
             )}
           </div>
         </ScrollArea>
