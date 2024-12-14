@@ -35,7 +35,7 @@ export const AllowancesSelector: React.FC<AllowancesSelectorProps> = ({ onAllowa
 
         <div className="flex items-center space-x-2">
           <Checkbox id="heightAbove22" />
-          <Label htmlFor="heightAbove22">Height > 22nd floor ($2.10/hour)</Label>
+          <Label htmlFor="heightAbove22">Height above 22nd floor ($2.10/hour)</Label>
         </div>
 
         <div className="flex items-center space-x-2">
@@ -45,7 +45,7 @@ export const AllowancesSelector: React.FC<AllowancesSelectorProps> = ({ onAllowa
 
         <div className="flex items-center space-x-2">
           <Checkbox id="hotPlaces54" />
-          <Label htmlFor="hotPlaces54">Hot Places >54°C ($0.77/hour)</Label>
+          <Label htmlFor="hotPlaces54">Hot Places above 54°C ($0.77/hour)</Label>
         </div>
 
         <div className="flex items-center space-x-2">
