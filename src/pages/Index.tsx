@@ -11,8 +11,16 @@ import { RosterManager } from '@/components/roster/RosterManager';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { BuilderMenu, builderElements } from '@/components/BuilderMenu';
+import { useToast } from '@/components/ui/use-toast';
 
 type View = 'sites' | 'scope' | 'costs' | 'roster';
+
+interface ElementPosition {
+  id: string;
+  x: number;
+  y: number;
+}
 
 const Index = () => {
   const [sites, setSites] = useState<Site[]>([]);
@@ -28,6 +36,8 @@ const Index = () => {
   });
   const [equipmentCosts, setEquipmentCosts] = useState({ monthly: 0 });
   const [activeView, setActiveView] = useState<View>('sites');
+  const [elementPositions, setElementPositions] = useState<ElementPosition[]>([]);
+  const { toast } = useToast();
 
   const calculateTotalOnCosts = () => {
     if (laborCosts.employmentType !== 'direct' || !laborCosts.onCosts) return 0;
@@ -57,18 +67,52 @@ const Index = () => {
     }))
   );
 
-  const getNextView = (currentView: View): View => {
-    const views: View[] = ['sites', 'scope', 'costs', 'roster'];
-    const currentIndex = views.indexOf(currentView);
-    return views[currentIndex + 1] || currentView;
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    const elementId = e.dataTransfer.getData('text/plain');
+    if (!elementId) return;
+
+    // Calculate snap positions (grid of 20px)
+    const snapX = Math.round(e.clientX / 20) * 20;
+    const snapY = Math.round(e.clientY / 20) * 20;
+
+    // Update element position
+    setElementPositions(prev => {
+      const existingIndex = prev.findIndex(pos => pos.id === elementId);
+      if (existingIndex >= 0) {
+        const newPositions = [...prev];
+        newPositions[existingIndex] = { id: elementId, x: snapX, y: snapY };
+        return newPositions;
+      }
+      return [...prev, { id: elementId, x: snapX, y: snapY }];
+    });
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const elementId = e.dataTransfer.getData('text/plain');
+    if (!elementId) return;
+
+    const element = builderElements.find(el => el.id === elementId);
+    if (element) {
+      toast({
+        title: "Element Added",
+        description: `${element.label} has been placed on the canvas`,
+      });
+    }
   };
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
+        <BuilderMenu />
         
-        <main className="flex-1 w-full">
+        <main 
+          className="flex-1 w-full"
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
           <div className="max-w-[1400px] mx-auto px-6 py-8 w-full">
             {/* Progress Steps */}
             <div className="mb-8">
