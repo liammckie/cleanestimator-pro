@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { getProductivityRate } from '@/data/productivityRates';
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
-import { Clock, Tool, MapPin, BarChart2 } from "lucide-react";
+import { Clock, BarChart2, MapPin } from "lucide-react";
 
 interface ScopeOfWorkSidebarProps {
   selectedTasks: Array<{
@@ -113,7 +113,7 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selected
               {/* Tools Summary */}
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
-                  <Tool className="w-5 h-5 text-primary" />
+                  <BarChart2 className="w-5 h-5 text-primary" />
                   <h3 className="font-semibold text-lg">Tools Required</h3>
                 </div>
                 {Object.entries(toolsSummary).map(([tool, details]) => (
