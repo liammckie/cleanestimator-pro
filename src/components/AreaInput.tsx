@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getAllProductivityRates, getProductivityRate } from "@/data/productivityRates";
+import { getAllProductivityRates, getProductivityRate } from '@/data/productivityRates';
 
 interface AreaInputProps {
   onAreaChange: (area: { 
@@ -14,6 +14,10 @@ interface AreaInputProps {
       taskId: string;
       quantity: number;
       timeRequired: number;
+      frequency: {
+        timesPerWeek: number;
+        timesPerMonth: number;
+      };
     }>;
     totalTime: number;
   }) => void;
@@ -24,6 +28,10 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
     taskId: string;
     quantity: number;
     timeRequired: number;
+    frequency: {
+      timesPerWeek: number;
+      timesPerMonth: number;
+    };
   }>>([]);
   const [squareFeet, setSquareFeet] = useState(0);
   const [category, setCategory] = useState("Carpet Maintenance - Spraying and Spotting");
@@ -35,10 +43,11 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
     handleInputChange();
   }, [selectedTasks, squareFeet]);
 
-  const calculateTimeRequired = (taskId: string, quantity: number) => {
+  const calculateTimeRequired = (taskId: string, quantity: number, frequency: { timesPerWeek: number; timesPerMonth: number }) => {
     const rate = getProductivityRate(taskId);
     if (!rate) return 0;
-    return quantity / rate.ratePerHour; // Returns time in hours
+    const baseTime = quantity / rate.ratePerHour; // Base time in hours
+    return baseTime * frequency.timesPerWeek * 4; // Monthly time considering frequency
   };
 
   const handleTaskSelection = (taskId: string, isSelected: boolean) => {
@@ -46,19 +55,37 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
       const newTask = {
         taskId,
         quantity: 0,
-        timeRequired: 0
+        timeRequired: 0,
+        frequency: {
+          timesPerWeek: 1,
+          timesPerMonth: 4
+        }
       };
-      setSelectedTasks([...selectedTasks, newTask]);
+      setSelectedTasks(prev => [...prev, newTask]);
     } else {
-      setSelectedTasks(selectedTasks.filter(task => task.taskId !== taskId));
+      setSelectedTasks(prev => prev.filter(task => task.taskId !== taskId));
     }
   };
 
   const handleQuantityChange = (taskId: string, quantity: number) => {
-    setSelectedTasks(selectedTasks.map(task => {
+    setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
-        const timeRequired = calculateTimeRequired(taskId, quantity);
+        const timeRequired = calculateTimeRequired(taskId, quantity, task.frequency);
         return { ...task, quantity, timeRequired };
+      }
+      return task;
+    }));
+  };
+
+  const handleFrequencyChange = (taskId: string, timesPerWeek: number) => {
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        const frequency = {
+          timesPerWeek,
+          timesPerMonth: timesPerWeek * 4
+        };
+        const timeRequired = calculateTimeRequired(taskId, task.quantity, frequency);
+        return { ...task, frequency, timeRequired };
       }
       return task;
     }));
@@ -85,10 +112,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
             <Label htmlFor="category">Category</Label>
             <Select
               value={category}
-              onValueChange={(value) => {
-                setCategory(value);
-                setSelectedTasks([]);
-              }}
+              onValueChange={(value) => setCategory(value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a category" />
@@ -122,23 +146,46 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
                         <span>{rate.task} ({rate.tool})</span>
                       </div>
                       {selectedTask && (
-                        <div className="ml-6">
-                          <Label htmlFor={`quantity-${rate.id}`}>
-                            {rate.unit === 'spot' ? 'Number of Spots' : `Quantity (${rate.unit})`}
-                          </Label>
-                          <Input
-                            id={`quantity-${rate.id}`}
-                            type="number"
-                            value={selectedTask.quantity || ''}
-                            onChange={(e) => {
-                              const value = parseFloat(e.target.value) || 0;
-                              handleQuantityChange(rate.id, value);
-                            }}
-                            className="mt-1"
-                          />
+                        <div className="ml-6 space-y-2">
+                          <div>
+                            <Label htmlFor={`quantity-${rate.id}`}>
+                              {rate.unit === 'spot' ? 'Number of Spots' : `Quantity (${rate.unit})`}
+                            </Label>
+                            <Input
+                              id={`quantity-${rate.id}`}
+                              type="number"
+                              value={selectedTask.quantity || ''}
+                              onChange={(e) => {
+                                const value = parseFloat(e.target.value) || 0;
+                                handleQuantityChange(rate.id, value);
+                              }}
+                              className="mt-1"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`frequency-${rate.id}`}>
+                              Times per Week
+                            </Label>
+                            <Select
+                              value={selectedTask.frequency.timesPerWeek.toString()}
+                              onValueChange={(value) => handleFrequencyChange(rate.id, parseInt(value))}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select frequency" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
+                                  <SelectItem key={freq} value={freq.toString()}>
+                                    {freq} {freq === 1 ? 'time' : 'times'} per week
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                           {selectedTask.timeRequired > 0 && (
                             <div className="text-sm text-gray-600 mt-1">
-                              Time required: {(selectedTask.timeRequired * 60).toFixed(1)} minutes
+                              <p>Time per service: {(selectedTask.timeRequired / (selectedTask.frequency.timesPerWeek * 4) * 60).toFixed(1)} minutes</p>
+                              <p>Monthly time: {(selectedTask.timeRequired * 60).toFixed(1)} minutes</p>
                             </div>
                           )}
                         </div>
@@ -155,17 +202,17 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
               id="squareFeet"
               type="number"
               placeholder="Enter total square footage"
+              value={squareFeet || ''}
               onChange={(e) => {
                 const value = parseFloat(e.target.value) || 0;
                 setSquareFeet(value);
-                handleInputChange();
               }}
             />
           </div>
 
           {selectedTasks.length > 0 && (
             <div className="p-4 bg-gray-50 rounded">
-              <h3 className="font-medium mb-2">Total Time Required</h3>
+              <h3 className="font-medium mb-2">Total Monthly Time Required</h3>
               <p>{(selectedTasks.reduce((sum, task) => sum + task.timeRequired, 0) * 60).toFixed(1)} minutes</p>
             </div>
           )}

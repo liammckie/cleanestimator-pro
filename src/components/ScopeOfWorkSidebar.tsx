@@ -12,6 +12,10 @@ interface ScopeOfWorkSidebarProps {
     taskId: string;
     quantity: number;
     timeRequired: number;
+    frequency: {
+      timesPerWeek: number;
+      timesPerMonth: number;
+    };
   }>;
 }
 
@@ -40,13 +44,15 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selected
                       <p>Category: {rateInfo.category}</p>
                       <p>Tool: {rateInfo.tool}</p>
                       <p>Quantity: {task.quantity} {rateInfo.unit}</p>
-                      <p>Time Required: {(task.timeRequired * 60).toFixed(1)} minutes</p>
+                      <p>Frequency: {task.frequency.timesPerWeek} times per week</p>
+                      <p>Time per service: {(task.timeRequired / (task.frequency.timesPerWeek * 4) * 60).toFixed(1)} minutes</p>
+                      <p>Monthly time: {(task.timeRequired * 60).toFixed(1)} minutes</p>
                     </div>
                   </div>
                 );
               })}
               <div className="border-t pt-4">
-                <p className="font-medium">Total Time Required:</p>
+                <p className="font-medium">Total Monthly Time Required:</p>
                 <p className="text-sm text-muted-foreground">
                   {(selectedTasks.reduce((sum, task) => sum + task.timeRequired, 0) * 60).toFixed(1)} minutes
                 </p>
