@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Building } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { categoryGroups, industryGroups } from '@/utils/categoryGroups';
 
 interface CategorySelectProps {
@@ -15,6 +16,7 @@ interface CategorySelectProps {
 export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueChange }) => {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'categories' | 'industries'>('categories');
 
   const renderCategories = (categories: Array<{ name: string; subcategories: string[] }> = []) => {
     if (!Array.isArray(categories)) return [];
@@ -24,11 +26,10 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
       .map((category) => {
         if (!category?.name || !Array.isArray(category?.subcategories)) return null;
 
-        const filteredSubcategories = (category.subcategories || [])
-          .filter(subcategory => 
-            subcategory && typeof subcategory === 'string' &&
-            subcategory.toLowerCase().includes(searchQuery.toLowerCase())
-          );
+        const filteredSubcategories = category.subcategories.filter(subcategory => 
+          subcategory && typeof subcategory === 'string' &&
+          subcategory.toLowerCase().includes(searchQuery.toLowerCase())
+        );
 
         if (filteredSubcategories.length === 0) return null;
 
@@ -65,7 +66,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
       .filter(Boolean);
   };
 
-  const renderIndustryGroups = () => {
+  const renderIndustries = () => {
     if (!Array.isArray(industryGroups)) return [];
 
     return industryGroups
@@ -73,18 +74,20 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
       .map(group => {
         if (!group?.name || !Array.isArray(group?.categories)) return null;
 
-        const filteredCategories = (group.categories || [])
-          .filter(category =>
-            category && typeof category === 'string' &&
-            category.toLowerCase().includes(searchQuery.toLowerCase())
-          );
+        const filteredCategories = group.categories.filter(category =>
+          category && typeof category === 'string' &&
+          category.toLowerCase().includes(searchQuery.toLowerCase())
+        );
 
         if (filteredCategories.length === 0) return null;
 
         return (
           <AccordionItem key={group.name} value={group.name}>
             <AccordionTrigger className="font-semibold">
-              {group.name}
+              <span className="flex items-center gap-2">
+                <Building className="h-4 w-4" />
+                {group.name}
+              </span>
             </AccordionTrigger>
             <AccordionContent>
               <CommandGroup>
@@ -114,27 +117,6 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
       .filter(Boolean);
   };
 
-  const hasResults = () => {
-    const safeCategories = Array.isArray(categoryGroups) ? categoryGroups : [];
-    const safeIndustries = Array.isArray(industryGroups) ? industryGroups : [];
-
-    const categoryResults = safeCategories.some(group => 
-      group?.categories?.some(category =>
-        category?.subcategories?.some(subcategory =>
-          subcategory?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      )
-    );
-
-    const industryResults = safeIndustries.some(group =>
-      group?.categories?.some(category =>
-        category?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-
-    return categoryResults || industryResults;
-  };
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -155,26 +137,45 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
-          <div className="max-h-[300px] overflow-y-auto">
-            <Accordion type="single" collapsible className="w-full">
-              {Array.isArray(categoryGroups) && categoryGroups.map(group => (
-                <AccordionItem key={group.name} value={group.name}>
-                  <AccordionTrigger className="font-semibold">
-                    {group.name}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Accordion type="single" collapsible className="w-full">
-                      {renderCategories(group.categories)}
-                    </Accordion>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-              {renderIndustryGroups()}
-            </Accordion>
+          <div className="border-t pt-2">
+            <Tabs value={activeTab} onValueChange={(value: 'categories' | 'industries') => setActiveTab(value)}>
+              <TabsList className="w-full">
+                <TabsTrigger value="categories" className="flex-1">Categories</TabsTrigger>
+                <TabsTrigger value="industries" className="flex-1">Industries</TabsTrigger>
+              </TabsList>
+              <div className="mt-2 max-h-[300px] overflow-y-auto">
+                <TabsContent value="categories">
+                  <Accordion type="single" collapsible className="w-full">
+                    {Array.isArray(categoryGroups) && categoryGroups.map(group => (
+                      <AccordionItem key={group.name} value={group.name}>
+                        <AccordionTrigger className="font-semibold">
+                          {group.name}
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <Accordion type="single" collapsible className="w-full">
+                            {renderCategories(group.categories)}
+                          </Accordion>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </TabsContent>
+                <TabsContent value="industries">
+                  <Accordion type="single" collapsible className="w-full">
+                    {renderIndustries()}
+                  </Accordion>
+                </TabsContent>
+              </div>
+            </Tabs>
           </div>
-          {!hasResults() && (
+          {!searchQuery && (
             <CommandEmpty className="py-6 text-center text-sm">
-              No category found.
+              Start typing to search...
+            </CommandEmpty>
+          )}
+          {searchQuery && !value && (
+            <CommandEmpty className="py-6 text-center text-sm">
+              No results found.
             </CommandEmpty>
           )}
         </Command>
