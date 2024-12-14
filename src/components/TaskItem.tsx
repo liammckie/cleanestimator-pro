@@ -79,29 +79,6 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     }
   };
 
-  // Define available tools based on common cleaning equipment
-  const availableTools = [
-    'Vacuum Cleaner',
-    'Mop',
-    'Scrubber',
-    'Steam Cleaner',
-    'Pressure Washer',
-    'Broom',
-    'Duster',
-    'Extractor',
-    'Chemical Sprayer',
-    'Brush',
-    'Cloth',
-    'Bucket',
-    'Wringer',
-    'Squeegee',
-    'Telescopic Pole',
-    'Microfiber Tools',
-    'Floor Machine',
-    'Air Mover',
-    'Dehumidifier'
-  ];
-
   return (
     <div key={rate.id} className="flex flex-col gap-2 p-2 border rounded">
       <div className="flex items-center justify-between gap-2">
@@ -130,7 +107,6 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           <ToolSelect
             taskId={rate.id}
             currentTool={selectedTask.selectedTool || rate.tool}
-            availableTools={availableTools}
             onToolChange={onToolChange}
           />
           <div>

@@ -1,24 +1,46 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Wrench } from "lucide-react";
 import { getProductivityRate } from '@/data/productivityRates';
 
 interface ToolSelectProps {
   taskId: string;
   currentTool: string;
-  availableTools: string[];
   onToolChange: (taskId: string, tool: string) => void;
 }
 
 export const ToolSelect: React.FC<ToolSelectProps> = ({
   taskId,
   currentTool,
-  availableTools,
   onToolChange,
 }) => {
   const taskRate = getProductivityRate(taskId);
   const defaultTool = taskRate?.tool || '';
   
+  // Common cleaning tools
+  const availableTools = [
+    'Vacuum Cleaner',
+    'Mop',
+    'Scrubber',
+    'Steam Cleaner',
+    'Pressure Washer',
+    'Broom',
+    'Duster',
+    'Extractor',
+    'Chemical Sprayer',
+    'Brush',
+    'Cloth',
+    'Bucket',
+    'Wringer',
+    'Squeegee',
+    'Telescopic Pole',
+    'Microfiber Tools',
+    'Floor Machine',
+    'Air Mover',
+    'Dehumidifier'
+  ];
+
   // Filter tools based on the task's default tool
   const relevantTools = availableTools.filter(tool => {
     const toolLower = tool.toLowerCase();
@@ -37,7 +59,10 @@ export const ToolSelect: React.FC<ToolSelectProps> = ({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={`tool-${taskId}`}>Tool Selection</Label>
+      <Label htmlFor={`tool-${taskId}`} className="flex items-center gap-2">
+        <Wrench className="h-4 w-4" />
+        Tool Selection
+      </Label>
       <Select
         value={currentTool}
         onValueChange={(value) => onToolChange(taskId, value)}
