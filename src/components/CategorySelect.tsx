@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Command, CommandEmpty, CommandInput, CommandGroup } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -23,18 +23,18 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'categories' | 'industries'>(defaultTab);
 
-  const handleSelect = (selectedValue: string) => {
+  const handleSelect = useCallback((selectedValue: string) => {
     onValueChange(selectedValue);
     setOpen(false);
     setSearchQuery('');
-  };
+  }, [onValueChange]);
 
-  const getPlaceholderText = () => {
+  const getPlaceholderText = useCallback(() => {
     if (defaultTab === 'industries') {
       return value || "Select industry (e.g., Healthcare, Corporate Offices)";
     }
     return value || "Select category (e.g., Floor Care, Surface Care)";
-  };
+  }, [defaultTab, value]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
