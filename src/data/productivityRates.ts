@@ -4,6 +4,7 @@ import { carpetVacuumRates } from './rates/carpetVacuumRates';
 import { carpetSteamRates } from './rates/carpetSteamRates';
 import { ceilingWallRates } from './rates/ceilingWallRates';
 import { kitchenRates } from './rates/kitchenRates';
+import { restorativeRates } from './rates/restorativeRates';
 
 export const getAllProductivityRates = (): ProductivityRate[] => {
   return [
@@ -11,7 +12,8 @@ export const getAllProductivityRates = (): ProductivityRate[] => {
     ...carpetVacuumRates,
     ...carpetSteamRates,
     ...ceilingWallRates,
-    ...kitchenRates
+    ...kitchenRates,
+    ...restorativeRates
   ];
 };
 
