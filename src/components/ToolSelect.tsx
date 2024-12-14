@@ -18,30 +18,39 @@ export const ToolSelect: React.FC<ToolSelectProps> = ({
   const taskRate = getProductivityRate(taskId);
   const defaultTool = taskRate?.tool || '';
   
-  // Common cleaning tools
+  // Enhanced cleaning tools with specific models and types
   const availableTools = [
-    'Vacuum Cleaner',
-    'Mop',
-    'Scrubber',
-    'Steam Cleaner',
-    'Pressure Washer',
-    'Broom',
-    'Duster',
-    'Extractor',
-    'Chemical Sprayer',
-    'Brush',
-    'Cloth',
-    'Bucket',
-    'Wringer',
-    'Squeegee',
-    'Telescopic Pole',
-    'Microfiber Tools',
-    'Floor Machine',
-    'Air Mover',
-    'Dehumidifier'
+    // Vacuum Cleaners
+    'Backpack Vacuum - ProTeam Super CoachVac',
+    'Upright Vacuum - SEBO Essential G4',
+    'Wet/Dry Vacuum - Karcher NT 70/2',
+    
+    // Floor Care
+    'Auto Scrubber - Tennant T300e',
+    'Floor Burnisher - Polivac Sumo',
+    'Steam Cleaner - Duplex 420',
+    'Pressure Washer - Karcher HDS 10/20-4M',
+    
+    // Manual Tools
+    'Commercial Mop - Kentucky Style',
+    'Microfiber Mop - Rubbermaid HYGEN',
+    'Telescopic Pole - Unger OptiLoc',
+    'Window Squeegee - Unger ErgoTec',
+    
+    // Specialty Equipment
+    'Carpet Extractor - Mytee Lite III',
+    'Dehumidifier - Dri-Eaz F413',
+    'Air Scrubber - HEPA 500',
+    'Chemical Sprayer - Victory VP200',
+    
+    // Basic Tools
+    'Microfiber Cloth Set - Commercial Grade',
+    'Dust Mop - Industrial 36"',
+    'Wet Mop - Loop End',
+    'Broom - Heavy Duty'
   ];
 
-  // Filter tools based on the task's default tool
+  // Filter tools based on the task's default tool and category
   const relevantTools = availableTools.filter(tool => {
     const toolLower = tool.toLowerCase();
     const defaultToolLower = defaultTool.toLowerCase();
@@ -53,9 +62,12 @@ export const ToolSelect: React.FC<ToolSelectProps> = ({
   });
 
   // Always include the default tool if it's not in the filtered list
-  if (!relevantTools.includes(defaultTool)) {
+  if (defaultTool && !relevantTools.includes(defaultTool)) {
     relevantTools.unshift(defaultTool);
   }
+
+  // If no relevant tools found, show all tools
+  const displayTools = relevantTools.length > 0 ? relevantTools : availableTools;
 
   return (
     <div className="space-y-2">
@@ -71,7 +83,7 @@ export const ToolSelect: React.FC<ToolSelectProps> = ({
           <SelectValue placeholder="Select a tool" />
         </SelectTrigger>
         <SelectContent>
-          {relevantTools.map((tool) => (
+          {displayTools.map((tool) => (
             <SelectItem key={tool} value={tool}>
               {tool}
             </SelectItem>
