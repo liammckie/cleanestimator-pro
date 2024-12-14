@@ -26,6 +26,8 @@ export const OnCostCategory: React.FC<OnCostCategoryProps> = ({
   onNameChange,
 }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [isEditingHeader, setIsEditingHeader] = useState(false);
+  const [headerTitle, setHeaderTitle] = useState(title);
 
   const handleNameSubmit = (index: number, currentName: string) => {
     if (currentName.trim()) {
@@ -33,10 +35,41 @@ export const OnCostCategory: React.FC<OnCostCategoryProps> = ({
     }
   };
 
+  const handleHeaderSubmit = () => {
+    if (headerTitle.trim()) {
+      setIsEditingHeader(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="font-semibold text-lg">{title}</h3>
+        {isEditingHeader ? (
+          <Input
+            value={headerTitle}
+            onChange={(e) => setHeaderTitle(e.target.value)}
+            onBlur={handleHeaderSubmit}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleHeaderSubmit();
+              }
+            }}
+            className="w-1/3"
+            autoFocus
+          />
+        ) : (
+          <div className="flex items-center space-x-2">
+            <h3 className="font-semibold text-lg">{headerTitle}</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditingHeader(true)}
+              className="h-8 w-8 p-0"
+            >
+              <Edit2 className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
         <Button
           variant="ghost"
           size="sm"
