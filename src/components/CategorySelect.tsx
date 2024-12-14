@@ -48,36 +48,34 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
               <CommandInput placeholder="Search categories..." />
               <CommandEmpty>No category found.</CommandEmpty>
               {safeGeneralGroups.map((group) => {
-                const categories = group?.categories || [];
-                return (
-                  <React.Fragment key={group.name}>
-                    {categories.map((category) => {
-                      const subcategories = category?.subcategories || [];
-                      return (
-                        <CommandGroup key={category.name} heading={category.name}>
-                          {subcategories.map((subcategory) => (
-                            <CommandItem
-                              key={subcategory}
-                              value={subcategory}
-                              onSelect={() => {
-                                onValueChange(subcategory);
-                                setOpen(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  value === subcategory ? "opacity-100" : "opacity-0"
-                                )}
-                              />
-                              {subcategory}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      );
-                    })}
-                  </React.Fragment>
-                );
+                if (!group || !Array.isArray(group.categories)) return null;
+                
+                return group.categories.map((category) => {
+                  if (!category || !Array.isArray(category.subcategories)) return null;
+                  
+                  return (
+                    <CommandGroup key={category.name} heading={category.name}>
+                      {category.subcategories.map((subcategory) => (
+                        <CommandItem
+                          key={subcategory}
+                          value={subcategory}
+                          onSelect={() => {
+                            onValueChange(subcategory);
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              value === subcategory ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {subcategory}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  );
+                });
               })}
             </Command>
           </TabsContent>
@@ -87,10 +85,11 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
               <CommandInput placeholder="Search industry categories..." />
               <CommandEmpty>No category found.</CommandEmpty>
               {safeIndustryGroups.map((group) => {
-                const categories = group?.categories || [];
+                if (!group || !Array.isArray(group.categories)) return null;
+                
                 return (
                   <CommandGroup key={group.name} heading={group.name}>
-                    {categories.map((category) => (
+                    {group.categories.map((category) => (
                       <CommandItem
                         key={category}
                         value={category}
