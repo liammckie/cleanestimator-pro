@@ -28,6 +28,13 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
     setOpen(false);
   };
 
+  const getPlaceholderText = () => {
+    if (defaultTab === 'industries') {
+      return value || "Select industry (e.g., Healthcare, Corporate Offices)";
+    }
+    return value || "Select category (e.g., Floor Care, Surface Care)";
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -35,16 +42,20 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="w-full justify-between text-left"
         >
-          {value || "Select..."}
+          {getPlaceholderText()}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
         <Command>
           <CommandInput 
-            placeholder="Search..." 
+            placeholder={
+              activeTab === 'industries' 
+                ? "Search industries (e.g., Healthcare, Retail)..." 
+                : "Search categories (e.g., Floor Care, Windows)..."
+            }
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
@@ -58,7 +69,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
                 <TabsContent value="categories">
                   {searchQuery === '' ? (
                     <CommandEmpty className="py-6 text-center text-sm">
-                      Start typing to search...
+                      Type to search categories like "Floor Care" or "Surface Care"
                     </CommandEmpty>
                   ) : (
                     <CategoryList
@@ -72,7 +83,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
                 <TabsContent value="industries">
                   {searchQuery === '' ? (
                     <CommandEmpty className="py-6 text-center text-sm">
-                      Start typing to search...
+                      Type to search industries like "Healthcare" or "Corporate Offices"
                     </CommandEmpty>
                   ) : (
                     <IndustryList
