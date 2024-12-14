@@ -8,6 +8,8 @@ import { restorativeRates } from './rates/restorativeRates';
 import { restroomRates } from './rates/restroomRates';
 import { furnitureRates } from './rates/furnitureRates';
 import { specialistRates } from './rates/specialistRates';
+import { stairwellRates, railingRates, escalatorRailRates } from './rates/stairwellRates';
+import { toolCleaningRates } from './rates/toolCleaningRates';
 
 export const getAllProductivityRates = (): ProductivityRate[] => {
   return [
@@ -19,7 +21,11 @@ export const getAllProductivityRates = (): ProductivityRate[] => {
     ...restorativeRates,
     ...restroomRates,
     ...furnitureRates,
-    ...specialistRates
+    ...specialistRates,
+    ...stairwellRates,
+    ...railingRates,
+    ...escalatorRailRates,
+    ...toolCleaningRates
   ];
 };
 
