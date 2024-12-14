@@ -10,6 +10,7 @@ import { CostSummary } from '@/components/CostSummary';
 import { ProfitLoss } from '@/components/ProfitLoss';
 import { AwardSettings } from '@/components/settings/AwardSettings';
 import { useSettings } from '@/contexts/SettingsContext';
+import { SiteOverview } from '@/components/overview/SiteOverview';
 
 interface MainContentProps {
   sites: any[];
@@ -112,6 +113,10 @@ export const MainContent: React.FC<MainContentProps> = ({
           currentIncrease={awardIncrease}
           onAwardIncreaseChange={handleAwardIncreaseChange}
         />
+      </TabsContent>
+
+      <TabsContent value="overview" className="space-y-6">
+        <SiteOverview sites={sites} />
       </TabsContent>
     </>
   );
