@@ -1,18 +1,65 @@
-export interface Employee {
-  fullName: string;
-  employeeId: string;
-  employmentType: 'full-time' | 'part-time' | 'casual';
-  classificationLevel: 1 | 2 | 3;
-  ageCategory: 'under16' | '16' | '17' | '18' | '19' | '20' | 'adult';
-  shiftType: 'rotating' | 'non-rotating';
+export interface PayRates {
+  standard: number;
+  earlyLate: number;
+  night: number;
+  saturday: number;
+  sunday: number;
+  publicHoliday: number;
+}
+
+export interface AwardLevel {
+  level: number;
+  payRates: PayRates;
+  description?: string;  // Added for better documentation
+}
+
+export interface AllowanceBase {
+  name: string;
+  amount: number;
+  description?: string;  // Added for better documentation
+  enabled: boolean;      // Added to track if allowance is active
+}
+
+export interface HourlyAllowance extends AllowanceBase {
+  type: 'hourly';
+}
+
+export interface DailyAllowance extends AllowanceBase {
+  type: 'daily';
+  maxWeekly?: number;
+}
+
+export interface WeeklyAllowance extends AllowanceBase {
+  type: 'weekly';
+}
+
+export interface KilometerAllowance extends AllowanceBase {
+  type: 'perKm';
+  vehicleType: 'motorVehicle' | 'motorCycle';
+}
+
+export type Allowance = HourlyAllowance | DailyAllowance | WeeklyAllowance | KilometerAllowance;
+
+export type ShiftType = 'weekday' | 'earlyLate' | 'night' | 'saturday' | 'sunday' | 'publicHoliday';
+
+export interface ShiftTiming {
+  type: ShiftType;
+  startTime?: string;
+  endTime?: string;
+  loading: number;
+  description?: string;  // Added for better documentation
 }
 
 export interface PayCalculation {
-  grossWeeklyPay: number;
-  totalAllowances: number;
-  totalPenaltyRates: number;
-  netPay: number;
-  totalHours: number;
+  basePayRate: number;
+  totalPay: number;
+  superannuation: number;
+  allowancesTotal: number;
+  total: number;
+  breakdowns?: {
+    allowances: Record<string, number>;
+    penalties: Record<string, number>;
+  };
 }
 
 export interface Allowances {
@@ -31,28 +78,20 @@ export interface Allowances {
   motorCycle: boolean;
 }
 
-export interface AwardLevel {
-  level: number;
-  payRates: {
-    standard: number;
-    earlyLate: number;
-    night: number;
-    saturday: number;
-    sunday: number;
-    publicHoliday: number;
-  };
+export interface EmployeeDetails {
+  fullName: string;
+  employeeId: string;
+  employmentType: 'full-time' | 'part-time' | 'casual';
+  classificationLevel: 1 | 2 | 3;
+  ageCategory: 'under16' | '16' | '17' | '18' | '19' | '20' | 'adult';
+  shiftType: 'rotating' | 'non-rotating';
 }
 
-export interface Allowance {
-  name: string;
-  amount: number;
-  type: 'hourly' | 'daily' | 'weekly' | 'perKm';
-  maxWeekly?: number;
-}
-
-export interface ShiftTiming {
-  type: 'weekday' | 'earlyLate' | 'night' | 'saturday' | 'sunday' | 'publicHoliday';
-  startTime?: string;
-  endTime?: string;
-  loading: number;
+export interface ShiftDetails {
+  startTime: string;
+  endTime: string;
+  workDays: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
+  overtimeHours: number;
+  publicHolidayWorked: boolean;
+  overtimeType?: 'first2' | 'after2' | 'weekend' | 'publicHoliday';
 }
