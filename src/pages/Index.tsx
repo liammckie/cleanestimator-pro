@@ -100,7 +100,7 @@ const Index = () => {
     {
       id: 'contract',
       label: 'Contract',
-      icon: "file-text",
+      icon: "menu",
       onClick: () => setActiveTab('contract')
     },
     { 
