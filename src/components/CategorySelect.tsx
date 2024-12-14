@@ -16,24 +16,6 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
 
-  // Ensure categoryGroups and industryGroups exist and are arrays
-  const safeGeneralCategories = (categoryGroups || []).flatMap(group => 
-    (group.categories || []).flatMap(category => 
-      (category.subcategories || []).map(subcategory => ({
-        group: group.name,
-        category: category.name,
-        subcategory
-      }))
-    )
-  );
-
-  const safeIndustryCategories = (industryGroups || []).flatMap(group => 
-    (group.categories || []).map(category => ({
-      group: group.name,
-      category
-    }))
-  );
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
