@@ -19,6 +19,7 @@ interface AreaInputProps {
         timesPerMonth: number;
       };
       productivityOverride?: number;
+      selectedTool?: string;
     }>;
     totalTime: number;
   }) => void;
@@ -34,6 +35,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
       timesPerMonth: number;
     };
     productivityOverride?: number;
+    selectedTool?: string;
   }>>([]);
   const [squareFeet, setSquareFeet] = useState(0);
   const [category, setCategory] = useState("Carpet Maintenance - Spraying and Spotting");
@@ -111,6 +113,15 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
     setSelectedTasks(prev => prev.filter(task => task.taskId !== taskId));
   };
 
+  const handleToolChange = (taskId: string, tool: string) => {
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        return { ...task, selectedTool: tool };
+      }
+      return task;
+    }));
+  };
+
   const handleInputChange = () => {
     const totalTime = selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0);
     onAreaChange({
@@ -162,6 +173,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
                     onFrequencyChange={handleFrequencyChange}
                     onProductivityOverride={handleProductivityOverride}
                     onRemoveTask={handleRemoveTask}
+                    onToolChange={handleToolChange}
                   />
                 ))}
             </div>
