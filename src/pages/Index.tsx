@@ -9,7 +9,7 @@ import { OnCostsState } from '@/data/types/onCosts';
 import { Site } from '@/data/types/site';
 import { SiteManager } from '@/components/SiteManager';
 import { RosterManager } from '@/components/roster/RosterManager';
-import { DynamicMenu } from '@/components/ui/dynamic-menu';
+import { DynamicMenu, MenuOption } from '@/components/ui/dynamic-menu';
 import { CostSummary } from '@/components/CostSummary';
 import { calculateCosts } from '@/utils/costCalculations';
 
@@ -61,7 +61,7 @@ const Index = () => {
     }))
   );
 
-  const menuOptions = [
+  const menuOptions: MenuOption[] = [
     { 
       id: 'scope', 
       label: 'Scope & Tasks', 
