@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { EquipmentItem } from '@/types/equipment';
 import { EquipmentBasicInfo } from './form/EquipmentBasicInfo';
 import { DepreciationSettings } from './form/DepreciationSettings';
+import { toast } from "sonner";
 
 interface EquipmentFormProps {
   onAddItem: (item: Omit<EquipmentItem, 'id'>) => void;
@@ -18,24 +19,53 @@ export const EquipmentForm: React.FC<EquipmentFormProps> = ({ onAddItem }) => {
   const [salvageValue, setSalvageValue] = React.useState('0');
 
   const handleSubmit = () => {
-    if (newItemName && newItemCost && purchaseDate) {
-      onAddItem({
-        name: newItemName,
-        cost: parseFloat(newItemCost),
-        purchaseDate,
-        lifespan: parseInt(lifespan),
-        depreciationType,
-        salvageValue: parseFloat(salvageValue)
-      });
-      
-      // Reset form
-      setNewItemName('');
-      setNewItemCost('');
-      setPurchaseDate('');
-      setLifespan('5');
-      setDepreciationType('diminishing-value');
-      setSalvageValue('0');
+    // Validate required fields
+    if (!newItemName.trim()) {
+      toast.error("Please enter an item name");
+      return;
     }
+
+    const cost = parseFloat(newItemCost);
+    if (isNaN(cost) || cost <= 0) {
+      toast.error("Please enter a valid cost");
+      return;
+    }
+
+    if (!purchaseDate) {
+      toast.error("Please select a purchase date");
+      return;
+    }
+
+    const parsedLifespan = parseInt(lifespan);
+    if (isNaN(parsedLifespan) || parsedLifespan <= 0) {
+      toast.error("Please enter a valid lifespan");
+      return;
+    }
+
+    const parsedSalvageValue = parseFloat(salvageValue);
+    if (isNaN(parsedSalvageValue) || parsedSalvageValue < 0) {
+      toast.error("Please enter a valid salvage value");
+      return;
+    }
+
+    onAddItem({
+      name: newItemName.trim(),
+      cost: cost,
+      purchaseDate,
+      lifespan: parsedLifespan,
+      depreciationType,
+      salvageValue: parsedSalvageValue
+    });
+    
+    // Reset form
+    setNewItemName('');
+    setNewItemCost('');
+    setPurchaseDate('');
+    setLifespan('5');
+    setDepreciationType('diminishing-value');
+    setSalvageValue('0');
+
+    toast.success("Equipment item added successfully");
   };
 
   return (
