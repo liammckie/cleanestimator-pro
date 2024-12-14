@@ -6,7 +6,7 @@ import { Employee, Shift, WeeklyRoster } from '@/data/types/roster';
 import { EmployeeList } from './EmployeeList';
 import { ShiftAssignment } from './ShiftAssignment';
 import { WeeklyView } from './WeeklyView';
-import { addDays, startOfWeek } from 'date-fns';
+import { addDays, startOfWeek, format } from 'date-fns';
 
 export const RosterManager = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -21,11 +21,65 @@ export const RosterManager = () => {
   const generateWeeklyShifts = () => {
     const weekStart = startOfWeek(selectedDate);
     const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
-    // ... Implementation for generating shifts based on site requirements
+    
+    const newShifts: Shift[] = weekDays.flatMap(date => {
+      // Generate two shifts per day as an example
+      return [
+        {
+          id: crypto.randomUUID(),
+          siteId: 'site1',
+          siteName: 'Main Office',
+          startTime: '09:00',
+          endTime: '17:00',
+          date: date,
+          requiredLevel: 1,
+          requiredCertifications: []
+        },
+        {
+          id: crypto.randomUUID(),
+          siteId: 'site2',
+          siteName: 'Medical Center',
+          startTime: '14:00',
+          endTime: '22:00',
+          date: date,
+          requiredLevel: 2,
+          requiredCertifications: ['Medical Cleaning']
+        }
+      ];
+    });
+
+    setUnassignedShifts(newShifts);
   };
 
   const assignShift = (shift: Shift, employeeId: string) => {
-    // ... Implementation for assigning shifts to employees
+    const dateKey = format(shift.date, 'yyyy-MM-dd');
+    const employee = employees.find(emp => emp.id === employeeId);
+    
+    if (!employee) return;
+
+    const newWeeklyRoster = { ...weeklyRoster };
+    if (!newWeeklyRoster[dateKey]) {
+      newWeeklyRoster[dateKey] = [];
+    }
+
+    // Update or add the roster entry
+    const existingEntryIndex = newWeeklyRoster[dateKey].findIndex(
+      entry => entry.employeeId === employeeId
+    );
+
+    if (existingEntryIndex >= 0) {
+      newWeeklyRoster[dateKey][existingEntryIndex].shifts.push(shift);
+    } else {
+      newWeeklyRoster[dateKey].push({
+        employeeId: employeeId,
+        employeeName: employee.name,
+        shifts: [shift],
+        totalHours: 8 // This should be calculated based on shift duration
+      });
+    }
+
+    setWeeklyRoster(newWeeklyRoster);
+    setUnassignedShifts(unassignedShifts.filter(s => s.id !== shift.id));
   };
 
   return (
