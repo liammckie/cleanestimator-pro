@@ -10,6 +10,7 @@ export interface Site {
   area: {
     squareMeters: number;
     spaceType: string;
+    industryType: string;
     selectedTasks: Array<{
       taskId: string;
       quantity: number;
