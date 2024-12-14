@@ -85,54 +85,63 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selected
             </div>
 
             {/* Sites Summary */}
-            {Object.entries(tasksBySite).map(([siteName, siteTasks]) => (
-              <Card key={siteName} className="p-4">
-                <div className="flex items-center space-x-2 mb-4">
-                  <MapPin className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-lg">{siteName}</h3>
-                </div>
-                
-                {/* Tasks by Category */}
-                <div className="space-y-4">
-                  {Object.entries(tasksByCategory).map(([category, tasks]) => {
-                    const siteCategoryTasks = tasks.filter(t => t.siteName === siteName);
-                    if (siteCategoryTasks.length === 0) return null;
-
-                    return (
-                      <div key={category} className="space-y-2">
-                        <h4 className="text-sm font-medium text-muted-foreground">{category}</h4>
-                        {siteCategoryTasks.map((task, index) => (
-                          <div key={`${task.taskId}-${index}`} className="pl-4 border-l-2 border-accent">
-                            <p className="text-sm font-medium">{task.rate.task}</p>
-                            <div className="flex flex-wrap gap-2 mt-1">
-                              <Badge variant="outline" className="text-xs">
-                                <Calendar className="w-3 h-3 mr-1" />
-                                {task.frequency.timesPerWeek}x/week
-                              </Badge>
-                              <Badge variant="outline" className="text-xs">
-                                <Wrench className="w-3 h-3 mr-1" />
-                                {task.selectedTool || task.rate.tool}
-                              </Badge>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Site Time Summary */}
-                <div className="mt-4 pt-4 border-t">
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>Monthly Time:</span>
-                    <span>
-                      {(siteTasks.reduce((sum, task) => 
-                        sum + (task.timeRequired || 0), 0) * 60).toFixed(1)} minutes
-                    </span>
+            {Object.entries(tasksBySite).map(([siteName, siteTasks]) => {
+              const siteMonthlyTime = siteTasks.reduce((sum, task) => 
+                sum + (task.timeRequired || 0), 0) * 60;
+              const siteWeeklyTime = siteMonthlyTime / 4.33;
+              
+              return (
+                <Card key={siteName} className="p-4">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <MapPin className="w-5 h-5 text-primary" />
+                    <h3 className="font-semibold text-lg">{siteName}</h3>
                   </div>
-                </div>
-              </Card>
-            ))}
+                  
+                  {/* Tasks by Category */}
+                  <div className="space-y-4">
+                    {Object.entries(tasksByCategory).map(([category, tasks]) => {
+                      const siteCategoryTasks = tasks.filter(t => t.siteName === siteName);
+                      if (siteCategoryTasks.length === 0) return null;
+
+                      return (
+                        <div key={category} className="space-y-2">
+                          <h4 className="text-sm font-medium text-muted-foreground">{category}</h4>
+                          {siteCategoryTasks.map((task, index) => (
+                            <div key={`${task.taskId}-${index}`} className="pl-4 border-l-2 border-accent">
+                              <p className="text-sm font-medium">{task.rate.task}</p>
+                              <div className="flex flex-wrap gap-2 mt-1">
+                                <Badge variant="outline" className="text-xs">
+                                  <Calendar className="w-3 h-3 mr-1" />
+                                  {task.frequency.timesPerWeek}x/week
+                                </Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  <Wrench className="w-3 h-3 mr-1" />
+                                  {task.selectedTool || task.rate.tool}
+                                </Badge>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Site Time Summary */}
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <div className="flex justify-between">
+                        <span>Weekly Hours:</span>
+                        <span>{(siteWeeklyTime / 60).toFixed(1)} hours</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Monthly Hours:</span>
+                        <span>{(siteMonthlyTime / 60).toFixed(1)} hours</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
 
             {selectedTasks.length === 0 && (
               <div className="flex flex-col items-center justify-center space-y-4 text-center p-8">
