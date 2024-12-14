@@ -17,7 +17,7 @@ interface ScopeOfWorkSidebarProps {
 
 export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selectedTasks }) => {
   return (
-    <Sidebar defaultCollapsed={false} className="border-r">
+    <Sidebar className="border-r">
       <SidebarHeader className="border-b px-4 py-2">
         <h2 className="text-lg font-semibold">Scope of Work</h2>
       </SidebarHeader>
