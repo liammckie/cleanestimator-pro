@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CategorySelect } from './CategorySelect';
 import { TaskList } from './TaskList';
-import { getProductivityRate } from '@/data/productivityRates';
+import { getRateById } from '@/data/rates/ratesManager';
 
 interface AreaInputProps {
   onAreaChange: (area: { 
@@ -46,7 +46,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
     frequency: { timesPerWeek: number; timesPerMonth: number }, 
     productivityOverride?: number
   ): number => {
-    const rate = getProductivityRate(taskId);
+    const rate = getRateById(taskId);
     if (!rate) return 0;
     
     const ratePerHour = productivityOverride || rate.ratePerHour;
@@ -82,7 +82,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({ onAreaChange }) => {
 
   const handleTaskSelection = (taskId: string, isSelected: boolean) => {
     if (isSelected) {
-      const rate = getProductivityRate(taskId);
+      const rate = getRateById(taskId);
       if (!rate) return;
       
       const newTask = {

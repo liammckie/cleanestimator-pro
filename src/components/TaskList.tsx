@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TaskItem } from './TaskItem';
-import { getAllProductivityRates } from '@/data/productivityRates';
+import { getRatesByCategory } from '@/data/rates/ratesManager';
 import { Input } from "@/components/ui/input";
 
 interface TaskListProps {
@@ -35,7 +35,7 @@ export const TaskList: React.FC<TaskListProps> = ({
   onToolChange,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const productivityRates = getAllProductivityRates();
+  const productivityRates = getRatesByCategory(category);
 
   const filteredRates = productivityRates
     .filter(rate => rate && rate.category === category)
