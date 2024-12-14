@@ -16,6 +16,7 @@ interface ScopeOfWorkSidebarProps {
       timesPerWeek: number;
       timesPerMonth: number;
     };
+    siteName?: string;
   }>;
 }
 
@@ -33,14 +34,15 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selected
             </p>
           ) : (
             <div className="space-y-4 py-4">
-              {selectedTasks.map((task) => {
+              {selectedTasks.map((task, index) => {
                 const rateInfo = getProductivityRate(task.taskId);
                 if (!rateInfo) return null;
 
                 return (
-                  <div key={task.taskId} className="border rounded-lg p-4 space-y-2">
+                  <div key={`${task.taskId}-${index}`} className="border rounded-lg p-4 space-y-2">
                     <div className="font-medium">{rateInfo.task}</div>
                     <div className="text-sm text-muted-foreground">
+                      {task.siteName && <p>Site: {task.siteName}</p>}
                       <p>Category: {rateInfo.category}</p>
                       <p>Tool: {rateInfo.tool}</p>
                       <p>Quantity: {task.quantity} {rateInfo.unit}</p>

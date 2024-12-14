@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { AreaInput } from '@/components/AreaInput';
 import { LaborCosts } from '@/components/LaborCosts';
 import { EquipmentCosts } from '@/components/EquipmentCosts';
 import { ProfitLoss } from '@/components/ProfitLoss';
@@ -7,16 +6,13 @@ import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OnCostsState } from '@/data/types/onCosts';
+import { Site } from '@/data/types/site';
+import { SiteManager } from '@/components/SiteManager';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
 const Index = () => {
-  const [area, setArea] = useState({ 
-    squareFeet: 0, 
-    spaceType: 'office',
-    selectedTasks: [],
-    totalTime: 0
-  });
+  const [sites, setSites] = useState<Site[]>([]);
   const [laborCosts, setLaborCosts] = useState<{ 
     hourlyRate: number;
     employmentType: 'contracted' | 'direct';
@@ -48,14 +44,25 @@ const Index = () => {
 
   const onCostsPerHour = calculateTotalOnCosts();
   const totalHourlyRate = laborCosts.hourlyRate + onCostsPerHour;
-  const laborCost = area.totalTime * totalHourlyRate;
+  
+  // Calculate total time and labor cost across all sites
+  const totalTime = sites.reduce((sum, site) => sum + site.area.totalTime, 0);
+  const laborCost = totalTime * totalHourlyRate;
   const monthlyRevenue = laborCost * 1.5;
   const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
+
+  // Get all selected tasks from all sites for the sidebar
+  const allSelectedTasks = sites.flatMap(site => 
+    site.area.selectedTasks.map(task => ({
+      ...task,
+      siteName: site.name
+    }))
+  );
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <ScopeOfWorkSidebar selectedTasks={area.selectedTasks} />
+        <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
         <div className="flex-1 bg-gray-50 py-8">
           <div className="container mx-auto px-4">
             <h1 className="text-3xl font-bold text-primary mb-8">
@@ -71,7 +78,7 @@ const Index = () => {
               </TabsList>
 
               <TabsContent value="scope" className="space-y-6">
-                <AreaInput onAreaChange={setArea} />
+                <SiteManager onSitesChange={setSites} />
               </TabsContent>
 
               <TabsContent value="labor" className="space-y-6">
@@ -92,8 +99,8 @@ const Index = () => {
                 
                 <div className="mt-6 text-sm text-gray-600">
                   <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
-                  {area.totalTime > 0 && (
-                    <p>* Total time required: {(area.totalTime * 60).toFixed(1)} minutes</p>
+                  {totalTime > 0 && (
+                    <p>* Total time required: {(totalTime * 60).toFixed(1)} minutes</p>
                   )}
                   {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
                     <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
