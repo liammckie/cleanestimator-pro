@@ -61,60 +61,41 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col bg-primary">
+      <div className="min-h-screen flex flex-col bg-background">
         <Header />
+        
         <div className="flex-1 flex">
-          {/* Site Overview - Left Panel */}
-          <div className="w-[300px] min-w-[300px] bg-primary border-r border-primary/20 overflow-y-auto">
-            <div className="p-4">
-              <h2 className="text-xl font-semibold text-white mb-4">Sites Overview</h2>
+          {/* Sites Panel - Left */}
+          <div className="w-[320px] min-w-[320px] border-r bg-primary/5">
+            <div className="p-6 h-full overflow-y-auto">
+              <h2 className="text-xl font-semibold mb-6">Sites Overview</h2>
               <SiteManager onSitesChange={setSites} />
             </div>
           </div>
 
-          {/* Scope of Work - Middle Panel */}
-          <div className="w-[400px] min-w-[400px] bg-primary border-r border-primary/20">
+          {/* Scope Panel - Middle */}
+          <div className="w-[400px] min-w-[400px] border-r bg-primary/5">
             <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
           </div>
 
-          {/* Main Content - Right Panel */}
-          <main className="flex-1 overflow-y-auto bg-primary p-6">
-            <div className="max-w-[900px] mx-auto">
+          {/* Main Content - Right */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="max-w-[900px] mx-auto p-8">
               <div className="mb-8">
-                <h1 className="text-3xl font-bold text-white text-center">
-                  Commercial Cleaning Estimation Tool
+                <h1 className="text-3xl font-bold text-center">
+                  Commercial Cleaning Calculator
                 </h1>
               </div>
 
               <Tabs defaultValue="labor" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-4 bg-accent/5">
-                  <TabsTrigger 
-                    value="labor"
-                    className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
-                  >
-                    Labor Costs
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="equipment"
-                    className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
-                  >
-                    Equipment
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="roster"
-                    className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
-                  >
-                    Roster
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="summary"
-                    className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
-                  >
-                    Summary
-                  </TabsTrigger>
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="labor">Labor Costs</TabsTrigger>
+                  <TabsTrigger value="equipment">Equipment</TabsTrigger>
+                  <TabsTrigger value="roster">Roster</TabsTrigger>
+                  <TabsTrigger value="summary">Summary</TabsTrigger>
                 </TabsList>
 
-                <div className="bg-accent/5 rounded-lg p-6 shadow-lg">
+                <div className="bg-card rounded-lg shadow-lg border p-6">
                   <TabsContent value="labor" className="mt-0">
                     <LaborCosts onLaborCostChange={setLaborCosts} />
                   </TabsContent>
@@ -136,7 +117,7 @@ const Index = () => {
                         overhead={overhead}
                       />
                       
-                      <div className="mt-6 p-4 bg-primary/20 rounded-lg text-sm text-gray-300 space-y-2">
+                      <div className="mt-6 p-4 bg-muted rounded-lg text-sm space-y-2">
                         <p>• Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
                         {totalTime > 0 && (
                           <p>• Total time required: {(totalTime * 60).toFixed(1)} minutes</p>
@@ -150,7 +131,7 @@ const Index = () => {
                 </div>
               </Tabs>
             </div>
-          </main>
+          </div>
         </div>
       </div>
     </SidebarProvider>

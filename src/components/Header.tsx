@@ -3,27 +3,34 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuL
 
 export const Header = () => {
   return (
-    <div className="flex items-center h-16 px-6 bg-primary border-b border-primary/20">
-      <div className="flex items-center gap-3">
-        <img 
-          src="/logo.png" 
-          alt="SCS Group Logo" 
-          className="h-8 w-auto"
-        />
-        <span className="text-lg font-semibold text-white">SCS Group</span>
+    <header className="h-16 border-b bg-primary shadow-md">
+      <div className="h-full max-w-screen-2xl mx-auto px-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <img 
+            src="/logo.png" 
+            alt="SCS Group Logo" 
+            className="h-8 w-auto"
+          />
+          <span className="text-lg font-semibold text-primary-foreground">
+            SCS Group
+          </span>
+        </div>
+
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuLink 
+                className="text-primary-foreground hover:text-secondary transition-colors px-4 py-2"
+                href="/"
+              >
+                Dashboard
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+
+        <div className="w-[200px]" /> {/* Spacer for symmetry */}
       </div>
-      <NavigationMenu className="mx-auto">
-        <NavigationMenuList>
-          <NavigationMenuItem>
-            <NavigationMenuLink 
-              className="text-white hover:text-secondary transition-colors px-4 py-2"
-              href="/"
-            >
-              Dashboard
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
-    </div>
+    </header>
   );
 };
