@@ -83,32 +83,12 @@ export const OnCostCategory: React.FC<OnCostCategoryProps> = ({
       {items.map((onCost, index) => (
         <div key={`${category}-${index}-${onCost.name}`} className="flex items-center justify-between space-x-4 p-2 bg-gray-50 rounded">
           <div className="flex-1 flex items-center space-x-2">
-            {editingIndex === index ? (
-              <Input
-                value={onCost.name}
-                onChange={(e) => onNameChange(index, e.target.value)}
-                onBlur={() => handleNameSubmit(index, onCost.name)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleNameSubmit(index, onCost.name);
-                  }
-                }}
-                className="w-full"
-                autoFocus
-              />
-            ) : (
-              <>
-                <Label className="flex-1">{onCost.name}</Label>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setEditingIndex(index)}
-                  className="h-8 w-8 p-0"
-                >
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-              </>
-            )}
+            <Input
+              value={onCost.name}
+              onChange={(e) => onNameChange(index, e.target.value)}
+              className="flex-1"
+              placeholder="Enter item name"
+            />
             {onCost.isMandatory && (
               <span className="text-xs text-red-500">(Mandatory)</span>
             )}
@@ -121,6 +101,7 @@ export const OnCostCategory: React.FC<OnCostCategoryProps> = ({
                 onChange={(e) => onRateChange(index, e.target.value)}
                 disabled={!onCost.isEnabled}
                 className="w-full"
+                placeholder="Rate"
               />
             </div>
             <div className="flex items-center space-x-2">
