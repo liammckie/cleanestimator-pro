@@ -61,15 +61,17 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col bg-primary">
+      <div className="min-h-screen flex flex-col">
         <Header />
-        <div className="flex flex-1 bg-primary/95">
+        <div className="flex-1 flex bg-primary">
           <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
-          <main className="flex-1 p-8">
-            <div className="max-w-[1200px] mx-auto">
-              <h1 className="text-3xl font-bold text-white mb-8">
-                Commercial Cleaning Estimation Tool
-              </h1>
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto px-8 py-6 max-w-7xl">
+              <div className="mb-8">
+                <h1 className="text-4xl font-bold text-white">
+                  Commercial Cleaning Estimation Tool
+                </h1>
+              </div>
               
               <Tabs defaultValue="scope" className="space-y-8">
                 <TabsList className="grid w-full grid-cols-5 bg-primary/20">
@@ -105,40 +107,42 @@ const Index = () => {
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="scope" className="space-y-6 bg-accent/5 p-6 rounded-lg">
-                  <SiteManager onSitesChange={setSites} />
-                </TabsContent>
+                <div className="bg-accent/5 rounded-lg p-8">
+                  <TabsContent value="scope" className="space-y-8 mt-0">
+                    <SiteManager onSitesChange={setSites} />
+                  </TabsContent>
 
-                <TabsContent value="labor" className="space-y-6 bg-accent/5 p-6 rounded-lg">
-                  <LaborCosts onLaborCostChange={setLaborCosts} />
-                </TabsContent>
+                  <TabsContent value="labor" className="space-y-8 mt-0">
+                    <LaborCosts onLaborCostChange={setLaborCosts} />
+                  </TabsContent>
 
-                <TabsContent value="equipment" className="space-y-6 bg-accent/5 p-6 rounded-lg">
-                  <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-                </TabsContent>
+                  <TabsContent value="equipment" className="space-y-8 mt-0">
+                    <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+                  </TabsContent>
 
-                <TabsContent value="roster" className="space-y-6 bg-accent/5 p-6 rounded-lg">
-                  <RosterManager />
-                </TabsContent>
+                  <TabsContent value="roster" className="space-y-8 mt-0">
+                    <RosterManager />
+                  </TabsContent>
 
-                <TabsContent value="summary" className="space-y-6 bg-accent/5 p-6 rounded-lg">
-                  <ProfitLoss
-                    revenue={monthlyRevenue}
-                    laborCost={laborCost}
-                    equipmentCost={equipmentCosts.monthly}
-                    overhead={overhead}
-                  />
-                  
-                  <div className="mt-6 text-sm text-gray-400">
-                    <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
-                    {totalTime > 0 && (
-                      <p>* Total time required: {(totalTime * 60).toFixed(1)} minutes</p>
-                    )}
-                    {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
-                      <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
-                    )}
-                  </div>
-                </TabsContent>
+                  <TabsContent value="summary" className="space-y-8 mt-0">
+                    <ProfitLoss
+                      revenue={monthlyRevenue}
+                      laborCost={laborCost}
+                      equipmentCost={equipmentCosts.monthly}
+                      overhead={overhead}
+                    />
+                    
+                    <div className="mt-6 text-sm text-gray-400">
+                      <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
+                      {totalTime > 0 && (
+                        <p>* Total time required: {(totalTime * 60).toFixed(1)} minutes</p>
+                      )}
+                      {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
+                        <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
+                      )}
+                    </div>
+                  </TabsContent>
+                </div>
               </Tabs>
             </div>
           </main>
