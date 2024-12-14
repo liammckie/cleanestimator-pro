@@ -20,6 +20,68 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
   const safeGeneralGroups = categoryGroups || [];
   const safeIndustryGroups = industryGroups || [];
 
+  const renderGeneralGroups = () => {
+    return safeGeneralGroups.map((group) => {
+      if (!group?.categories?.length) return null;
+      
+      return group.categories.map((category) => {
+        if (!category?.subcategories?.length) return null;
+        
+        return (
+          <CommandGroup key={category.name} heading={category.name}>
+            {category.subcategories.map((subcategory) => (
+              <CommandItem
+                key={subcategory}
+                value={subcategory}
+                onSelect={() => {
+                  onValueChange(subcategory);
+                  setOpen(false);
+                }}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    value === subcategory ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {subcategory}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        );
+      });
+    });
+  };
+
+  const renderIndustryGroups = () => {
+    return safeIndustryGroups.map((group) => {
+      if (!group?.categories?.length) return null;
+      
+      return (
+        <CommandGroup key={group.name} heading={group.name}>
+          {group.categories.map((category) => (
+            <CommandItem
+              key={category}
+              value={category}
+              onSelect={() => {
+                onValueChange(category);
+                setOpen(false);
+              }}
+            >
+              <Check
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  value === category ? "opacity-100" : "opacity-0"
+                )}
+              />
+              {category}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      );
+    });
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -47,36 +109,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             <Command>
               <CommandInput placeholder="Search categories..." />
               <CommandEmpty>No category found.</CommandEmpty>
-              {safeGeneralGroups.map((group) => {
-                if (!group || !Array.isArray(group.categories)) return null;
-                
-                return group.categories.map((category) => {
-                  if (!category || !Array.isArray(category.subcategories)) return null;
-                  
-                  return (
-                    <CommandGroup key={category.name} heading={category.name}>
-                      {category.subcategories.map((subcategory) => (
-                        <CommandItem
-                          key={subcategory}
-                          value={subcategory}
-                          onSelect={() => {
-                            onValueChange(subcategory);
-                            setOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              value === subcategory ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {subcategory}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  );
-                });
-              })}
+              {renderGeneralGroups()}
             </Command>
           </TabsContent>
 
@@ -84,32 +117,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             <Command>
               <CommandInput placeholder="Search industry categories..." />
               <CommandEmpty>No category found.</CommandEmpty>
-              {safeIndustryGroups.map((group) => {
-                if (!group || !Array.isArray(group.categories)) return null;
-                
-                return (
-                  <CommandGroup key={group.name} heading={group.name}>
-                    {group.categories.map((category) => (
-                      <CommandItem
-                        key={category}
-                        value={category}
-                        onSelect={() => {
-                          onValueChange(category);
-                          setOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            value === category ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {category}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                );
-              })}
+              {renderIndustryGroups()}
             </Command>
           </TabsContent>
         </Tabs>
