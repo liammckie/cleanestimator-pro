@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CategorySelect } from './CategorySelect';
 import { TaskList } from './TaskList';
+import { getProductivityRate } from '@/data/productivityRates';
 
 interface AreaInputProps {
   onAreaChange: (area: { 

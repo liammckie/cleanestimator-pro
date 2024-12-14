@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TaskItem } from './TaskItem';
 import { getAllProductivityRates } from '@/data/productivityRates';
+import { Input } from "@/components/ui/input";
 
 interface TaskListProps {
   category: string;
@@ -33,13 +34,27 @@ export const TaskList: React.FC<TaskListProps> = ({
   onRemoveTask,
   onToolChange,
 }) => {
+  const [searchQuery, setSearchQuery] = useState('');
   const productivityRates = getAllProductivityRates();
 
+  const filteredRates = productivityRates
+    .filter(rate => rate.category === category)
+    .filter(rate => 
+      rate.task.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rate.tool.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
   return (
-    <div className="grid gap-2">
-      {productivityRates
-        .filter(rate => rate.category === category)
-        .map((rate) => (
+    <div className="space-y-4">
+      <Input
+        type="text"
+        placeholder="Search tasks..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="mb-4"
+      />
+      <div className="grid gap-2">
+        {filteredRates.map((rate) => (
           <TaskItem
             key={rate.id}
             rate={rate}
@@ -52,6 +67,7 @@ export const TaskList: React.FC<TaskListProps> = ({
             onToolChange={onToolChange}
           />
         ))}
+      </div>
     </div>
   );
 };
