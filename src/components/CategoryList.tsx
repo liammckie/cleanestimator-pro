@@ -66,6 +66,22 @@ export const CategoryList: React.FC<CategoryListProps> = ({
 
   if (!Array.isArray(groups)) return null;
 
+  const hasResults = groups.some(group => 
+    group?.categories?.some(category =>
+      category?.subcategories?.some(subcategory =>
+        subcategory?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    )
+  );
+
+  if (!hasResults && searchQuery) {
+    return (
+      <div className="p-4 text-sm text-muted-foreground text-center">
+        No matching categories found.
+      </div>
+    );
+  }
+
   return (
     <Accordion type="single" collapsible className="w-full">
       {groups.map(group => {

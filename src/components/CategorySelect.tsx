@@ -60,8 +60,13 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
+          <CommandEmpty>No results found.</CommandEmpty>
           <div className="border-t pt-2">
-            <Tabs defaultValue={activeTab} onValueChange={(value: any) => setActiveTab(value)}>
+            <Tabs defaultValue={activeTab} onValueChange={(value: string) => {
+              if (value === 'categories' || value === 'industries') {
+                setActiveTab(value);
+              }
+            }}>
               <TabsList className="w-full">
                 <TabsTrigger value="categories" className="flex-1">Categories</TabsTrigger>
                 <TabsTrigger value="industries" className="flex-1">Industries</TabsTrigger>
