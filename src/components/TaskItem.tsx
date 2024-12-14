@@ -4,9 +4,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { getProductivityRate } from '@/data/productivityRates';
-import { Trash2 } from "lucide-react";
+import { Trash2, Activity } from "lucide-react";
 import { ToolSelect } from './ToolSelect';
+import { calculateTaskProductivity } from '@/utils/productivityCalculations';
+import { Card } from "@/components/ui/card";
 
 interface TaskItemProps {
   rate: {
@@ -79,6 +80,14 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     }
   };
 
+  const productivity = selectedTask ? calculateTaskProductivity(
+    rate.id,
+    selectedTask.quantity,
+    selectedTask.selectedTool,
+    selectedTask.frequency,
+    selectedTask.quantity // Using quantity as area size for this calculation
+  ) : null;
+
   return (
     <div key={rate.id} className="flex flex-col gap-2 p-2 border rounded">
       <div className="flex items-center justify-between gap-2">
@@ -102,6 +111,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           </Button>
         )}
       </div>
+
       {selectedTask && (
         <div className="ml-6 space-y-2">
           <ToolSelect
@@ -109,6 +119,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             currentTool={selectedTask.selectedTool || rate.tool}
             onToolChange={onToolChange}
           />
+          
           <div>
             <Label htmlFor={`quantity-${rate.id}`}>
               {getQuantityLabel()}
@@ -124,6 +135,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               className="mt-1"
             />
           </div>
+
           <div>
             <Label htmlFor={`frequency-${rate.id}`}>
               Times per Week
@@ -144,6 +156,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               </SelectContent>
             </Select>
           </div>
+
           <div>
             <Label htmlFor={`productivity-${rate.id}`}>
               {getProductivityLabel()}
@@ -159,6 +172,25 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               className="mt-1"
             />
           </div>
+
+          {productivity && (
+            <Card className="p-3 bg-slate-50">
+              <div className="flex items-center gap-2 mb-2">
+                <Activity className="h-4 w-4 text-blue-500" />
+                <span className="font-medium">Productivity Analysis</span>
+              </div>
+              <div className="text-sm space-y-1">
+                <p>Base Rate: {productivity.baseRate.toFixed(2)} units/hour</p>
+                <p>Adjusted Rate: {productivity.adjustedRate.toFixed(2)} units/hour</p>
+                <p className="text-muted-foreground">
+                  Factors: Tool ({(productivity.factors.toolEfficiency * 100).toFixed()}%),
+                  Area ({(productivity.factors.areaSize * 100).toFixed()}%),
+                  Frequency ({(productivity.factors.frequency * 100).toFixed()}%)
+                </p>
+              </div>
+            </Card>
+          )}
+
           {selectedTask.timeRequired > 0 && (
             <div className="text-sm text-gray-600 mt-1">
               <p>Time per service: {((selectedTask.timeRequired / (selectedTask.frequency?.timesPerWeek || 1)) / 4 * 60).toFixed(1)} minutes</p>
