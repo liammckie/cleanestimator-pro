@@ -4,19 +4,20 @@ import { LaborCosts } from '@/components/LaborCosts';
 import { EquipmentCosts } from '@/components/EquipmentCosts';
 import { ProfitLoss } from '@/components/ProfitLoss';
 
-const PRODUCTIVITY_RATE = 3000; // Square feet per hour (example rate)
 const OVERHEAD_PERCENTAGE = 0.15; // 15% overhead
 
 const Index = () => {
-  const [area, setArea] = useState({ squareFeet: 0, spaceType: 'office' });
+  const [area, setArea] = useState({ 
+    squareFeet: 0, 
+    spaceType: 'office',
+    selectedTasks: [],
+    totalTime: 0
+  });
   const [laborCosts, setLaborCosts] = useState({ hourlyRate: 0 });
   const [equipmentCosts, setEquipmentCosts] = useState({ monthly: 0 });
 
-  // Calculate required hours based on area and productivity rate
-  const requiredHours = area.squareFeet / PRODUCTIVITY_RATE;
-  
-  // Calculate costs
-  const laborCost = requiredHours * laborCosts.hourlyRate;
+  // Calculate costs based on total time from all tasks
+  const laborCost = area.totalTime * laborCosts.hourlyRate;
   const monthlyRevenue = laborCost * 1.5; // 50% markup for example
   const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
 
@@ -43,8 +44,10 @@ const Index = () => {
         </div>
 
         <div className="mt-6 text-sm text-gray-600">
-          <p>* Calculations based on industry standard productivity rate of {PRODUCTIVITY_RATE} sq ft/hour</p>
           <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
+          {area.totalTime > 0 && (
+            <p>* Total time required: {(area.totalTime * 60).toFixed(1)} minutes</p>
+          )}
         </div>
       </div>
     </div>
