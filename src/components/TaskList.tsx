@@ -38,11 +38,14 @@ export const TaskList: React.FC<TaskListProps> = ({
   const productivityRates = getAllProductivityRates();
 
   const filteredRates = productivityRates
-    .filter(rate => rate.category === category)
-    .filter(rate => 
-      rate.task.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      rate.tool.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    .filter(rate => rate && rate.category === category)
+    .filter(rate => {
+      const query = searchQuery.toLowerCase();
+      return (
+        rate.task.toLowerCase().includes(query) ||
+        rate.tool.toLowerCase().includes(query)
+      );
+    });
 
   return (
     <div className="space-y-4">
@@ -58,7 +61,7 @@ export const TaskList: React.FC<TaskListProps> = ({
           <TaskItem
             key={rate.id}
             rate={rate}
-            selectedTask={selectedTasks.find(task => task.taskId === rate.id)}
+            selectedTask={selectedTasks?.find(task => task.taskId === rate.id)}
             onTaskSelection={onTaskSelection}
             onQuantityChange={onQuantityChange}
             onFrequencyChange={onFrequencyChange}
