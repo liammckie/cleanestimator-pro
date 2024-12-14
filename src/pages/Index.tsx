@@ -47,13 +47,11 @@ const Index = () => {
   const onCostsPerHour = calculateTotalOnCosts();
   const totalHourlyRate = laborCosts.hourlyRate + onCostsPerHour;
   
-  // Calculate total time and labor cost across all sites
   const totalTime = sites.reduce((sum, site) => sum + site.area.totalTime, 0);
   const laborCost = totalTime * totalHourlyRate;
   const monthlyRevenue = laborCost * 1.5;
   const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
 
-  // Get all selected tasks from all sites for the sidebar
   const allSelectedTasks = sites.flatMap(site => 
     site.area.selectedTasks.map(task => ({
       ...task,
@@ -67,9 +65,9 @@ const Index = () => {
         <Header />
         <div className="flex flex-1">
           <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
-          <div className="flex-1 bg-primary/95 py-8">
-            <div className="container mx-auto px-4">
-              <h1 className="text-3xl font-bold text-white mb-8">
+          <main className="flex-1 p-6 max-w-[1600px] mx-auto w-full">
+            <div className="space-y-6">
+              <h1 className="text-3xl font-bold text-white">
                 Commercial Cleaning Estimation Tool
               </h1>
               
@@ -107,23 +105,23 @@ const Index = () => {
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="scope" className="space-y-6 bg-accent/5 p-6 rounded-lg">
+                <TabsContent value="scope" className="space-y-6">
                   <SiteManager onSitesChange={setSites} />
                 </TabsContent>
 
-                <TabsContent value="labor" className="space-y-6 bg-accent/5 p-6 rounded-lg">
+                <TabsContent value="labor" className="space-y-6">
                   <LaborCosts onLaborCostChange={setLaborCosts} />
                 </TabsContent>
 
-                <TabsContent value="equipment" className="space-y-6 bg-accent/5 p-6 rounded-lg">
+                <TabsContent value="equipment" className="space-y-6">
                   <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
                 </TabsContent>
 
-                <TabsContent value="roster" className="space-y-6 bg-accent/5 p-6 rounded-lg">
+                <TabsContent value="roster" className="space-y-6">
                   <RosterManager />
                 </TabsContent>
 
-                <TabsContent value="summary" className="space-y-6 bg-accent/5 p-6 rounded-lg">
+                <TabsContent value="summary" className="space-y-6">
                   <ProfitLoss
                     revenue={monthlyRevenue}
                     laborCost={laborCost}
@@ -143,7 +141,7 @@ const Index = () => {
                 </TabsContent>
               </Tabs>
             </div>
-          </div>
+          </main>
         </div>
       </div>
     </SidebarProvider>
