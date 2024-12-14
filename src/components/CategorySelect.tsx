@@ -32,7 +32,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             {category.name}
           </AccordionTrigger>
           <AccordionContent>
-            <Command>
+            <CommandGroup>
               {filteredSubcategories.map((subcategory) => (
                 <CommandItem
                   key={subcategory}
@@ -51,7 +51,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
                   {subcategory}
                 </CommandItem>
               ))}
-            </Command>
+            </CommandGroup>
           </AccordionContent>
         </AccordionItem>
       );
@@ -74,7 +74,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             {group.name}
           </AccordionTrigger>
           <AccordionContent>
-            <Command>
+            <CommandGroup>
               {filteredCategories.map((category) => (
                 <CommandItem
                   key={category}
@@ -93,11 +93,29 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
                   {category}
                 </CommandItem>
               ))}
-            </Command>
+            </CommandGroup>
           </AccordionContent>
         </AccordionItem>
       );
     });
+  };
+
+  const hasResults = () => {
+    const categoryResults = (categoryGroups || []).some(group => 
+      group.categories?.some(category =>
+        category.subcategories?.some(subcategory =>
+          subcategory.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      )
+    );
+
+    const industryResults = (industryGroups || []).some(group =>
+      group.categories?.some(category =>
+        category.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+
+    return categoryResults || industryResults;
   };
 
   return (
@@ -120,7 +138,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
-          <CommandEmpty>No category found.</CommandEmpty>
+          {!hasResults() && <CommandEmpty>No category found.</CommandEmpty>}
           <div className="max-h-[300px] overflow-y-auto">
             <Accordion type="single" collapsible className="w-full">
               {(categoryGroups || []).map(group => (
