@@ -49,7 +49,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
-        <Command>
+        <Command shouldFilter={false}>
           <CommandInput 
             placeholder={
               activeTab === 'industries' 
@@ -73,7 +73,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
                     </CommandEmpty>
                   ) : (
                     <CategoryList
-                      groups={categoryGroups}
+                      groups={categoryGroups || []}
                       selectedValue={value}
                       searchQuery={searchQuery}
                       onSelect={handleSelect}
@@ -87,7 +87,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
                     </CommandEmpty>
                   ) : (
                     <IndustryList
-                      groups={industryGroups}
+                      groups={industryGroups || []}
                       selectedValue={value}
                       searchQuery={searchQuery}
                       onSelect={handleSelect}
