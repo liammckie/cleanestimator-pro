@@ -1,11 +1,51 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React, { useState } from 'react';
+import { AreaInput } from '@/components/AreaInput';
+import { LaborCosts } from '@/components/LaborCosts';
+import { EquipmentCosts } from '@/components/EquipmentCosts';
+import { ProfitLoss } from '@/components/ProfitLoss';
+
+const PRODUCTIVITY_RATE = 3000; // Square feet per hour (example rate)
+const OVERHEAD_PERCENTAGE = 0.15; // 15% overhead
 
 const Index = () => {
+  const [area, setArea] = useState({ squareFeet: 0, spaceType: 'office' });
+  const [laborCosts, setLaborCosts] = useState({ hourlyRate: 0 });
+  const [equipmentCosts, setEquipmentCosts] = useState({ monthly: 0 });
+
+  // Calculate required hours based on area and productivity rate
+  const requiredHours = area.squareFeet / PRODUCTIVITY_RATE;
+  
+  // Calculate costs
+  const laborCost = requiredHours * laborCosts.hourlyRate;
+  const monthlyRevenue = laborCost * 1.5; // 50% markup for example
+  const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        <h1 className="text-3xl font-bold text-primary mb-8">
+          Commercial Cleaning Estimation Tool
+        </h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <AreaInput onAreaChange={setArea} />
+          <LaborCosts onLaborCostChange={setLaborCosts} />
+          <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+        </div>
+
+        <div className="mt-8">
+          <ProfitLoss
+            revenue={monthlyRevenue}
+            laborCost={laborCost}
+            equipmentCost={equipmentCosts.monthly}
+            overhead={overhead}
+          />
+        </div>
+
+        <div className="mt-6 text-sm text-gray-600">
+          <p>* Calculations based on industry standard productivity rate of {PRODUCTIVITY_RATE} sq ft/hour</p>
+          <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
+        </div>
       </div>
     </div>
   );
