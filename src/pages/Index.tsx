@@ -64,25 +64,22 @@ const Index = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="flex-1 flex bg-primary">
+          <div className="w-1/4 min-w-[300px] border-r border-primary/20">
+            <SiteManager onSitesChange={setSites} />
+          </div>
           <div className="w-1/3 min-w-[400px] border-r border-primary/20">
             <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
           </div>
-          <main className="flex-1 overflow-auto p-6 flex justify-center">
-            <div className="w-full max-w-[1200px]">
+          <main className="flex-1 overflow-auto p-6">
+            <div className="w-full max-w-[800px] mx-auto">
               <div className="mb-8 text-center">
                 <h1 className="text-4xl font-bold text-white">
                   Commercial Cleaning Estimation Tool
                 </h1>
               </div>
               
-              <Tabs defaultValue="scope" className="space-y-8">
-                <TabsList className="grid w-full grid-cols-5 bg-primary/20">
-                  <TabsTrigger 
-                    value="scope"
-                    className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
-                  >
-                    Scope & Tasks
-                  </TabsTrigger>
+              <Tabs defaultValue="labor" className="space-y-8">
+                <TabsList className="grid w-full grid-cols-4 bg-primary/20">
                   <TabsTrigger 
                     value="labor"
                     className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
@@ -110,10 +107,6 @@ const Index = () => {
                 </TabsList>
 
                 <div className="bg-accent/5 rounded-lg p-8">
-                  <TabsContent value="scope" className="space-y-8 mt-0">
-                    <SiteManager onSitesChange={setSites} />
-                  </TabsContent>
-
                   <TabsContent value="labor" className="space-y-8 mt-0">
                     <LaborCosts onLaborCostChange={setLaborCosts} />
                   </TabsContent>
