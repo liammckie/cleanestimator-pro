@@ -16,11 +16,9 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const renderCategories = (categories: Array<{ name: string; subcategories: string[] }>) => {
-    if (!Array.isArray(categories)) return null;
-
+  const renderCategories = (categories: Array<{ name: string; subcategories: string[] }> = []) => {
     return categories.map((category) => {
-      if (!category?.subcategories?.length) return null;
+      if (!category?.name || !Array.isArray(category?.subcategories)) return null;
 
       const filteredSubcategories = category.subcategories.filter(subcategory =>
         subcategory.toLowerCase().includes(searchQuery.toLowerCase())
@@ -60,6 +58,48 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
     });
   };
 
+  const renderIndustryGroups = () => {
+    return (industryGroups || []).map(group => {
+      if (!group?.name || !Array.isArray(group?.categories)) return null;
+
+      const filteredCategories = group.categories.filter(category =>
+        category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      if (filteredCategories.length === 0) return null;
+
+      return (
+        <AccordionItem key={group.name} value={group.name}>
+          <AccordionTrigger className="font-semibold">
+            {group.name}
+          </AccordionTrigger>
+          <AccordionContent>
+            <Command>
+              {filteredCategories.map((category) => (
+                <CommandItem
+                  key={category}
+                  value={category}
+                  onSelect={() => {
+                    onValueChange(category);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === category ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {category}
+                </CommandItem>
+              ))}
+            </Command>
+          </AccordionContent>
+        </AccordionItem>
+      );
+    });
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -83,7 +123,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
           <CommandEmpty>No category found.</CommandEmpty>
           <div className="max-h-[300px] overflow-y-auto">
             <Accordion type="single" collapsible className="w-full">
-              {categoryGroups?.map(group => (
+              {(categoryGroups || []).map(group => (
                 <AccordionItem key={group.name} value={group.name}>
                   <AccordionTrigger className="font-semibold">
                     {group.name}
@@ -95,39 +135,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
                   </AccordionContent>
                 </AccordionItem>
               ))}
-              {industryGroups?.map(group => (
-                <AccordionItem key={group.name} value={group.name}>
-                  <AccordionTrigger className="font-semibold">
-                    {group.name}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Command>
-                      {group.categories
-                        .filter(category => 
-                          category.toLowerCase().includes(searchQuery.toLowerCase())
-                        )
-                        .map((category) => (
-                          <CommandItem
-                            key={category}
-                            value={category}
-                            onSelect={() => {
-                              onValueChange(category);
-                              setOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                value === category ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {category}
-                          </CommandItem>
-                        ))}
-                    </Command>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+              {renderIndustryGroups()}
             </Accordion>
           </div>
         </Command>
