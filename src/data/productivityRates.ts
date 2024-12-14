@@ -14,14 +14,7 @@ import { trashBarrelRates } from './rates/trashBarrelRates';
 import { windowsGlassRates, windowBlindsRates, glassCleaningRates } from './rates/windowsGlassRates';
 import { correctionalRates } from './rates/correctionalRates';
 import { dormRates } from './rates/dormRates';
-import { 
-  healthcareAssetRates,
-  healthcareBundledRates,
-  healthcareGeneralCleaningRates,
-  healthcareVacuumingRates,
-  healthcarePhoneRates,
-  healthcareTrashRates 
-} from './rates/healthcareGeneralRates';
+import { healthcareRates } from './rates/healthcareRates';
 import { hotelRates } from './rates/hotelRates';
 
 export const getAllProductivityRates = (): ProductivityRate[] => {
@@ -45,12 +38,7 @@ export const getAllProductivityRates = (): ProductivityRate[] => {
     ...glassCleaningRates,
     ...correctionalRates,
     ...dormRates,
-    ...healthcareAssetRates,
-    ...healthcareBundledRates,
-    ...healthcareGeneralCleaningRates,
-    ...healthcareVacuumingRates,
-    ...healthcarePhoneRates,
-    ...healthcareTrashRates,
+    ...healthcareRates,
     ...hotelRates
   ];
 };
