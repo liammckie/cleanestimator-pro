@@ -10,20 +10,36 @@ export const kitchenRates: KitchenRates = {
     {
       id: "KIT-1M",
       category: "Kitchen - Commercial",
-      task: "Deep clean commercial kitchen",
-      tool: "Commercial kitchen cleaning kit",
-      unit: "kitchen",
-      ratePerHour: 1
+      task: "Clean commercial kitchen surfaces",
+      tool: "Commercial cleaning kit",
+      unit: "m²",
+      ratePerHour: 85
+    },
+    {
+      id: "KIT-2M",
+      category: "Kitchen - Commercial",
+      task: "Clean commercial kitchen equipment",
+      tool: "Specialized cleaning tools",
+      unit: "unit",
+      ratePerHour: 12
     }
   ],
   industrial: [
     {
-      id: "KIT-2M",
+      id: "KIT-3M",
       category: "Kitchen - Industrial",
-      task: "Industrial kitchen equipment cleaning",
+      task: "Clean industrial kitchen surfaces",
       tool: "Industrial cleaning equipment",
-      unit: "equipment",
-      ratePerHour: 2
+      unit: "m²",
+      ratePerHour: 65
+    },
+    {
+      id: "KIT-4M",
+      category: "Kitchen - Industrial",
+      task: "Clean industrial kitchen equipment",
+      tool: "Heavy-duty cleaning kit",
+      unit: "unit",
+      ratePerHour: 8
     }
   ]
 };

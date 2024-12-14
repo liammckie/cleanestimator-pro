@@ -10,20 +10,36 @@ export const windowRates: WindowRates = {
     {
       id: "WIN-1M",
       category: "Windows - Interior",
-      task: "Clean interior windows",
+      task: "Clean interior windows - standard height",
       tool: "Window cleaning kit",
       unit: "m²",
-      ratePerHour: 100
+      ratePerHour: 95
+    },
+    {
+      id: "WIN-2M",
+      category: "Windows - Interior",
+      task: "Clean interior windows - high access",
+      tool: "Extension pole kit",
+      unit: "m²",
+      ratePerHour: 65
     }
   ],
   exterior: [
     {
-      id: "WIN-2M",
+      id: "WIN-3M",
       category: "Windows - Exterior",
-      task: "Clean exterior windows",
-      tool: "Height access equipment",
+      task: "Clean exterior windows - ground level",
+      tool: "Professional window cleaning kit",
       unit: "m²",
       ratePerHour: 75
+    },
+    {
+      id: "WIN-4M",
+      category: "Windows - Exterior",
+      task: "Clean exterior windows - height access",
+      tool: "Height access equipment",
+      unit: "m²",
+      ratePerHour: 45
     }
   ]
 };
