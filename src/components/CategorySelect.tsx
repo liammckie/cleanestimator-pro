@@ -16,10 +16,10 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
 
-  // Flatten categories for searching
-  const allGeneralCategories = categoryGroups.flatMap(group => 
-    group.categories.flatMap(category => 
-      category.subcategories.map(subcategory => ({
+  // Ensure categoryGroups and industryGroups exist and are arrays
+  const safeGeneralCategories = (categoryGroups || []).flatMap(group => 
+    (group.categories || []).flatMap(category => 
+      (category.subcategories || []).map(subcategory => ({
         group: group.name,
         category: category.name,
         subcategory
@@ -27,8 +27,8 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
     )
   );
 
-  const allIndustryCategories = industryGroups.flatMap(group => 
-    group.categories.map(category => ({
+  const safeIndustryCategories = (industryGroups || []).flatMap(group => 
+    (group.categories || []).map(category => ({
       group: group.name,
       category
     }))
@@ -61,11 +61,11 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             <Command>
               <CommandInput placeholder="Search categories..." />
               <CommandEmpty>No category found.</CommandEmpty>
-              {categoryGroups.map((group) => (
+              {(categoryGroups || []).map((group) => (
                 <React.Fragment key={group.name}>
-                  {group.categories.map((category) => (
+                  {(group.categories || []).map((category) => (
                     <CommandGroup key={category.name} heading={category.name}>
-                      {category.subcategories.map((subcategory) => (
+                      {(category.subcategories || []).map((subcategory) => (
                         <CommandItem
                           key={subcategory}
                           value={subcategory}
@@ -94,9 +94,9 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             <Command>
               <CommandInput placeholder="Search industry categories..." />
               <CommandEmpty>No category found.</CommandEmpty>
-              {industryGroups.map((group) => (
+              {(industryGroups || []).map((group) => (
                 <CommandGroup key={group.name} heading={group.name}>
-                  {group.categories.map((category) => (
+                  {(group.categories || []).map((category) => (
                     <CommandItem
                       key={category}
                       value={category}
