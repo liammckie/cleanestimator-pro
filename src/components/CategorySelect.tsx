@@ -17,7 +17,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
   const [searchQuery, setSearchQuery] = useState('');
 
   const renderCategories = (categories: Array<{ name: string; subcategories: string[] }> = []) => {
-    if (!Array.isArray(categories)) return null;
+    if (!Array.isArray(categories)) return [];
 
     return categories.map((category) => {
       if (!category?.name || !Array.isArray(category?.subcategories)) return null;
@@ -61,7 +61,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
   };
 
   const renderIndustryGroups = () => {
-    if (!Array.isArray(industryGroups)) return null;
+    if (!Array.isArray(industryGroups)) return [];
 
     return industryGroups.map(group => {
       if (!group?.name || !Array.isArray(group?.categories)) return null;
@@ -105,7 +105,9 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
   };
 
   const hasResults = () => {
-    const categoryResults = (categoryGroups || []).some(group => 
+    if (!Array.isArray(categoryGroups) || !Array.isArray(industryGroups)) return false;
+
+    const categoryResults = categoryGroups.some(group => 
       group?.categories?.some(category =>
         category?.subcategories?.some(subcategory =>
           subcategory?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -113,7 +115,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
       )
     );
 
-    const industryResults = (industryGroups || []).some(group =>
+    const industryResults = industryGroups.some(group =>
       group?.categories?.some(category =>
         category?.toLowerCase().includes(searchQuery.toLowerCase())
       )
@@ -144,7 +146,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
           />
           <div className="max-h-[300px] overflow-y-auto">
             <Accordion type="single" collapsible className="w-full">
-              {(categoryGroups || []).map(group => (
+              {Array.isArray(categoryGroups) && categoryGroups.map(group => (
                 <AccordionItem key={group.name} value={group.name}>
                   <AccordionTrigger className="font-semibold">
                     {group.name}
@@ -159,7 +161,11 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
               {renderIndustryGroups()}
             </Accordion>
           </div>
-          {!hasResults() && <CommandEmpty>No category found.</CommandEmpty>}
+          {!hasResults() && (
+            <div className="py-6 text-center text-sm">
+              <CommandEmpty>No category found.</CommandEmpty>
+            </div>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
