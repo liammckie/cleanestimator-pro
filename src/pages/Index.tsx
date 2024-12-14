@@ -5,9 +5,10 @@ import { EquipmentCosts } from '@/components/EquipmentCosts';
 import { ProfitLoss } from '@/components/ProfitLoss';
 import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OnCostsState } from '@/data/types/onCosts';
 
-const OVERHEAD_PERCENTAGE = 0.15; // 15% overhead
+const OVERHEAD_PERCENTAGE = 0.15;
 
 const Index = () => {
   const [area, setArea] = useState({ 
@@ -45,11 +46,10 @@ const Index = () => {
     return (baseRate * totalOnCostPercentage) / 100;
   };
 
-  // Calculate costs based on total time from all tasks
   const onCostsPerHour = calculateTotalOnCosts();
   const totalHourlyRate = laborCosts.hourlyRate + onCostsPerHour;
   const laborCost = area.totalTime * totalHourlyRate;
-  const monthlyRevenue = laborCost * 1.5; // 50% markup for example
+  const monthlyRevenue = laborCost * 1.5;
   const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
 
   return (
@@ -62,30 +62,45 @@ const Index = () => {
               Commercial Cleaning Estimation Tool
             </h1>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <AreaInput onAreaChange={setArea} />
-              <LaborCosts onLaborCostChange={setLaborCosts} />
-              <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-            </div>
+            <Tabs defaultValue="scope" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="scope">Scope & Tasks</TabsTrigger>
+                <TabsTrigger value="labor">Labor Costs</TabsTrigger>
+                <TabsTrigger value="equipment">Equipment</TabsTrigger>
+                <TabsTrigger value="summary">Summary</TabsTrigger>
+              </TabsList>
 
-            <div className="mt-8">
-              <ProfitLoss
-                revenue={monthlyRevenue}
-                laborCost={laborCost}
-                equipmentCost={equipmentCosts.monthly}
-                overhead={overhead}
-              />
-            </div>
+              <TabsContent value="scope" className="space-y-6">
+                <AreaInput onAreaChange={setArea} />
+              </TabsContent>
 
-            <div className="mt-6 text-sm text-gray-600">
-              <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
-              {area.totalTime > 0 && (
-                <p>* Total time required: {(area.totalTime * 60).toFixed(1)} minutes</p>
-              )}
-              {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
-                <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
-              )}
-            </div>
+              <TabsContent value="labor" className="space-y-6">
+                <LaborCosts onLaborCostChange={setLaborCosts} />
+              </TabsContent>
+
+              <TabsContent value="equipment" className="space-y-6">
+                <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+              </TabsContent>
+
+              <TabsContent value="summary" className="space-y-6">
+                <ProfitLoss
+                  revenue={monthlyRevenue}
+                  laborCost={laborCost}
+                  equipmentCost={equipmentCosts.monthly}
+                  overhead={overhead}
+                />
+                
+                <div className="mt-6 text-sm text-gray-600">
+                  <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
+                  {area.totalTime > 0 && (
+                    <p>* Total time required: {(area.totalTime * 60).toFixed(1)} minutes</p>
+                  )}
+                  {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
+                    <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>
