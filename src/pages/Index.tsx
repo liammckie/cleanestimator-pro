@@ -64,52 +64,60 @@ const Index = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
         
-        <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-4 p-4">
+        <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-6 p-6 max-w-[1920px] mx-auto h-[calc(100vh-4rem)]">
           {/* Panel 1 - Sites */}
-          <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto">
-            <h2 className="text-xl font-semibold mb-4">Sites Overview</h2>
-            <SiteManager onSitesChange={setSites} />
+          <div className="bg-white rounded-lg shadow-lg overflow-auto">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Sites Overview</h2>
+              <SiteManager onSitesChange={setSites} />
+            </div>
           </div>
 
           {/* Panel 2 - Scope of Work */}
-          <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto">
-            <h2 className="text-xl font-semibold mb-4">Scope of Work</h2>
-            <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
+          <div className="bg-white rounded-lg shadow-lg overflow-auto">
+            <div className="p-6 h-full">
+              <h2 className="text-xl font-semibold mb-4">Scope of Work</h2>
+              <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
+            </div>
           </div>
 
           {/* Panel 3 - Costs Calculator */}
-          <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto">
-            <h2 className="text-xl font-semibold mb-4">Cost Calculator</h2>
-            <Tabs defaultValue="labor" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="labor">Labor</TabsTrigger>
-                <TabsTrigger value="equipment">Equipment</TabsTrigger>
-                <TabsTrigger value="summary">Summary</TabsTrigger>
-              </TabsList>
+          <div className="bg-white rounded-lg shadow-lg overflow-auto">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Cost Calculator</h2>
+              <Tabs defaultValue="labor" className="space-y-4">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="labor">Labor</TabsTrigger>
+                  <TabsTrigger value="equipment">Equipment</TabsTrigger>
+                  <TabsTrigger value="summary">Summary</TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="labor" className="mt-0">
-                <LaborCosts onLaborCostChange={setLaborCosts} />
-              </TabsContent>
+                <TabsContent value="labor" className="mt-0">
+                  <LaborCosts onLaborCostChange={setLaborCosts} />
+                </TabsContent>
 
-              <TabsContent value="equipment" className="mt-0">
-                <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-              </TabsContent>
+                <TabsContent value="equipment" className="mt-0">
+                  <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+                </TabsContent>
 
-              <TabsContent value="summary" className="mt-0">
-                <ProfitLoss
-                  revenue={monthlyRevenue}
-                  laborCost={laborCost}
-                  equipmentCost={equipmentCosts.monthly}
-                  overhead={overhead}
-                />
-              </TabsContent>
-            </Tabs>
+                <TabsContent value="summary" className="mt-0">
+                  <ProfitLoss
+                    revenue={monthlyRevenue}
+                    laborCost={laborCost}
+                    equipmentCost={equipmentCosts.monthly}
+                    overhead={overhead}
+                  />
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
 
           {/* Panel 4 - Roster */}
-          <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto">
-            <h2 className="text-xl font-semibold mb-4">Roster Management</h2>
-            <RosterManager />
+          <div className="bg-white rounded-lg shadow-lg overflow-auto">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Roster Management</h2>
+              <RosterManager />
+            </div>
           </div>
         </div>
       </div>
