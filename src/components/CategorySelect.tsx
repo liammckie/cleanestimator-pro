@@ -17,11 +17,13 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
   const [searchQuery, setSearchQuery] = useState('');
 
   const renderCategories = (categories: Array<{ name: string; subcategories: string[] }> = []) => {
+    if (!Array.isArray(categories)) return null;
+
     return categories.map((category) => {
       if (!category?.name || !Array.isArray(category?.subcategories)) return null;
 
       const filteredSubcategories = category.subcategories.filter(subcategory =>
-        subcategory.toLowerCase().includes(searchQuery.toLowerCase())
+        subcategory?.toLowerCase().includes(searchQuery.toLowerCase())
       );
 
       if (filteredSubcategories.length === 0) return null;
@@ -55,15 +57,17 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
           </AccordionContent>
         </AccordionItem>
       );
-    });
+    }).filter(Boolean);
   };
 
   const renderIndustryGroups = () => {
-    return (industryGroups || []).map(group => {
+    if (!Array.isArray(industryGroups)) return null;
+
+    return industryGroups.map(group => {
       if (!group?.name || !Array.isArray(group?.categories)) return null;
 
       const filteredCategories = group.categories.filter(category =>
-        category.toLowerCase().includes(searchQuery.toLowerCase())
+        category?.toLowerCase().includes(searchQuery.toLowerCase())
       );
 
       if (filteredCategories.length === 0) return null;
@@ -97,21 +101,21 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
           </AccordionContent>
         </AccordionItem>
       );
-    });
+    }).filter(Boolean);
   };
 
   const hasResults = () => {
     const categoryResults = (categoryGroups || []).some(group => 
-      group.categories?.some(category =>
-        category.subcategories?.some(subcategory =>
-          subcategory.toLowerCase().includes(searchQuery.toLowerCase())
+      group?.categories?.some(category =>
+        category?.subcategories?.some(subcategory =>
+          subcategory?.toLowerCase().includes(searchQuery.toLowerCase())
         )
       )
     );
 
     const industryResults = (industryGroups || []).some(group =>
-      group.categories?.some(category =>
-        category.toLowerCase().includes(searchQuery.toLowerCase())
+      group?.categories?.some(category =>
+        category?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     );
 
@@ -138,7 +142,6 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
-          {!hasResults() && <CommandEmpty>No category found.</CommandEmpty>}
           <div className="max-h-[300px] overflow-y-auto">
             <Accordion type="single" collapsible className="w-full">
               {(categoryGroups || []).map(group => (
@@ -156,6 +159,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({ value, onValueCh
               {renderIndustryGroups()}
             </Accordion>
           </div>
+          {!hasResults() && <CommandEmpty>No category found.</CommandEmpty>}
         </Command>
       </PopoverContent>
     </Popover>
