@@ -3,20 +3,20 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuL
 
 export const Header = () => {
   return (
-    <div className="flex items-center justify-between p-4 bg-primary w-full">
-      <div className="flex items-center gap-2 ml-4">
+    <div className="flex items-center h-16 px-6 bg-primary border-b border-primary/20">
+      <div className="flex items-center gap-3">
         <img 
           src="/logo.png" 
           alt="SCS Group Logo" 
-          className="h-10 w-auto"
+          className="h-8 w-auto"
         />
-        <span className="text-xl font-bold text-white">SCS Group</span>
+        <span className="text-lg font-semibold text-white">SCS Group</span>
       </div>
-      <NavigationMenu className="absolute left-1/2 transform -translate-x-1/2">
+      <NavigationMenu className="mx-auto">
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuLink 
-              className="text-white hover:text-secondary transition-colors"
+              className="text-white hover:text-secondary transition-colors px-4 py-2"
               href="/"
             >
               Dashboard

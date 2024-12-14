@@ -61,25 +61,33 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-primary">
         <Header />
-        <div className="flex-1 flex bg-primary">
-          <div className="w-1/4 min-w-[300px] border-r border-primary/20">
-            <SiteManager onSitesChange={setSites} />
+        <div className="flex-1 flex">
+          {/* Site Overview - Left Panel */}
+          <div className="w-[300px] min-w-[300px] bg-primary border-r border-primary/20 overflow-y-auto">
+            <div className="p-4">
+              <h2 className="text-xl font-semibold text-white mb-4">Sites Overview</h2>
+              <SiteManager onSitesChange={setSites} />
+            </div>
           </div>
-          <div className="w-1/3 min-w-[400px] border-r border-primary/20">
+
+          {/* Scope of Work - Middle Panel */}
+          <div className="w-[400px] min-w-[400px] bg-primary border-r border-primary/20">
             <ScopeOfWorkSidebar selectedTasks={allSelectedTasks} />
           </div>
-          <main className="flex-1 overflow-auto p-6">
-            <div className="w-full max-w-[800px] mx-auto">
-              <div className="mb-8 text-center">
-                <h1 className="text-4xl font-bold text-white">
+
+          {/* Main Content - Right Panel */}
+          <main className="flex-1 overflow-y-auto bg-primary p-6">
+            <div className="max-w-[900px] mx-auto">
+              <div className="mb-8">
+                <h1 className="text-3xl font-bold text-white text-center">
                   Commercial Cleaning Estimation Tool
                 </h1>
               </div>
-              
-              <Tabs defaultValue="labor" className="space-y-8">
-                <TabsList className="grid w-full grid-cols-4 bg-primary/20">
+
+              <Tabs defaultValue="labor" className="space-y-6">
+                <TabsList className="grid w-full grid-cols-4 bg-accent/5">
                   <TabsTrigger 
                     value="labor"
                     className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-white"
@@ -106,35 +114,37 @@ const Index = () => {
                   </TabsTrigger>
                 </TabsList>
 
-                <div className="bg-accent/5 rounded-lg p-8">
-                  <TabsContent value="labor" className="space-y-8 mt-0">
+                <div className="bg-accent/5 rounded-lg p-6 shadow-lg">
+                  <TabsContent value="labor" className="mt-0">
                     <LaborCosts onLaborCostChange={setLaborCosts} />
                   </TabsContent>
 
-                  <TabsContent value="equipment" className="space-y-8 mt-0">
+                  <TabsContent value="equipment" className="mt-0">
                     <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
                   </TabsContent>
 
-                  <TabsContent value="roster" className="space-y-8 mt-0">
+                  <TabsContent value="roster" className="mt-0">
                     <RosterManager />
                   </TabsContent>
 
-                  <TabsContent value="summary" className="space-y-8 mt-0">
-                    <ProfitLoss
-                      revenue={monthlyRevenue}
-                      laborCost={laborCost}
-                      equipmentCost={equipmentCosts.monthly}
-                      overhead={overhead}
-                    />
-                    
-                    <div className="mt-6 text-sm text-gray-400">
-                      <p>* Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
-                      {totalTime > 0 && (
-                        <p>* Total time required: {(totalTime * 60).toFixed(1)} minutes</p>
-                      )}
-                      {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
-                        <p>* On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
-                      )}
+                  <TabsContent value="summary" className="mt-0">
+                    <div className="space-y-6">
+                      <ProfitLoss
+                        revenue={monthlyRevenue}
+                        laborCost={laborCost}
+                        equipmentCost={equipmentCosts.monthly}
+                        overhead={overhead}
+                      />
+                      
+                      <div className="mt-6 p-4 bg-primary/20 rounded-lg text-sm text-gray-300 space-y-2">
+                        <p>• Overhead calculated at {OVERHEAD_PERCENTAGE * 100}% of revenue</p>
+                        {totalTime > 0 && (
+                          <p>• Total time required: {(totalTime * 60).toFixed(1)} minutes</p>
+                        )}
+                        {laborCosts.employmentType === 'direct' && onCostsPerHour > 0 && (
+                          <p>• On-costs per hour: ${onCostsPerHour.toFixed(2)}</p>
+                        )}
+                      </div>
                     </div>
                   </TabsContent>
                 </div>
