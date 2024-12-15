@@ -17,7 +17,7 @@ const Index = () => {
   const [sites, setSites] = useState([]);
   const [activeTab, setActiveTab] = useState('sites');
   const [laborCosts, setLaborCosts] = useState({ 
-    hourlyRate: 38, // Set default rate to $38
+    hourlyRate: 38,
     employmentType: 'contracted' as const,
     totalMonthlyHours: 0,
     taskCosts: []
@@ -31,6 +31,31 @@ const Index = () => {
       yearThree: 0,
     },
   });
+
+  const handleAreaChange = (area: {
+    squareMeters: number;
+    spaceType: string;
+    industryType: string;
+    selectedTasks: Array<{
+      taskId: string;
+      quantity: number;
+      timeRequired: number;
+      frequency: {
+        timesPerWeek: number;
+        timesPerMonth: number;
+      };
+      productivityOverride?: number;
+      selectedTool?: string;
+    }>;
+    totalTime: number;
+  }) => {
+    console.log('Area changed:', area);
+    setLaborCosts(prev => ({
+      ...prev,
+      totalMonthlyHours: area.totalTime,
+      taskCosts: area.selectedTasks
+    }));
+  };
 
   const costBreakdown = calculateCosts(sites, laborCosts.hourlyRate);
   const monthlyRevenue = costBreakdown.totalMonthlyCost * 1.5;
@@ -85,7 +110,7 @@ const Index = () => {
   return (
     <SettingsProvider>
       <SidebarProvider>
-        <TaskProvider onTasksChange={handleTasksChange}>
+        <TaskProvider onTasksChange={handleAreaChange}>
           <div className="min-h-screen flex w-full bg-background">
             <div className="flex-1">
               <div className="container mx-auto px-4 py-8">

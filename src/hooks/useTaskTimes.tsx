@@ -1,31 +1,34 @@
 import { useCallback } from 'react';
 import { calculateTaskProductivity } from '@/utils/productivityCalculations';
+import { TaskFrequency } from '@/components/area/task/types';
+
+export const calculateTaskTime = (
+  taskId: string,
+  quantity: number,
+  selectedTool: string | undefined,
+  frequency: TaskFrequency
+): number => {
+  const productivity = calculateTaskProductivity(
+    taskId,
+    quantity,
+    selectedTool,
+    frequency,
+    quantity
+  );
+  
+  console.log('Task time calculation:', {
+    taskId,
+    quantity,
+    selectedTool,
+    frequency,
+    productivity
+  });
+
+  return productivity?.timeRequired || 0;
+};
 
 export const useTaskTimes = () => {
-  const calculateTaskTime = useCallback((
-    taskId: string,
-    quantity: number,
-    selectedTool: string | undefined,
-    frequency: { timesPerWeek: number; timesPerMonth: number }
-  ) => {
-    const productivity = calculateTaskProductivity(
-      taskId,
-      quantity,
-      selectedTool,
-      frequency,
-      quantity
-    );
-    
-    console.log('Task time calculation:', {
-      taskId,
-      quantity,
-      selectedTool,
-      frequency,
-      productivity
-    });
+  const calculateTaskTimeCallback = useCallback(calculateTaskTime, []);
 
-    return productivity?.timeRequired || 0;
-  }, []);
-
-  return { calculateTaskTime };
+  return { calculateTaskTime: calculateTaskTimeCallback };
 };
