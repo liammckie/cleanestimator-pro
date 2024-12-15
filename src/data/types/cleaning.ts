@@ -10,7 +10,6 @@ export interface CleaningTask {
   rate: number;
   unit: 'SQM/hour' | 'Units/hour';
   category: string;
-  subcategory?: string;
   notes?: string;
   defaultTool?: string;
 }

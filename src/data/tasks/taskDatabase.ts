@@ -1,4 +1,4 @@
-import { TaskGroup, TaskCategory } from '../types/cleaning';
+import { TaskGroup } from '../types/cleaning';
 import { coreCleaning } from './coreCleaning';
 import { specializedCleaning } from './specializedCleaning';
 import { industrySpecificCleaning } from './industrySpecificCleaning';
