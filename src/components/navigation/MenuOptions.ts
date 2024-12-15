@@ -2,9 +2,14 @@ import { MenuOption } from "../ui/dynamic-menu";
 
 export const getMenuOptions = (setTab: (tab: string) => void): MenuOption[] => [
   {
-    name: "Scope & Tasks",
+    name: "Sites",
+    icon: "building",
+    onClick: () => setTab("sites")
+  },
+  {
+    name: "Tasks",
     icon: "list",
-    onClick: () => setTab("scope")
+    onClick: () => setTab("tasks")
   },
   {
     name: "Labor Costs",
@@ -35,10 +40,5 @@ export const getMenuOptions = (setTab: (tab: string) => void): MenuOption[] => [
     name: "Settings",
     icon: "settings",
     onClick: () => setTab("settings")
-  },
-  {
-    name: "Site Overview",
-    icon: "globe",
-    onClick: () => setTab("overview")
   }
 ];
