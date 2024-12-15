@@ -28,20 +28,22 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
     return groups.reduce((acc: any[], group) => {
       if (!group?.name || !Array.isArray(group?.categories)) return acc;
 
-      const transformedGroup = {
-        name: group.name,
-        categories: group.categories.reduce((catAcc: any[], category) => {
+      const categories = group.categories
+        .filter(category => category && typeof category === 'object')
+        .reduce((catAcc: any[], category) => {
           if (!category?.name || !Array.isArray(category?.subcategories)) return catAcc;
 
-          const tasks = category.subcategories.reduce((taskAcc: string[], subcategory) => {
-            if (!subcategory?.tasks) return taskAcc;
-            
-            const taskNames = subcategory.tasks
-              .filter(task => task && typeof task === 'object' && task.task)
-              .map(task => task.task);
+          const tasks = category.subcategories
+            .filter(subcategory => subcategory && typeof subcategory === 'object')
+            .reduce((taskAcc: string[], subcategory) => {
+              if (!Array.isArray(subcategory?.tasks)) return taskAcc;
               
-            return [...taskAcc, ...taskNames];
-          }, []);
+              const taskNames = subcategory.tasks
+                .filter(task => task && typeof task === 'object' && task.task)
+                .map(task => task.task);
+                
+              return [...taskAcc, ...taskNames];
+            }, []);
 
           if (tasks.length === 0) return catAcc;
 
@@ -49,11 +51,14 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
             name: category.name,
             subcategories: tasks
           }];
-        }, [])
-      };
+        }, []);
 
-      if (transformedGroup.categories.length === 0) return acc;
-      return [...acc, transformedGroup];
+      if (categories.length === 0) return acc;
+      
+      return [...acc, {
+        name: group.name,
+        categories
+      }];
     }, []);
   }, [groups]);
 
