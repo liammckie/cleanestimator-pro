@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { TaskProvider } from './components/area/task/TaskContext';
 import { CostProvider } from './contexts/CostContext';
 import { EquipmentCosts } from './components/EquipmentCosts';
