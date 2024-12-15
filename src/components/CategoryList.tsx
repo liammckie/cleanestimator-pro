@@ -50,7 +50,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({ groups }) => {
                                 <div>
                                   <p className="font-medium">{task.task}</p>
                                   <p className="text-sm text-muted-foreground">
-                                    {task.ratePerHour} {task.unit}
+                                    {task.ratePerHour} {task.unit}/hr
                                   </p>
                                 </div>
                                 <Button
