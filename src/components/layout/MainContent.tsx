@@ -11,6 +11,7 @@ import { ProfitLoss } from '@/components/ProfitLoss';
 import { AwardSettings } from '@/components/settings/AwardSettings';
 import { useSettings } from '@/contexts/SettingsContext';
 import { SiteOverview } from '@/components/overview/SiteOverview';
+import { ScopeAndTaskPage } from '@/components/scope/ScopeAndTaskPage';
 
 interface MainContentProps {
   sites: any[];
@@ -62,6 +63,10 @@ export const MainContent: React.FC<MainContentProps> = ({
     <>
       <TabsContent value="sites" className="space-y-6">
         <SiteManager onSitesChange={onSitesChange} />
+      </TabsContent>
+
+      <TabsContent value="scope" className="space-y-6">
+        <ScopeAndTaskPage sites={sites} />
       </TabsContent>
 
       <TabsContent value="labor" className="space-y-6">

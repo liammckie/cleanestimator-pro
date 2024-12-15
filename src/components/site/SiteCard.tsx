@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trash2 } from "lucide-react";
 import { Site } from '@/data/types/site';
-import { AreaInput } from '../AreaInput';
 
 interface SiteCardProps {
   site: Site;
@@ -13,7 +12,6 @@ interface SiteCardProps {
   onDelete: (siteId: string) => void;
   onUpdateName: (siteId: string, name: string) => void;
   onUpdateAddress: (siteId: string, field: keyof Site['address'], value: string) => void;
-  onUpdateArea: (siteId: string, area: Site['area']) => void;
 }
 
 export const SiteCard: React.FC<SiteCardProps> = ({
@@ -22,7 +20,6 @@ export const SiteCard: React.FC<SiteCardProps> = ({
   onDelete,
   onUpdateName,
   onUpdateAddress,
-  onUpdateArea
 }) => {
   return (
     <Card className="w-full">
@@ -88,8 +85,6 @@ export const SiteCard: React.FC<SiteCardProps> = ({
             />
           </div>
         </div>
-        
-        <AreaInput onAreaChange={(area) => onUpdateArea(site.id, area)} />
       </CardContent>
     </Card>
   );

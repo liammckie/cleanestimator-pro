@@ -1,44 +1,11 @@
-import { MenuOption } from "../ui/dynamic-menu";
-
-export const getMenuOptions = (setTab: (tab: string) => void): MenuOption[] => [
-  {
-    name: "Sites",
-    icon: "layout",
-    onClick: () => setTab("sites")
-  },
-  {
-    name: "Task Database",
-    icon: "list",
-    onClick: () => setTab("tasks")
-  },
-  {
-    name: "Labor Costs",
-    icon: "user",
-    onClick: () => setTab("labor")
-  },
-  {
-    name: "Equipment",
-    icon: "wrench",
-    onClick: () => setTab("equipment")
-  },
-  {
-    name: "Roster",
-    icon: "calendar",
-    onClick: () => setTab("roster")
-  },
-  {
-    name: "Contract",
-    icon: "file-text",
-    onClick: () => setTab("contract")
-  },
-  {
-    name: "Summary",
-    icon: "layout",
-    onClick: () => setTab("summary")
-  },
-  {
-    name: "Settings",
-    icon: "settings",
-    onClick: () => setTab("settings")
-  }
+export const menuOptions = [
+  { id: 'sites', label: 'Site Manager', icon: 'layout' },
+  { id: 'scope', label: 'Scope of Work', icon: 'file-text' },
+  { id: 'tasks', label: 'Task Database', icon: 'list' },
+  { id: 'labor', label: 'Labor Costs', icon: 'user' },
+  { id: 'equipment', label: 'Equipment', icon: 'wrench' },
+  { id: 'roster', label: 'Roster', icon: 'calendar' },
+  { id: 'contract', label: 'Contract', icon: 'check-square' },
+  { id: 'summary', label: 'Summary', icon: 'globe' },
+  { id: 'settings', label: 'Settings', icon: 'settings' },
 ];
