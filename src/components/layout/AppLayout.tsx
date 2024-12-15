@@ -31,17 +31,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   children
 }) => {
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex h-screen">
       {/* Left Menu */}
-      <div className="w-[250px] shrink-0">
-        <DynamicMenu 
-          options={menuOptions} 
-          className="h-full bg-card rounded-lg border border-border"
-        />
+      <div className="fixed left-0 top-0 h-full w-[250px] bg-card border-r border-border">
+        <DynamicMenu options={menuOptions} />
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 ml-[250px] mr-[384px]">
         <MainNavigation />
         <div className="p-6">
           {children}
@@ -49,7 +46,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       </div>
 
       {/* Right Sidebar */}
-      <div className="w-[300px] shrink-0 border-l border-border">
+      <div className="fixed right-0 top-0 h-full w-[384px] border-l border-border">
         <ScopeOfWorkSidebar selectedTasks={selectedTasks} sites={sites} />
       </div>
     </div>
