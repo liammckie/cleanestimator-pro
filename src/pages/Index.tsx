@@ -8,8 +8,7 @@ import { menuOptions } from '@/components/navigation/MenuOptions';
 import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskProvider } from '@/components/area/task/TaskContext';
-import { TaskManagementPage } from '@/components/task-management/TaskManagementPage';
-import { ScopeAndTaskPage } from '@/components/scope/ScopeAndTaskPage';
+import { AreaContainer } from '@/components/area/AreaContainer';
 import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
 
 const OVERHEAD_PERCENTAGE = 0.15;
@@ -54,10 +53,8 @@ const Index = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'tasks':
-        return <TaskManagementPage />;
       case 'scope':
-        return <ScopeAndTaskPage sites={sites} />;
+        return <AreaContainer />;
       default:
         return (
           <MainContent
