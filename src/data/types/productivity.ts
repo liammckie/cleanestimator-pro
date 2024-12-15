@@ -23,6 +23,26 @@ export interface TaskSubcategory {
   tasks: ProductivityRate[];
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  subcategories: {
+    id: string;
+    name: string;
+    tasks: Array<{
+      id: string;
+      category: string;
+      subcategory: string;
+      task: string;
+      tool: string;
+      unit: string;
+      ratePerHour: number;
+      defaultQuantity: number;
+      minimumQuantity: number;
+    }>;
+  }[];
+}
+
 export interface TaskSelection {
   taskId: string;
   quantity: number;
