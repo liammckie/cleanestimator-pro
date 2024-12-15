@@ -38,6 +38,11 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     ) : null,
   [rate.id, selectedTask]);
 
+  const weeklyHours = useMemo(() => {
+    if (!selectedTask?.timeRequired) return 0;
+    return selectedTask.timeRequired / 4.33; // Convert monthly to weekly
+  }, [selectedTask?.timeRequired]);
+
   const handleLocalTaskSelection = useCallback((taskId: string, checked: boolean) => {
     handleTaskSelection(taskId, checked, siteId, siteName);
   }, [handleTaskSelection, siteId, siteName]);
@@ -71,6 +76,14 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           {productivity && (
             <ProductivityCard productivity={productivity} />
           )}
+
+          <div className="bg-accent/50 p-4 rounded-lg space-y-2">
+            <h4 className="font-medium">Time Requirements</h4>
+            <div className="text-sm space-y-1">
+              <p>Weekly Hours: {weeklyHours.toFixed(1)} hours</p>
+              <p>Monthly Hours: {selectedTask.timeRequired.toFixed(1)} hours</p>
+            </div>
+          </div>
 
           {selectedTask.timeRequired > 0 && (
             <TimeDisplay
