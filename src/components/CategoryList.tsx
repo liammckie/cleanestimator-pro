@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ToolSelect } from './ToolSelect';
 import { calculateTaskProductivity } from '@/utils/productivityCalculations';
 import { Site } from '@/data/types/site';
+import { Button } from "@/components/ui/button";
 
 interface CategoryListProps {
   groups: CategoryGroup[];
