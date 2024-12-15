@@ -5,8 +5,10 @@ interface CostContextType {
   totalLaborCost: number;
   totalEquipmentCost: number;
   totalWeeklyHours: number;
+  laborRate: number;
   updateLaborCost: (cost: number) => void;
   updateEquipmentCost: (cost: number) => void;
+  updateLaborRate: (rate: number) => void;
 }
 
 const CostContext = createContext<CostContextType | undefined>(undefined);
@@ -16,17 +18,28 @@ export const CostProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [totalLaborCost, setTotalLaborCost] = useState(0);
   const [totalEquipmentCost, setTotalEquipmentCost] = useState(0);
   const [totalWeeklyHours, setTotalWeeklyHours] = useState(0);
+  const [laborRate, setLaborRate] = useState(38); // Default labor rate
 
   useEffect(() => {
-    // Calculate total weekly hours from selected tasks
+    // Calculate total weekly hours and costs from selected tasks
     const weeklyHours = selectedTasks.reduce((total, task) => {
       const monthlyHours = task.timeRequired || 0;
       return total + (monthlyHours / 4.33); // Convert monthly to weekly
     }, 0);
     
+    const monthlyHours = weeklyHours * 4.33;
+    const laborCost = monthlyHours * laborRate;
+    
     setTotalWeeklyHours(weeklyHours);
-    console.log('Updated total weekly hours:', weeklyHours);
-  }, [selectedTasks]);
+    setTotalLaborCost(laborCost);
+    
+    console.log('Updated calculations:', {
+      weeklyHours,
+      monthlyHours,
+      laborRate,
+      laborCost
+    });
+  }, [selectedTasks, laborRate]);
 
   const updateLaborCost = (cost: number) => {
     setTotalLaborCost(cost);
@@ -36,13 +49,19 @@ export const CostProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTotalEquipmentCost(cost);
   };
 
+  const updateLaborRate = (rate: number) => {
+    setLaborRate(rate);
+  };
+
   return (
     <CostContext.Provider value={{
       totalLaborCost,
       totalEquipmentCost,
       totalWeeklyHours,
+      laborRate,
       updateLaborCost,
       updateEquipmentCost,
+      updateLaborRate,
     }}>
       {children}
     </CostContext.Provider>

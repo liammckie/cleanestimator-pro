@@ -9,6 +9,7 @@ import { EmploymentTypeSelector } from './labor/EmploymentTypeSelector';
 import { DirectEmploymentOptions } from './labor/DirectEmploymentOptions';
 import { AwardIncreaseManager } from './labor/AwardIncreaseManager';
 import { useTaskContext } from './area/task/TaskContext';
+import { useCostContext } from '@/contexts/CostContext';
 
 interface LaborCostsProps {
   onLaborCostChange: (costs: { 
@@ -47,6 +48,7 @@ const defaultOnCosts: OnCostsState = {
 
 export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => {
   const { totalWeeklyHours } = useTaskContext();
+  const { updateLaborRate } = useCostContext();
   const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
   const [contractedRate, setContractedRate] = useState<number>(38);
   const [awardLevel, setAwardLevel] = useState<number>(1);
@@ -68,6 +70,7 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
     const value = parseFloat(e.target.value) || 0;
     setContractedRate(value);
     if (employmentType === 'contracted') {
+      updateLaborRate(value);
       onLaborCostChange({
         hourlyRate: value,
         employmentType
@@ -81,6 +84,7 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
 
   const updateLaborCosts = (type: 'contracted' | 'direct' = employmentType) => {
     if (type === 'contracted') {
+      updateLaborRate(contractedRate);
       onLaborCostChange({
         hourlyRate: contractedRate,
         employmentType: type
@@ -90,6 +94,7 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
       const baseRate = selectedLevel?.payRates[shiftType as keyof typeof selectedLevel.payRates] || 0;
       const adjustedRate = calculateAdjustedRate(baseRate);
       
+      updateLaborRate(adjustedRate);
       onLaborCostChange({
         hourlyRate: adjustedRate,
         employmentType: type,
