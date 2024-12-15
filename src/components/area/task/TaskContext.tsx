@@ -52,7 +52,7 @@ export const TaskProvider: React.FC<{
         timeRequired: 0,
         frequency: {
           timesPerWeek: 1,
-          timesPerMonth: 4
+          timesPerMonth: 4.33
         },
         selectedTool: rate.tool
       };
@@ -82,7 +82,11 @@ export const TaskProvider: React.FC<{
             task.frequency,
             quantity
           );
-          return { ...task, quantity, timeRequired: productivity?.timeRequired || 0 };
+          return { 
+            ...task, 
+            quantity, 
+            timeRequired: productivity?.timeRequired || 0 
+          };
         }
         return task;
       });
@@ -97,7 +101,7 @@ export const TaskProvider: React.FC<{
         if (task.taskId === taskId) {
           const frequency = {
             timesPerWeek,
-            timesPerMonth: timesPerWeek * 4
+            timesPerMonth: timesPerWeek * 4.33
           };
           const productivity = calculateTaskProductivity(
             taskId,
@@ -106,7 +110,11 @@ export const TaskProvider: React.FC<{
             frequency,
             task.quantity
           );
-          return { ...task, frequency, timeRequired: productivity?.timeRequired || 0 };
+          return { 
+            ...task, 
+            frequency, 
+            timeRequired: productivity?.timeRequired || 0 
+          };
         }
         return task;
       });
@@ -124,9 +132,14 @@ export const TaskProvider: React.FC<{
             task.quantity,
             task.selectedTool,
             task.frequency,
-            task.quantity
+            task.quantity,
+            override
           );
-          return { ...task, productivityOverride: override, timeRequired: productivity?.timeRequired || 0 };
+          return { 
+            ...task, 
+            productivityOverride: override,
+            timeRequired: productivity?.timeRequired || 0 
+          };
         }
         return task;
       });
@@ -146,7 +159,11 @@ export const TaskProvider: React.FC<{
             task.frequency,
             task.quantity
           );
-          return { ...task, selectedTool: tool, timeRequired: productivity?.timeRequired || 0 };
+          return { 
+            ...task, 
+            selectedTool: tool,
+            timeRequired: productivity?.timeRequired || 0 
+          };
         }
         return task;
       });

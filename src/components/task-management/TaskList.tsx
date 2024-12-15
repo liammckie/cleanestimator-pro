@@ -4,20 +4,23 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash } from "lucide-react";
 import { CleaningTask } from '@/data/types/taskManagement';
 import { Badge } from '@/components/ui/badge';
+import { useTaskContext } from '../area/task/TaskContext';
 
 interface TaskListProps {
   tasks: CleaningTask[];
   onEditTask: (task: CleaningTask) => void;
   onDeleteTask: (taskId: string) => void;
-  mode?: 'default' | 'selection';  // Added mode prop with optional type
+  mode?: 'default' | 'selection';
 }
 
 export const TaskList: React.FC<TaskListProps> = ({ 
   tasks, 
   onEditTask, 
   onDeleteTask,
-  mode = 'default' // Default value if not provided
+  mode = 'default'
 }) => {
+  const { handleTaskSelection, selectedTasks } = useTaskContext();
+  
   const groupedTasks = tasks.reduce((acc, task) => {
     if (!acc[task.category]) {
       acc[task.category] = [];
@@ -25,6 +28,10 @@ export const TaskList: React.FC<TaskListProps> = ({
     acc[task.category].push(task);
     return acc;
   }, {} as Record<string, CleaningTask[]>);
+
+  const isTaskSelected = (taskId: string) => {
+    return selectedTasks.some(task => task.taskId === taskId);
+  };
 
   if (tasks.length === 0) {
     return (
@@ -82,10 +89,10 @@ export const TaskList: React.FC<TaskListProps> = ({
                     )}
                     {mode === 'selection' && (
                       <Button
-                        variant="secondary"
-                        onClick={() => onEditTask(task)}
+                        variant={isTaskSelected(task.id) ? "secondary" : "outline"}
+                        onClick={() => handleTaskSelection(task.id, !isTaskSelected(task.id))}
                       >
-                        Add to Scope
+                        {isTaskSelected(task.id) ? 'Remove from Scope' : 'Add to Scope'}
                       </Button>
                     )}
                   </div>
