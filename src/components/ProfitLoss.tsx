@@ -9,6 +9,7 @@ interface ProfitLossProps {
   laborCost: number;
   equipmentCost: number;
   overhead: number;
+  totalLaborHours: number;
   onMarginChange?: (margin: number) => void;
 }
 
@@ -17,17 +18,19 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
   laborCost,
   equipmentCost,
   overhead,
+  totalLaborHours,
   onMarginChange
 }) => {
   const [targetMargin, setTargetMargin] = useState(15);
   const totalCosts = laborCost + equipmentCost + overhead;
   const profit = revenue - totalCosts;
   const actualMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
+  const effectiveHourlyRate = totalLaborHours > 0 ? laborCost / totalLaborHours : 0;
   
   // Calculate suggested revenue based on target margin
   const suggestedRevenue = totalCosts / (1 - (targetMargin / 100));
   const suggestedMonthlyRate = suggestedRevenue;
-  const suggestedHourlyRate = laborCost > 0 ? (suggestedRevenue / laborCost) * laborCost : 0;
+  const suggestedHourlyRate = totalLaborHours > 0 ? suggestedRevenue / totalLaborHours : 0;
 
   const handleMarginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newMargin = parseFloat(e.target.value) || 0;
@@ -70,7 +73,7 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
             
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Labor Cost</span>
+                <span className="text-sm text-muted-foreground">Labor Cost ({totalLaborHours.toFixed(1)} hours @ ${effectiveHourlyRate.toFixed(2)}/hr)</span>
                 <span className="text-red-600">-${laborCost.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center">

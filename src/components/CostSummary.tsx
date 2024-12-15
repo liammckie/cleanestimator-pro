@@ -27,6 +27,24 @@ export const CostSummary: React.FC<CostSummaryProps> = ({ costs }) => {
           </div>
 
           <div className="border-t pt-4">
+            <h3 className="font-medium mb-2">Labor Cost Breakdown</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Base Labor Rate</span>
+                <span>${costs.laborCostPerHour.toFixed(2)}/hour</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Monthly Hours</span>
+                <span>{Math.round(costs.suggestedMonthlyHours)} hours</span>
+              </div>
+              <div className="flex justify-between font-medium">
+                <span>Total Monthly Labor Cost</span>
+                <span>${costs.totalMonthlyCost.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t pt-4">
             <h3 className="font-medium mb-2">Suggested Staffing</h3>
             <div className="space-y-2">
               {costs.rosterSuggestion.fullTimeStaff > 0 && (
@@ -38,14 +56,6 @@ export const CostSummary: React.FC<CostSummaryProps> = ({ costs }) => {
               {costs.rosterSuggestion.casualStaff > 0 && (
                 <p>Casual staff: {costs.rosterSuggestion.casualStaff}</p>
               )}
-            </div>
-          </div>
-
-          <div className="border-t pt-4">
-            <h3 className="font-medium mb-2">Cost Projection</h3>
-            <div className="space-y-2">
-              <p>Labor rate: ${costs.laborCostPerHour.toFixed(2)}/hour</p>
-              <p className="font-bold">Monthly cost: ${costs.totalMonthlyCost.toFixed(2)}</p>
             </div>
           </div>
         </div>
