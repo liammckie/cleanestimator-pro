@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { CleaningTask } from '@/data/types/taskManagement';
 import { loadTasks, groupTasksByCategory } from '@/utils/taskStorage';
 import { Badge } from '@/components/ui/badge';
@@ -11,39 +11,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useTaskContext } from '../area/task/TaskContext';
 import { Site } from '@/data/types/site';
 import { calculateTaskProductivity } from '@/utils/productivityCalculations';
+import { ToolSelect } from '../ToolSelect';
 
 export const ScopeOfWorkPage = () => {
   const [availableTasks, setAvailableTasks] = useState<CleaningTask[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
-  const { selectedTasks, handleTaskSelection, handleQuantityChange, handleFrequencyChange } = useTaskContext();
+  const { selectedTasks, handleTaskSelection, handleQuantityChange, handleFrequencyChange, handleToolChange } = useTaskContext();
   const { toast } = useToast();
 
   useEffect(() => {
     const tasks = loadTasks();
     setAvailableTasks(tasks);
     
-    // Load sites from localStorage
     const savedSites = localStorage.getItem('sites');
     if (savedSites) {
       setSites(JSON.parse(savedSites));
     }
   }, []);
-
-  const handleAddToScope = (taskId: string, siteId: string, siteName: string) => {
-    if (selectedTasks.some(task => task.taskId === taskId && task.siteId === siteId)) {
-      toast({
-        title: "Task Already Added",
-        description: "This task is already in your scope of work for this site.",
-        variant: "destructive",
-      });
-      return;
-    }
-    handleTaskSelection(taskId, true, siteId, siteName);
-    toast({
-      title: "Task Added",
-      description: "Task has been added to your scope of work.",
-    });
-  };
 
   const handleRemoveFromScope = (taskId: string, siteId: string) => {
     handleTaskSelection(taskId, false, siteId);
@@ -52,8 +36,6 @@ export const ScopeOfWorkPage = () => {
       description: "Task has been removed from your scope of work.",
     });
   };
-
-  const groupedAvailableTasks = groupTasksByCategory(availableTasks);
 
   return (
     <div className="container mx-auto py-8">
@@ -122,6 +104,13 @@ export const ScopeOfWorkPage = () => {
                       placeholder={`Enter ${taskDetails.measurementUnit === 'SQM/hour' ? 'area' : 'quantity'}`}
                     />
                   </div>
+
+                  {/* Tool Selection */}
+                  <ToolSelect
+                    taskId={selectedTask.taskId}
+                    currentTool={selectedTask.selectedTool || ''}
+                    onToolChange={handleToolChange}
+                  />
 
                   {/* Frequency Selection */}
                   <div className="space-y-2">
