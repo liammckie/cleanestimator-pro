@@ -67,7 +67,7 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
                         </Button>
                       </div>
 
-                      <div className="grid gap-4">
+                      <div className="grid grid-cols-3 gap-4">
                         <div>
                           <Label>Quantity ({taskDetails.unit})</Label>
                           <Input
@@ -105,18 +105,27 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
                             </SelectContent>
                           </Select>
                         </div>
+                      </div>
 
-                        {productivity && (
-                          <div className="bg-accent/50 p-4 rounded-lg space-y-2">
-                            <h4 className="font-medium">Time Requirements</h4>
-                            <div className="text-sm space-y-1">
-                              <p>Time per service: {(productivity.timeRequired * 60).toFixed(1)} minutes</p>
-                              <p>Monthly hours: {(productivity.timeRequired * selectedTask.frequency.timesPerMonth).toFixed(1)} hours</p>
-                              <p>Productivity rate: {productivity.adjustedRate.toFixed(2)} {taskDetails.unit}</p>
+                      {productivity && (
+                        <div className="mt-4 bg-accent/50 p-4 rounded-lg">
+                          <h4 className="font-medium mb-2">Time Requirements</h4>
+                          <div className="grid grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Time per service:</span>
+                              <p>{(productivity.timeRequired * 60).toFixed(1)} minutes</p>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Monthly hours:</span>
+                              <p>{(productivity.timeRequired * selectedTask.frequency.timesPerMonth).toFixed(1)} hours</p>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Productivity rate:</span>
+                              <p>{productivity.adjustedRate.toFixed(2)} {taskDetails.unit}</p>
                             </div>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 );
@@ -159,10 +168,19 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
                 return (
                   <div key={site.id} className="border-b pb-4 last:border-b-0">
                     <h3 className="font-medium mb-2">{site.name}</h3>
-                    <div className="space-y-1 text-sm">
-                      <p>Daily Hours: {(totalDailyMinutes / 60).toFixed(1)}</p>
-                      <p>Weekly Hours: {totalWeeklyHours.toFixed(1)}</p>
-                      <p>Monthly Hours: {totalMonthlyHours.toFixed(1)}</p>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Daily Hours:</span>
+                        <p>{(totalDailyMinutes / 60).toFixed(1)}</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Weekly Hours:</span>
+                        <p>{totalWeeklyHours.toFixed(1)}</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Monthly Hours:</span>
+                        <p>{totalMonthlyHours.toFixed(1)}</p>
+                      </div>
                     </div>
                   </div>
                 );
