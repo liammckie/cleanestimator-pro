@@ -8,6 +8,7 @@ import { OnCostsState } from '@/data/types/onCosts';
 import { EmploymentTypeSelector } from './labor/EmploymentTypeSelector';
 import { DirectEmploymentOptions } from './labor/DirectEmploymentOptions';
 import { AwardIncreaseManager } from './labor/AwardIncreaseManager';
+import { useTaskContext } from './area/task/TaskContext';
 
 interface LaborCostsProps {
   onLaborCostChange: (costs: { 
@@ -17,7 +18,6 @@ interface LaborCostsProps {
     shiftType?: string;
     onCosts?: OnCostsState;
   }) => void;
-  totalMonthlyHours?: number;
 }
 
 const defaultOnCosts: OnCostsState = {
@@ -45,7 +45,8 @@ const defaultOnCosts: OnCostsState = {
   ],
 };
 
-export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange, totalMonthlyHours = 0 }) => {
+export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => {
+  const { totalWeeklyHours } = useTaskContext();
   const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
   const [contractedRate, setContractedRate] = useState<number>(38);
   const [awardLevel, setAwardLevel] = useState<number>(1);
@@ -138,7 +139,8 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange, total
           <div className="grid gap-6">
             <div className="bg-accent/50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground mb-2">Monthly Hours Required</p>
-              <p className="text-2xl font-bold">{totalMonthlyHours.toFixed(1)} hours</p>
+              <p className="text-2xl font-bold">{(totalWeeklyHours * 4.33).toFixed(1)} hours</p>
+              <p className="text-sm text-muted-foreground">Weekly Hours: {totalWeeklyHours.toFixed(1)}</p>
             </div>
 
             <EmploymentTypeSelector

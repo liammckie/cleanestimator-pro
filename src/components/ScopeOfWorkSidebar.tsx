@@ -1,6 +1,5 @@
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getProductivityRate } from '@/data/productivityRates';
 import { Card } from "@/components/ui/card";
 import { Building, Clock } from "lucide-react";
 import { Site } from '@/data/types/site';
@@ -24,10 +23,9 @@ interface ScopeOfWorkSidebarProps {
 }
 
 export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
-  selectedTasks,
   sites = []
 }) => {
-  const { handleTaskSelection, handleQuantityChange, handleFrequencyChange } = useTaskContext();
+  const { selectedTasks, handleTaskSelection, totalWeeklyHours } = useTaskContext();
 
   const handleRemoveTask = (taskId: string, siteId?: string) => {
     handleTaskSelection(taskId, false, siteId);
@@ -37,28 +35,6 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
     });
   };
 
-  // Calculate total monthly time
-  const totalMonthlyTime = selectedTasks.reduce((sum, task) => 
-    sum + (task.timeRequired || 0), 0) * 60;
-
-  // Calculate total weekly hours
-  const weeklyHours = totalMonthlyTime / (4.33 * 60);
-
-  // Group tasks by site
-  const tasksBySite = selectedTasks.reduce((acc, task) => {
-    const siteName = task.siteName || 'Default Site';
-    if (!acc[siteName]) {
-      acc[siteName] = [];
-    }
-    acc[siteName].push(task);
-    return acc;
-  }, {} as Record<string, typeof selectedTasks>);
-
-  const getTaskName = (taskId: string) => {
-    const rate = getProductivityRate(taskId);
-    return rate?.task || 'Unknown Task';
-  };
-
   return (
     <div className="w-[300px] shrink-0 border-l bg-background">
       <div className="border-b px-6 py-4 bg-accent">
@@ -66,7 +42,6 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
       </div>
       <ScrollArea className="h-[calc(100vh-10rem)] px-6">
         <div className="space-y-6 py-6">
-          {/* Overview Cards */}
           <div className="grid grid-cols-2 gap-4">
             <Card className="p-4 bg-accent/50">
               <div className="flex items-center space-x-2">
@@ -81,12 +56,18 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
                 <Clock className="w-4 h-4 text-primary" />
                 <p className="text-sm font-medium">Weekly Hours</p>
               </div>
-              <p className="text-2xl font-bold mt-2">{weeklyHours.toFixed(1)}</p>
+              <p className="text-2xl font-bold mt-2">{totalWeeklyHours.toFixed(1)}</p>
             </Card>
           </div>
 
-          {/* Sites Summary */}
-          {Object.entries(tasksBySite).map(([siteName, siteTasks]) => {
+          {Object.entries(selectedTasks.reduce((acc, task) => {
+            const siteName = task.siteName || 'Default Site';
+            if (!acc[siteName]) {
+              acc[siteName] = [];
+            }
+            acc[siteName].push(task);
+            return acc;
+          }, {} as Record<string, typeof selectedTasks>)).map(([siteName, siteTasks]) => {
             const siteMonthlyTime = siteTasks.reduce((sum, task) => 
               sum + (task.timeRequired || 0), 0) * 60;
             const siteWeeklyTime = siteMonthlyTime / 4.33;
@@ -101,10 +82,14 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
                 
                 <TaskList
                   tasks={siteTasks}
-                  onQuantityChange={handleQuantityChange}
-                  onFrequencyChange={handleFrequencyChange}
+                  onQuantityChange={(taskId, quantity) => {
+                    console.log('Updating quantity:', taskId, quantity);
+                  }}
+                  onFrequencyChange={(taskId, freq) => {
+                    console.log('Updating frequency:', taskId, freq);
+                  }}
                   onRemoveTask={(taskId) => handleRemoveTask(taskId)}
-                  getTaskName={getTaskName}
+                  getTaskName={(taskId) => taskId}
                 />
               </div>
             );

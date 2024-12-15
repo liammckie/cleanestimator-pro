@@ -1,12 +1,9 @@
-import React, { createContext, useContext } from 'react';
-import { TaskContextType, AreaData } from './types';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { AreaData, SelectedTask, TaskContextType } from './types';
 import { useTaskManagement } from '@/hooks/useTaskManagement';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
 import { useTaskModifiers } from '@/hooks/useTaskModifiers';
 
-/**
- * Context for managing task-related state and operations throughout the application
- */
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 interface TaskProviderProps {
@@ -15,35 +12,44 @@ interface TaskProviderProps {
   defaultLaborRate?: number;
 }
 
-/**
- * Provider component that makes task context available to child components
- */
 export const TaskProvider: React.FC<TaskProviderProps> = ({ 
   children, 
   onTasksChange,
   defaultLaborRate = 38 
 }) => {
-  // Initialize task management hooks
   const { selectedTasks, setSelectedTasks, calculateTaskTime } = useTaskManagement(
     onTasksChange,
     defaultLaborRate
   );
 
-  // Initialize task operation hooks
   const {
     handleTaskSelection,
     handleQuantityChange,
     handleFrequencyChange
   } = useTaskOperations(selectedTasks, setSelectedTasks, calculateTaskTime, defaultLaborRate);
 
-  // Initialize task modifier hooks
   const {
     handleToolChange,
     handleLaborRateChange,
     handleProductivityOverride
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
-  // Combine all values for context
+  // Calculate total weekly hours whenever tasks change
+  const calculateTotalWeeklyHours = () => {
+    return selectedTasks.reduce((total, task) => {
+      const monthlyHours = task.timeRequired || 0;
+      return total + (monthlyHours / 4.33); // Convert monthly to weekly
+    }, 0);
+  };
+
+  const [totalWeeklyHours, setTotalWeeklyHours] = useState(0);
+
+  useEffect(() => {
+    const newTotalWeeklyHours = calculateTotalWeeklyHours();
+    setTotalWeeklyHours(newTotalWeeklyHours);
+    console.log('Updated total weekly hours:', newTotalWeeklyHours);
+  }, [selectedTasks]);
+
   const value = {
     selectedTasks,
     handleTaskSelection,
@@ -51,7 +57,8 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     handleFrequencyChange,
     handleToolChange,
     handleLaborRateChange,
-    handleProductivityOverride
+    handleProductivityOverride,
+    totalWeeklyHours
   };
 
   return (
@@ -61,11 +68,6 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   );
 };
 
-/**
- * Custom hook to use the task context
- * @throws Error if used outside of TaskProvider
- * @returns TaskContextType object containing task state and operations
- */
 export const useTaskContext = () => {
   const context = useContext(TaskContext);
   if (context === undefined) {
