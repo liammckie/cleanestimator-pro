@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Command, CommandInput } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import { CategoryList } from './CategoryList';
 import { TaskGroup } from '@/data/types/productivity';
 
@@ -27,10 +27,9 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
     name: group.name,
     categories: group.categories.map(category => ({
       name: category.name,
-      subcategories: category.subcategories.map(sub => ({
-        name: sub.name,
-        tasks: sub.tasks.map(task => task.task)
-      })).flat()
+      subcategories: category.subcategories.map(sub => 
+        sub.tasks.map(task => task.task)
+      ).flat()
     }))
   }));
 
