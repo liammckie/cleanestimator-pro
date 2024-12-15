@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -18,10 +18,20 @@ import { ScopeOfWorkSidebar } from '../ScopeOfWorkSidebar';
 import { calculateManHours, validateTaskInput } from '@/utils/manHourCalculations';
 import { TaskSelectionPanel } from './TaskSelectionPanel';
 
+const SELECTED_TASKS_STORAGE_KEY = 'selected-tasks';
+
 export const TaskManagementPage = () => {
   const [tasks, setTasks] = useState<CleaningTask[]>(() => loadTasks());
-  const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
+  const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>(() => {
+    const savedTasks = localStorage.getItem(SELECTED_TASKS_STORAGE_KEY);
+    return savedTasks ? JSON.parse(savedTasks) : [];
+  });
   const { toast } = useToast();
+
+  // Save selected tasks to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(SELECTED_TASKS_STORAGE_KEY, JSON.stringify(selectedTasks));
+  }, [selectedTasks]);
 
   // Group tasks by category
   const tasksByCategory = tasks.reduce((acc, task) => {
