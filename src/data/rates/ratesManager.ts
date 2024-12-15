@@ -28,7 +28,7 @@ class RatesManager {
         if (Array.isArray(rates)) {
           this.ratesCache.set(category, rates.map(rate => ({
             ...rate,
-            subcategory: rate.subcategory || rate.category // Ensure subcategory exists
+            subcategory: rate.subcategory || rate.category // Default to category if subcategory is missing
           })));
         } else {
           console.warn(`Invalid rates format for category: ${category}`);

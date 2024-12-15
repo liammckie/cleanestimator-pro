@@ -1,7 +1,7 @@
 export interface ProductivityRate {
   id: string;
   category: string;
-  subcategory: string;
+  subcategory?: string; // Made optional to maintain compatibility
   task: string;
   tool: string;
   unit: string;
