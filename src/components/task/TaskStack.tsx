@@ -8,7 +8,18 @@ import { Button } from '@/components/ui/button';
 export const TaskStack = () => {
   const { selectedTasks, handleTaskSelection } = useTaskContext();
 
-  if (!selectedTasks?.length) {
+  // Early return if selectedTasks is undefined (loading state)
+  if (selectedTasks === undefined) {
+    return (
+      <div className="w-64 border-r bg-muted/30 p-4">
+        <h3 className="font-semibold mb-4">Selected Tasks</h3>
+        <p className="text-sm text-muted-foreground">Loading tasks...</p>
+      </div>
+    );
+  }
+
+  // Only show "No tasks selected" if the array is empty
+  if (selectedTasks.length === 0) {
     return (
       <div className="w-64 border-r bg-muted/30 p-4">
         <h3 className="font-semibold mb-4">Selected Tasks</h3>
@@ -19,7 +30,7 @@ export const TaskStack = () => {
 
   return (
     <div className="w-64 border-r bg-muted/30 p-4">
-      <h3 className="font-semibold mb-4">Selected Tasks</h3>
+      <h3 className="font-semibold mb-4">Selected Tasks ({selectedTasks.length})</h3>
       <ScrollArea className="h-[calc(100vh-8rem)]">
         <div className="space-y-2">
           {selectedTasks.map((task) => (

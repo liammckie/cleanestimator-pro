@@ -1,6 +1,8 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { calculateTaskProductivity } from '@/utils/productivityCalculations';
 import { getRateById } from '@/data/rates/ratesManager';
+
+const SELECTED_TASKS_KEY = 'selected-tasks-context';
 
 interface TaskContextType {
   selectedTasks: Array<{
@@ -36,7 +38,17 @@ export const TaskProvider: React.FC<{
   children: React.ReactNode;
   onTasksChange: (tasks: TaskContextType['selectedTasks']) => void;
 }> = ({ children, onTasksChange }) => {
-  const [selectedTasks, setSelectedTasks] = useState<TaskContextType['selectedTasks']>([]);
+  // Initialize state from localStorage
+  const [selectedTasks, setSelectedTasks] = useState<TaskContextType['selectedTasks']>(() => {
+    const savedTasks = localStorage.getItem(SELECTED_TASKS_KEY);
+    return savedTasks ? JSON.parse(savedTasks) : [];
+  });
+
+  // Save to localStorage whenever tasks change
+  useEffect(() => {
+    localStorage.setItem(SELECTED_TASKS_KEY, JSON.stringify(selectedTasks));
+    onTasksChange(selectedTasks);
+  }, [selectedTasks, onTasksChange]);
 
   const handleTaskSelection = useCallback((taskId: string, isSelected: boolean) => {
     if (isSelected) {
@@ -57,19 +69,11 @@ export const TaskProvider: React.FC<{
         selectedTool: rate.tool
       };
 
-      setSelectedTasks(prev => {
-        const updated = [...prev, newTask];
-        onTasksChange(updated);
-        return updated;
-      });
+      setSelectedTasks(prev => [...prev, newTask]);
     } else {
-      setSelectedTasks(prev => {
-        const updated = prev.filter(task => task.taskId !== taskId);
-        onTasksChange(updated);
-        return updated;
-      });
+      setSelectedTasks(prev => prev.filter(task => task.taskId !== taskId));
     }
-  }, [onTasksChange]);
+  }, []);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
     setSelectedTasks(prev => {
