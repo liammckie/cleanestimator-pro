@@ -38,9 +38,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   const calculateTotalWeeklyHours = () => {
     return selectedTasks.reduce((total, task) => {
       const monthlyHours = task.timeRequired || 0;
-      const weeklyHours = monthlyHours / 4.33; // Convert monthly to weekly
-      console.log(`Task ${task.taskId} contributes ${weeklyHours.toFixed(2)} weekly hours`);
-      return total + weeklyHours;
+      return total + (monthlyHours / 4.33); // Convert monthly to weekly
     }, 0);
   };
 
@@ -48,8 +46,8 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
 
   useEffect(() => {
     const newTotalWeeklyHours = calculateTotalWeeklyHours();
-    console.log('Updated total weekly hours:', newTotalWeeklyHours);
     setTotalWeeklyHours(newTotalWeeklyHours);
+    console.log('Updated total weekly hours:', newTotalWeeklyHours);
   }, [selectedTasks]);
 
   const value = {
