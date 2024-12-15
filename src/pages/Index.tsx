@@ -9,7 +9,8 @@ import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskProvider } from '@/components/area/task/TaskContext';
 import { AreaContainer } from '@/components/area/AreaContainer';
-import { ScopeOfWork } from '@/components/scope/ScopeOfWork';
+import { TaskSelector } from '@/components/task/TaskSelector';
+import { TaskStack } from '@/components/task/TaskStack';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -58,7 +59,18 @@ const Index = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'scope':
-        return <AreaContainer onAreaChange={handleAreaChange} />;
+        return (
+          <div className="flex">
+            <div className="flex-1 pr-4">
+              <TaskSelector
+                onTaskSelect={(taskId) => handleTaskSelection(taskId, !selectedTasks.includes(taskId))}
+                selectedTasks={selectedTasks.map(task => task.taskId)}
+              />
+              <AreaContainer onAreaChange={handleAreaChange} />
+            </div>
+            <TaskStack />
+          </div>
+        );
       default:
         return (
           <MainContent

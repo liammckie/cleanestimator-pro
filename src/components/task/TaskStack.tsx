@@ -10,6 +10,7 @@ import { Clock, Trash2, Calculator } from 'lucide-react';
 import { calculateTaskProductivity } from '@/utils/productivityCalculations';
 import { getRateById } from '@/data/rates/ratesManager';
 import { ToolSelect } from '../ToolSelect';
+import { useToast } from '@/components/ui/use-toast';
 
 export const TaskStack = () => {
   const { 
@@ -19,6 +20,21 @@ export const TaskStack = () => {
     handleFrequencyChange,
     handleToolChange 
   } = useTaskContext();
+  
+  const { toast } = useToast();
+
+  const handleQuantityUpdate = (taskId: string, value: string) => {
+    const numValue = parseFloat(value);
+    if (isNaN(numValue) || numValue < 0) {
+      toast({
+        title: "Invalid Input",
+        description: "Please enter a valid positive number",
+        variant: "destructive",
+      });
+      return;
+    }
+    handleQuantityChange(taskId, numValue);
+  };
 
   return (
     <div className="w-96 border-l bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -72,7 +88,7 @@ export const TaskStack = () => {
                           <Input
                             type="number"
                             value={task.quantity || ''}
-                            onChange={(e) => handleQuantityChange(task.taskId, Number(e.target.value))}
+                            onChange={(e) => handleQuantityUpdate(task.taskId, e.target.value)}
                             placeholder={`Enter ${taskDetails.unit === 'SQM/hour' ? 'area' : 'quantity'}`}
                           />
                           <Calculator className="h-4 w-4 text-muted-foreground" />
