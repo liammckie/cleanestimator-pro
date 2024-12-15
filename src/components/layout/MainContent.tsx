@@ -13,6 +13,7 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { SiteOverview } from '@/components/overview/SiteOverview';
 import { TaskManagementPage } from '@/components/task-management/TaskManagementPage';
 import { ScopeOfWork } from '@/components/scope/ScopeOfWork';
+import { calculateTaskCosts, calculateTotalMonthlyHours } from '@/utils/costingCalculations';
 
 interface MainContentProps {
   sites: any[];
@@ -43,65 +44,6 @@ export const MainContent: React.FC<MainContentProps> = ({
 }) => {
   const { awardIncrease, setAwardIncrease } = useSettings();
 
-  const calculateTotalMonthlyHours = () => {
-    console.log('Calculating total hours from sites:', sites);
-    return sites.reduce((total, site) => {
-      if (!site.area?.selectedTasks) {
-        console.log(`Site ${site.name} has no selected tasks`);
-        return total;
-      }
-      
-      const siteTasks = site.area.selectedTasks;
-      console.log(`Site ${site.name} tasks:`, siteTasks);
-      
-      const siteTotal = siteTasks.reduce((siteTotal: number, task: any) => {
-        const taskHours = task.timeRequired || 0;
-        console.log(`Task ${task.taskId} hours:`, taskHours);
-        return siteTotal + taskHours;
-      }, 0);
-      
-      console.log(`Site ${site.name} total hours:`, siteTotal);
-      return total + siteTotal;
-    }, 0);
-  };
-
-  const getAllSelectedTasks = () => {
-    console.log('Getting all selected tasks from sites:', sites);
-    const tasks = sites.reduce((allTasks: any[], site) => {
-      if (!site.area?.selectedTasks) {
-        console.log(`Site ${site.name} has no selected tasks`);
-        return allTasks;
-      }
-      
-      const siteTasks = site.area.selectedTasks;
-      console.log(`Site ${site.name} tasks:`, siteTasks);
-      
-      return [...allTasks, ...siteTasks.map(task => ({
-        ...task,
-        siteName: site.name
-      }))];
-    }, []);
-    
-    console.log('All selected tasks:', tasks);
-    return tasks;
-  };
-
-  const handleAwardIncreaseChange = (increase: number) => {
-    setAwardIncrease(increase);
-    if (laborCosts.employmentType === 'direct') {
-      setLaborCosts(prev => ({
-        ...prev,
-        hourlyRate: prev.hourlyRate * (1 + (increase / 100))
-      }));
-    }
-  };
-
-  const handleMarginChange = (margin: number) => {
-    const totalCosts = costBreakdown.totalMonthlyCost + equipmentCosts.monthly + overhead;
-    const newRevenue = totalCosts / (1 - (margin / 100));
-    console.log('New revenue based on margin:', newRevenue);
-  };
-
   const handleUpdateSite = (siteId: string, tasks: any[]) => {
     console.log('Updating site tasks:', { siteId, tasks });
     const updatedSites = sites.map(site => 
@@ -114,18 +56,37 @@ export const MainContent: React.FC<MainContentProps> = ({
         }
       } : site
     );
+    
     onSitesChange(updatedSites);
 
-    // Update labor costs when tasks change
-    const totalMonthlyHours = calculateTotalMonthlyHours();
+    // Update labor costs
+    const totalMonthlyHours = calculateTotalMonthlyHours(updatedSites);
+    const taskCosts = calculateTaskCosts(updatedSites, laborCosts.hourlyRate, laborCosts.onCosts);
+    
     setLaborCosts(prev => ({
       ...prev,
-      totalMonthlyHours
+      totalMonthlyHours,
+      taskCosts
     }));
+
+    console.log('Updated labor costs:', {
+      totalMonthlyHours,
+      taskCosts
+    });
   };
 
-  const totalMonthlyHours = calculateTotalMonthlyHours();
-  const allSelectedTasks = getAllSelectedTasks();
+  const handleAwardIncreaseChange = (increase: number) => {
+    setAwardIncrease(increase);
+    if (laborCosts.employmentType === 'direct') {
+      setLaborCosts(prev => ({
+        ...prev,
+        hourlyRate: prev.hourlyRate * (1 + (increase / 100))
+      }));
+    }
+  };
+
+  const totalMonthlyHours = calculateTotalMonthlyHours(sites);
+  const taskCosts = calculateTaskCosts(sites, laborCosts.hourlyRate, laborCosts.onCosts);
 
   return (
     <>
@@ -134,7 +95,10 @@ export const MainContent: React.FC<MainContentProps> = ({
       </TabsContent>
 
       <TabsContent value="scope" className="space-y-6">
-        <ScopeOfWork sites={sites} onUpdateSite={handleUpdateSite} />
+        <ScopeOfWork 
+          sites={sites} 
+          onUpdateSite={handleUpdateSite}
+        />
       </TabsContent>
 
       <TabsContent value="task-management" className="space-y-6">
@@ -176,7 +140,7 @@ export const MainContent: React.FC<MainContentProps> = ({
           equipmentCost={equipmentCosts.monthly}
           overhead={overhead}
           totalLaborHours={totalMonthlyHours}
-          selectedTasks={allSelectedTasks}
+          selectedTasks={taskCosts}
           onMarginChange={handleMarginChange}
         />
       </TabsContent>

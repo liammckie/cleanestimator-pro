@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { getProductivityRate } from '@/data/productivityRates';
+import { TaskCostBreakdown } from '@/utils/costingCalculations';
 
 interface ProfitLossProps {
   revenue: number;
@@ -11,16 +12,7 @@ interface ProfitLossProps {
   equipmentCost: number;
   overhead: number;
   totalLaborHours: number;
-  selectedTasks?: Array<{
-    taskId: string;
-    quantity: number;
-    timeRequired: number;
-    frequency: {
-      timesPerWeek: number;
-      timesPerMonth: number;
-    };
-    siteName?: string;
-  }>;
+  selectedTasks?: TaskCostBreakdown[];
   onMarginChange?: (margin: number) => void;
 }
 
@@ -33,14 +25,12 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
   selectedTasks = [],
   onMarginChange
 }) => {
-  console.log('ProfitLoss received tasks:', selectedTasks);
   const [targetMargin, setTargetMargin] = useState(15);
   const totalCosts = laborCost + equipmentCost + overhead;
   const profit = revenue - totalCosts;
   const actualMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
   const effectiveHourlyRate = totalLaborHours > 0 ? laborCost / totalLaborHours : 0;
   
-  // Calculate suggested revenue based on target margin
   const suggestedRevenue = totalCosts / (1 - (targetMargin / 100));
   const suggestedMonthlyRate = suggestedRevenue;
   const suggestedHourlyRate = totalLaborHours > 0 ? suggestedRevenue / totalLaborHours : 0;
@@ -55,7 +45,6 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
 
   const getTaskName = (taskId: string) => {
     const rate = getProductivityRate(taskId);
-    console.log('Getting task name for:', taskId, 'Found rate:', rate);
     return rate?.task || 'Unknown Task';
   };
 
@@ -103,9 +92,10 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
                     <div key={index} className="flex justify-between items-center text-sm">
                       <span className="text-muted-foreground">
                         {getTaskName(task.taskId)} ({task.timeRequired.toFixed(1)} hrs)
+                        <span className="text-xs ml-1">- {task.siteName}</span>
                       </span>
                       <span className="text-muted-foreground">
-                        ${(task.timeRequired * effectiveHourlyRate).toFixed(2)}
+                        ${task.monthlyCost.toFixed(2)}
                       </span>
                     </div>
                   ))
