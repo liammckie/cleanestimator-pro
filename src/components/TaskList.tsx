@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { TaskItem } from './TaskItem';
 import { getRatesByCategory } from '@/data/rates/ratesManager';
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface TaskListProps {
   category: string;
@@ -26,7 +28,7 @@ interface TaskListProps {
 
 export const TaskList: React.FC<TaskListProps> = ({
   category,
-  selectedTasks,
+  selectedTasks = [],
   onTaskSelection,
   onQuantityChange,
   onFrequencyChange,
@@ -35,17 +37,29 @@ export const TaskList: React.FC<TaskListProps> = ({
   onToolChange,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const productivityRates = getRatesByCategory(category);
+  const productivityRates = getRatesByCategory(category) || [];
 
   const filteredRates = productivityRates
     .filter(rate => rate && rate.category === category)
     .filter(rate => {
+      if (!rate) return false;
       const query = searchQuery.toLowerCase();
       return (
         rate.task.toLowerCase().includes(query) ||
         rate.tool.toLowerCase().includes(query)
       );
     });
+
+  if (!category) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Please select a category to view available tasks.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -57,19 +71,27 @@ export const TaskList: React.FC<TaskListProps> = ({
         className="mb-4"
       />
       <div className="grid gap-2">
-        {filteredRates.map((rate) => (
-          <TaskItem
-            key={rate.id}
-            rate={rate}
-            selectedTask={selectedTasks?.find(task => task.taskId === rate.id)}
-            onTaskSelection={onTaskSelection}
-            onQuantityChange={onQuantityChange}
-            onFrequencyChange={onFrequencyChange}
-            onProductivityOverride={onProductivityOverride}
-            onRemoveTask={onRemoveTask}
-            onToolChange={onToolChange}
-          />
-        ))}
+        {filteredRates.length > 0 ? (
+          filteredRates.map((rate) => (
+            <TaskItem
+              key={rate.id}
+              rate={rate}
+              selectedTask={selectedTasks?.find(task => task.taskId === rate.id)}
+              onTaskSelection={onTaskSelection}
+              onQuantityChange={onQuantityChange}
+              onFrequencyChange={onFrequencyChange}
+              onProductivityOverride={onProductivityOverride}
+              onRemoveTask={onRemoveTask}
+              onToolChange={onToolChange}
+            />
+          ))
+        ) : (
+          <Alert>
+            <AlertDescription>
+              No tasks found for the selected category.
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
     </div>
   );

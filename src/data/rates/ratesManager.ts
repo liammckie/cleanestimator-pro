@@ -23,17 +23,54 @@ class RatesManager {
   }
 
   private initializeRates() {
-    // Initialize rates by category
-    this.ratesCache.set('carpet-maintenance', carpetMaintenanceRates.spotting.concat(
-      carpetMaintenanceRates.vacuum,
-      carpetMaintenanceRates.steam
-    ));
-    this.ratesCache.set('restroom', [...restroomRates.cleaning, ...restroomRates.maintenance]);
-    this.ratesCache.set('specialist', [...specialistRates.medical, ...specialistRates.industrial]);
-    this.ratesCache.set('healthcare', [...healthcareRates.patientRooms, ...healthcareRates.clinicalAreas]);
-    this.ratesCache.set('kitchen', [...kitchenRates.commercial, ...kitchenRates.industrial]);
-    this.ratesCache.set('windows', [...windowRates.interior, ...windowRates.exterior]);
-    this.ratesCache.set('bundles', bundledRates);
+    try {
+      // Initialize rates by category with proper error handling
+      const initializeCategory = (category: string, rates: ProductivityRate[]) => {
+        if (Array.isArray(rates)) {
+          this.ratesCache.set(category, rates);
+        } else {
+          console.warn(`Invalid rates format for category: ${category}`);
+          this.ratesCache.set(category, []);
+        }
+      };
+
+      initializeCategory('carpet-maintenance', [
+        ...(Array.isArray(carpetMaintenanceRates.spotting) ? carpetMaintenanceRates.spotting : []),
+        ...(Array.isArray(carpetMaintenanceRates.vacuum) ? carpetMaintenanceRates.vacuum : []),
+        ...(Array.isArray(carpetMaintenanceRates.steam) ? carpetMaintenanceRates.steam : [])
+      ]);
+
+      initializeCategory('restroom', [
+        ...(Array.isArray(restroomRates.cleaning) ? restroomRates.cleaning : []),
+        ...(Array.isArray(restroomRates.maintenance) ? restroomRates.maintenance : [])
+      ]);
+
+      initializeCategory('specialist', [
+        ...(Array.isArray(specialistRates.medical) ? specialistRates.medical : []),
+        ...(Array.isArray(specialistRates.industrial) ? specialistRates.industrial : [])
+      ]);
+
+      initializeCategory('healthcare', [
+        ...(Array.isArray(healthcareRates.patientRooms) ? healthcareRates.patientRooms : []),
+        ...(Array.isArray(healthcareRates.clinicalAreas) ? healthcareRates.clinicalAreas : [])
+      ]);
+
+      initializeCategory('kitchen', [
+        ...(Array.isArray(kitchenRates.commercial) ? kitchenRates.commercial : []),
+        ...(Array.isArray(kitchenRates.industrial) ? kitchenRates.industrial : [])
+      ]);
+
+      initializeCategory('windows', [
+        ...(Array.isArray(windowRates.interior) ? windowRates.interior : []),
+        ...(Array.isArray(windowRates.exterior) ? windowRates.exterior : [])
+      ]);
+
+      initializeCategory('bundles', Array.isArray(bundledRates) ? bundledRates : []);
+    } catch (error) {
+      console.error('Error initializing rates:', error);
+      // Ensure the cache is initialized even if there's an error
+      this.ratesCache = new Map();
+    }
   }
 
   public getRatesByCategory(category: string): ProductivityRate[] {
@@ -42,7 +79,7 @@ class RatesManager {
 
   public getRateById(id: string): ProductivityRate | undefined {
     for (const rates of this.ratesCache.values()) {
-      const rate = rates.find(r => r.id === id);
+      const rate = rates.find(r => r && r.id === id);
       if (rate) return rate;
     }
     return undefined;
@@ -50,16 +87,21 @@ class RatesManager {
 
   public getAllRates(): ProductivityRate[] {
     const allRates: ProductivityRate[] = [];
-    this.ratesCache.forEach(rates => allRates.push(...rates));
+    this.ratesCache.forEach(rates => {
+      if (Array.isArray(rates)) {
+        allRates.push(...rates);
+      }
+    });
     return allRates;
   }
 
   public searchRates(query: string): ProductivityRate[] {
     const searchTerm = query.toLowerCase();
     return this.getAllRates().filter(rate => 
-      rate.task.toLowerCase().includes(searchTerm) ||
+      rate &&
+      (rate.task.toLowerCase().includes(searchTerm) ||
       rate.tool.toLowerCase().includes(searchTerm) ||
-      rate.category.toLowerCase().includes(searchTerm)
+      rate.category.toLowerCase().includes(searchTerm))
     );
   }
 

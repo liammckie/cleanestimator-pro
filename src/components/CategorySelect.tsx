@@ -15,7 +15,7 @@ interface CategorySelectProps {
 }
 
 export const CategorySelect: React.FC<CategorySelectProps> = ({ 
-  value, 
+  value = '', 
   onValueChange,
   defaultTab = 'categories'
 }) => {
@@ -24,16 +24,20 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
   const [activeTab, setActiveTab] = useState<'categories' | 'industries'>(defaultTab);
 
   const handleSelect = useCallback((selectedValue: string) => {
-    onValueChange(selectedValue);
-    setOpen(false);
-    setSearchQuery('');
+    if (selectedValue) {
+      onValueChange(selectedValue);
+      setOpen(false);
+      setSearchQuery('');
+    }
   }, [onValueChange]);
 
   const getPlaceholderText = useCallback(() => {
-    if (defaultTab === 'industries') {
-      return value || "Select industry (e.g., Healthcare, Corporate Offices)";
+    if (!value) {
+      return defaultTab === 'industries' 
+        ? "Select industry (e.g., Healthcare, Corporate Offices)"
+        : "Select category (e.g., Floor Care, Surface Care)";
     }
-    return value || "Select category (e.g., Floor Care, Surface Care)";
+    return value;
   }, [defaultTab, value]);
 
   return (
@@ -74,7 +78,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
               <div className="mt-2 max-h-[300px] overflow-y-auto">
                 <TabsContent value="categories">
                   <CategoryList
-                    groups={categoryGroups}
+                    groups={categoryGroups || []}
                     selectedValue={value}
                     searchQuery={searchQuery}
                     onSelect={handleSelect}
@@ -82,7 +86,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
                 </TabsContent>
                 <TabsContent value="industries">
                   <IndustryList
-                    groups={industryGroups}
+                    groups={industryGroups || []}
                     selectedValue={value}
                     searchQuery={searchQuery}
                     onSelect={handleSelect}
