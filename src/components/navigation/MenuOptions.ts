@@ -8,4 +8,5 @@ export const menuOptions = [
   { id: 'contract', label: 'Contract', icon: 'check-square' },
   { id: 'summary', label: 'Summary', icon: 'globe' },
   { id: 'settings', label: 'Settings', icon: 'settings' },
+  { id: 'overview', label: 'Overview', icon: 'layout' }
 ];
