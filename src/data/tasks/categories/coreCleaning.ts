@@ -73,6 +73,46 @@ export const coreCleaning: TaskGroup = {
               unit: 'SQM/hour',
               ratePerHour: 200,
               notes: 'Includes mopping steps and handrails'
+            },
+            {
+              id: 'furniture-cleaning',
+              category: 'Core Cleaning',
+              subcategory: 'Core Cleaning',
+              task: 'Furniture Cleaning',
+              tool: 'Cleaning Kit',
+              unit: 'SQM/hour',
+              ratePerHour: 250,
+              notes: 'Dusting and wiping furniture surfaces'
+            },
+            {
+              id: 'drinking-fountain',
+              category: 'Core Cleaning',
+              subcategory: 'Core Cleaning',
+              task: 'Drinking Fountain Cleaning',
+              tool: 'Cleaning Kit',
+              unit: 'SQM/hour',
+              ratePerHour: 120,
+              notes: 'Sanitizing and polishing'
+            },
+            {
+              id: 'trash-removal',
+              category: 'Core Cleaning',
+              subcategory: 'Core Cleaning',
+              task: 'Trash Removal',
+              tool: 'Waste Management Equipment',
+              unit: 'SQM/hour',
+              ratePerHour: 200,
+              notes: 'Emptying trash bins in common areas'
+            },
+            {
+              id: 'carpet-spot-cleaning',
+              category: 'Core Cleaning',
+              subcategory: 'Core Cleaning',
+              task: 'Carpet Spot Cleaning',
+              tool: 'Spot Cleaning Kit',
+              unit: 'SQM/hour',
+              ratePerHour: 150,
+              notes: 'Spot treatment for minor stains'
             }
           ]
         }

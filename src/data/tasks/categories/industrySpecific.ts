@@ -53,6 +53,66 @@ export const industrySpecific: TaskGroup = {
               unit: 'SQM/hour',
               ratePerHour: 150,
               notes: 'Transportation hubs or fleets'
+            },
+            {
+              id: 'hotel-room-cleaning',
+              category: 'Industry-Specific',
+              subcategory: 'Industry-Specific',
+              task: 'Hotel Room Cleaning',
+              tool: 'Hospitality Cleaning Kit',
+              unit: 'SQM/hour',
+              ratePerHour: 180,
+              notes: 'Accommodation turnover service'
+            },
+            {
+              id: 'warehouse-cleaning',
+              category: 'Industry-Specific',
+              subcategory: 'Industry-Specific',
+              task: 'Warehouse Cleaning',
+              tool: 'Industrial Cleaning Equipment',
+              unit: 'SQM/hour',
+              ratePerHour: 300,
+              notes: 'Cleaning industrial storage spaces'
+            },
+            {
+              id: 'kitchen-sanitization',
+              category: 'Industry-Specific',
+              subcategory: 'Industry-Specific',
+              task: 'Kitchen Sanitization',
+              tool: 'Commercial Kitchen Cleaning Kit',
+              unit: 'SQM/hour',
+              ratePerHour: 100,
+              notes: 'For commercial kitchens and food prep areas'
+            },
+            {
+              id: 'patient-room-disinfection',
+              category: 'Industry-Specific',
+              subcategory: 'Industry-Specific',
+              task: 'Patient Room Disinfection',
+              tool: 'Medical Grade Disinfection Kit',
+              unit: 'SQM/hour',
+              ratePerHour: 70,
+              notes: 'Hospitals and healthcare rooms'
+            },
+            {
+              id: 'office-deep-cleaning',
+              category: 'Industry-Specific',
+              subcategory: 'Industry-Specific',
+              task: 'Office Deep Cleaning',
+              tool: 'Deep Cleaning Equipment',
+              unit: 'SQM/hour',
+              ratePerHour: 150,
+              notes: 'Quarterly or annual cleaning'
+            },
+            {
+              id: 'parking-lot-cleaning',
+              category: 'Industry-Specific',
+              subcategory: 'Industry-Specific',
+              task: 'Parking Lot Cleaning',
+              tool: 'Outdoor Cleaning Equipment',
+              unit: 'SQM/hour',
+              ratePerHour: 200,
+              notes: 'Sweeping and debris removal in parking spaces'
             }
           ]
         }

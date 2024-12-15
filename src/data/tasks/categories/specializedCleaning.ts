@@ -25,14 +25,14 @@ export const specializedCleaning: TaskGroup = {
               notes: 'Seasonal task for exteriors'
             },
             {
-              id: 'trash-removal',
+              id: 'trash-sorting',
               category: 'Specialized Cleaning',
               subcategory: 'Specialized Cleaning',
-              task: 'Trash Removal',
+              task: 'Trash Sorting and Recycling',
               tool: 'Waste Management Equipment',
               unit: 'SQM/hour',
               ratePerHour: 90,
-              notes: 'Includes sorting and recycling'
+              notes: 'Includes sorting recyclable materials'
             },
             {
               id: 'deep-cleaning',
@@ -55,6 +55,36 @@ export const specializedCleaning: TaskGroup = {
               notes: 'Polishing hardwood or tiled floors'
             },
             {
+              id: 'grout-cleaning',
+              category: 'Specialized Cleaning',
+              subcategory: 'Specialized Cleaning',
+              task: 'Grout Cleaning',
+              tool: 'Grout Cleaning Equipment',
+              unit: 'SQM/hour',
+              ratePerHour: 80,
+              notes: 'Deep cleaning tile grout lines'
+            },
+            {
+              id: 'pressure-cleaning',
+              category: 'Specialized Cleaning',
+              subcategory: 'Specialized Cleaning',
+              task: 'High-Pressure Cleaning',
+              tool: 'Pressure Washer',
+              unit: 'SQM/hour',
+              ratePerHour: 180,
+              notes: 'For exteriors and stubborn stains'
+            },
+            {
+              id: 'ceiling-cleaning',
+              category: 'Specialized Cleaning',
+              subcategory: 'Specialized Cleaning',
+              task: 'Ceiling Cleaning',
+              tool: 'Extended Cleaning Tools',
+              unit: 'SQM/hour',
+              ratePerHour: 70,
+              notes: 'Removing dust and cobwebs'
+            },
+            {
               id: 'glass-cleaning',
               category: 'Specialized Cleaning',
               subcategory: 'Specialized Cleaning',
@@ -63,6 +93,26 @@ export const specializedCleaning: TaskGroup = {
               unit: 'SQM/hour',
               ratePerHour: 100,
               notes: 'Covers glass partitions and panels'
+            },
+            {
+              id: 'tool-cleaning',
+              category: 'Specialized Cleaning',
+              subcategory: 'Specialized Cleaning',
+              task: 'Tool Cleaning',
+              tool: 'Cleaning Equipment',
+              unit: 'Units/hour',
+              ratePerHour: 80,
+              notes: 'Cleaning and maintaining tools'
+            },
+            {
+              id: 'wall-washing',
+              category: 'Specialized Cleaning',
+              subcategory: 'Specialized Cleaning',
+              task: 'Wall Washing',
+              tool: 'Wall Cleaning Equipment',
+              unit: 'SQM/hour',
+              ratePerHour: 90,
+              notes: 'Cleaning smudges and marks on walls'
             }
           ]
         }
