@@ -15,7 +15,7 @@ const OVERHEAD_PERCENTAGE = 0.15;
 
 const Index = () => {
   const [sites, setSites] = useState([]);
-  const [activeTab, setActiveTab] = useState('scope');
+  const [activeTab, setActiveTab] = useState('sites'); // Changed from 'scope' to 'sites'
   const [laborCosts, setLaborCosts] = useState({ 
     hourlyRate: 0,
     employmentType: 'contracted' as const

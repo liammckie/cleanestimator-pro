@@ -12,6 +12,7 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
     {
       id: uuidv4(),
       name: 'New Site',
+      client: '',
       address: {
         street: '',
         suburb: '',
@@ -29,9 +30,11 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
   ]);
 
   const addSite = () => {
+    const clientName = sites[0]?.client || ''; // Use the client name from the first site
     const newSite: Site = {
       id: uuidv4(),
       name: `New Site ${sites.length + 1}`,
+      client: clientName,
       address: {
         street: '',
         suburb: '',
@@ -65,6 +68,16 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
     onSitesChange(updatedSites);
   };
 
+  const updateSiteClient = (siteId: string, client: string) => {
+    const updatedSites = sites.map(site => 
+      site.id === siteId ? { ...site, client } : 
+      sites[0].id === siteId ? { ...site, client } : // If it's the first site, update client
+      { ...site, client } // For all other sites, also update client
+    );
+    setSites(updatedSites);
+    onSitesChange(updatedSites);
+  };
+
   const updateSiteAddress = (siteId: string, field: keyof Site['address'], value: string) => {
     const updatedSites = sites.map(site => 
       site.id === siteId ? {
@@ -85,6 +98,7 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
       onAddSite={addSite}
       onDeleteSite={removeSite}
       onUpdateSiteName={updateSiteName}
+      onUpdateSiteClient={updateSiteClient}
       onUpdateSiteAddress={updateSiteAddress}
     />
   );

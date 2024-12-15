@@ -1,6 +1,7 @@
 export interface Site {
   id: string;
   name: string;
+  client: string;
   address: {
     street: string;
     suburb: string;

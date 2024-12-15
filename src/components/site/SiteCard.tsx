@@ -11,6 +11,7 @@ interface SiteCardProps {
   canDelete: boolean;
   onDelete: (siteId: string) => void;
   onUpdateName: (siteId: string, name: string) => void;
+  onUpdateClient: (siteId: string, client: string) => void;
   onUpdateAddress: (siteId: string, field: keyof Site['address'], value: string) => void;
 }
 
@@ -19,6 +20,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({
   canDelete,
   onDelete,
   onUpdateName,
+  onUpdateClient,
   onUpdateAddress,
 }) => {
   return (
@@ -37,6 +39,16 @@ export const SiteCard: React.FC<SiteCardProps> = ({
         )}
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor={`client-${site.id}`}>Client Name</Label>
+          <Input
+            id={`client-${site.id}`}
+            value={site.client}
+            onChange={(e) => onUpdateClient(site.id, e.target.value)}
+            placeholder="Enter client name"
+          />
+        </div>
+        
         <div className="space-y-2">
           <Label htmlFor={`site-name-${site.id}`}>Site Name</Label>
           <Input

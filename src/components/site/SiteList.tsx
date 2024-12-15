@@ -9,6 +9,7 @@ interface SiteListProps {
   onAddSite: () => void;
   onDeleteSite: (siteId: string) => void;
   onUpdateSiteName: (siteId: string, name: string) => void;
+  onUpdateSiteClient: (siteId: string, client: string) => void;
   onUpdateSiteAddress: (siteId: string, field: keyof Site['address'], value: string) => void;
 }
 
@@ -17,6 +18,7 @@ export const SiteList: React.FC<SiteListProps> = ({
   onAddSite,
   onDeleteSite,
   onUpdateSiteName,
+  onUpdateSiteClient,
   onUpdateSiteAddress,
 }) => {
   return (
@@ -28,6 +30,7 @@ export const SiteList: React.FC<SiteListProps> = ({
           canDelete={sites.length > 1}
           onDelete={onDeleteSite}
           onUpdateName={onUpdateSiteName}
+          onUpdateClient={onUpdateSiteClient}
           onUpdateAddress={onUpdateSiteAddress}
         />
       ))}
