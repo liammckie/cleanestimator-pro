@@ -84,33 +84,33 @@ const Index = () => {
 
   return (
     <SettingsProvider>
-      <SidebarProvider>
-        <TaskProvider onTasksChange={handleAreaChange}>
-          <div className="min-h-screen flex w-full bg-background">
-            <div className="flex-1">
-              <div className="container mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold text-primary mb-8">
-                  Commercial Cleaning Estimation Tool
-                </h1>
-                
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                  <div className="grid grid-cols-[250px,auto,250px] gap-6">
-                    <DynamicMenu 
-                      options={formattedMenuOptions} 
-                      className="bg-card rounded-lg border border-border"
-                    />
-                    <div className="space-y-6">
-                      <MainNavigation />
-                      {renderContent()}
-                    </div>
+      <TaskProvider onTasksChange={handleAreaChange}>
+        <div className="min-h-screen flex w-full bg-background">
+          <div className="flex-1">
+            <div className="container mx-auto px-4 py-8">
+              <h1 className="text-3xl font-bold text-primary mb-8">
+                Commercial Cleaning Estimation Tool
+              </h1>
+              
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                <div className="flex gap-6">
+                  <DynamicMenu 
+                    options={formattedMenuOptions} 
+                    className="bg-card rounded-lg border border-border w-[250px] shrink-0"
+                  />
+                  <div className="flex-1 space-y-6">
+                    <MainNavigation />
+                    {renderContent()}
+                  </div>
+                  <div className="w-[250px] shrink-0">
                     <ScopeOfWorkSidebar selectedTasks={selectedTasks} sites={sites} />
                   </div>
-                </Tabs>
-              </div>
+                </div>
+              </Tabs>
             </div>
           </div>
-        </TaskProvider>
-      </SidebarProvider>
+        </div>
+      </TaskProvider>
     </SettingsProvider>
   );
 };
