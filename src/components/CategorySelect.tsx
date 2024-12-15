@@ -46,6 +46,8 @@ export const CategorySelect = ({
   const categories = React.useMemo(() => {
     const result: Array<{ value: string; label: string; group: string }> = [];
     
+    if (!validGroups?.length) return result;
+    
     validGroups.forEach(group => {
       if (!group?.categories) return;
       
@@ -65,12 +67,13 @@ export const CategorySelect = ({
 
   // Ensure we have a valid value
   const displayValue = React.useMemo(() => {
-    if (!value) return '';
+    if (!value || !categories?.length) return '';
     const category = categories.find(cat => cat.value === value.toLowerCase());
     return category?.label || '';
   }, [categories, value]);
 
-  if (!validGroups.length) {
+  // Early return if no valid groups
+  if (!validGroups?.length) {
     return (
       <Button
         variant="outline"
