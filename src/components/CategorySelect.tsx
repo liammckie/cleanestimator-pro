@@ -24,7 +24,7 @@ interface CategorySelectProps {
 }
 
 export const CategorySelect = ({
-  value,
+  value = '',
   onValueChange,
   defaultTab = 'categories',
   groups = []
@@ -34,29 +34,33 @@ export const CategorySelect = ({
   // Ensure we have valid groups and categories
   const validGroups = React.useMemo(() => {
     if (!Array.isArray(groups)) return [];
-    
     return groups.filter(group => 
       group && 
       typeof group === 'object' && 
-      Array.isArray(group.categories)
+      Array.isArray(group.categories) &&
+      group.categories.length > 0
     );
   }, [groups]);
 
   // Create a flat list of all categories from all groups
   const categories = React.useMemo(() => {
-    return validGroups.reduce((acc: Array<{ value: string; label: string; group: string }>, group) => {
-      if (!group?.categories) return acc;
+    const result: Array<{ value: string; label: string; group: string }> = [];
+    
+    validGroups.forEach(group => {
+      if (!group?.categories) return;
       
-      const groupCategories = group.categories
-        .filter(category => category && category.name) // Filter out invalid categories
-        .map(category => ({
-          value: category.name.toLowerCase(),
-          label: category.name,
-          group: group.name
-        }));
-      
-      return [...acc, ...groupCategories];
-    }, []);
+      group.categories.forEach(category => {
+        if (category && category.name) {
+          result.push({
+            value: category.name.toLowerCase(),
+            label: category.name,
+            group: group.name
+          });
+        }
+      });
+    });
+    
+    return result;
   }, [validGroups]);
 
   // Ensure we have a valid value
@@ -65,6 +69,19 @@ export const CategorySelect = ({
     const category = categories.find(cat => cat.value === value.toLowerCase());
     return category?.label || '';
   }, [categories, value]);
+
+  if (!validGroups.length) {
+    return (
+      <Button
+        variant="outline"
+        className="w-full justify-between"
+        disabled
+      >
+        No categories available
+        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+      </Button>
+    );
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

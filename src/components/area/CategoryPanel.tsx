@@ -11,7 +11,6 @@ interface CategoryPanelProps {
 }
 
 export const CategoryPanel: React.FC<CategoryPanelProps> = ({ value, onValueChange }) => {
-  // Ensure we get a valid array of task groups with proper error handling
   const taskGroups = React.useMemo(() => {
     try {
       const groups = getTaskGroups();
