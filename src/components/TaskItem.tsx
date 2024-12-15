@@ -5,6 +5,7 @@ import { ProductivityCard } from './task/ProductivityCard';
 import { TimeDisplay } from './task/TimeDisplay';
 import { TaskControls } from './task/TaskControls';
 import { TaskHeader } from './task/TaskHeader';
+import { useTaskContext } from './area/task/TaskContext';
 
 interface TaskItemProps {
   rate: {
@@ -14,35 +15,19 @@ interface TaskItemProps {
     unit: string;
     ratePerHour: number;
   };
-  selectedTask: {
-    taskId: string;
-    quantity: number;
-    timeRequired: number;
-    frequency: {
-      timesPerWeek: number;
-      timesPerMonth: number;
-    };
-    productivityOverride?: number;
-    selectedTool?: string;
-  } | undefined;
-  onTaskSelection: (taskId: string, checked: boolean) => void;
-  onQuantityChange: (taskId: string, quantity: number) => void;
-  onFrequencyChange: (taskId: string, timesPerWeek: number) => void;
-  onProductivityOverride: (taskId: string, override: number) => void;
-  onRemoveTask: (taskId: string) => void;
-  onToolChange: (taskId: string, tool: string) => void;
+  siteId?: string;
+  siteName?: string;
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({
   rate,
-  selectedTask,
-  onTaskSelection,
-  onQuantityChange,
-  onFrequencyChange,
-  onProductivityOverride,
-  onRemoveTask,
-  onToolChange,
+  siteId,
+  siteName,
 }) => {
+  const { selectedTasks, handleTaskSelection, handleQuantityChange, handleFrequencyChange, handleProductivityOverride, handleToolChange } = useTaskContext();
+  
+  const selectedTask = selectedTasks.find(task => task.taskId === rate.id && task.siteId === siteId);
+
   const productivity = useMemo(() => 
     selectedTask ? calculateTaskProductivity(
       rate.id,
@@ -53,25 +38,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     ) : null,
   [rate.id, selectedTask]);
 
-  const handleTaskSelection = useCallback((taskId: string, checked: boolean) => {
-    onTaskSelection(taskId, checked);
-  }, [onTaskSelection]);
-
-  const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
-    onQuantityChange(taskId, quantity);
-  }, [onQuantityChange]);
-
-  const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
-    onFrequencyChange(taskId, timesPerWeek);
-  }, [onFrequencyChange]);
-
-  const handleProductivityOverride = useCallback((taskId: string, override: number) => {
-    onProductivityOverride(taskId, override);
-  }, [onProductivityOverride]);
-
-  const handleToolChange = useCallback((taskId: string, tool: string) => {
-    onToolChange(taskId, tool);
-  }, [onToolChange]);
+  const handleLocalTaskSelection = useCallback((taskId: string, checked: boolean) => {
+    handleTaskSelection(taskId, checked, siteId, siteName);
+  }, [handleTaskSelection, siteId, siteName]);
 
   return (
     <div key={rate.id} className="flex flex-col gap-2 p-2 border rounded">
@@ -79,8 +48,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         taskId={rate.id}
         taskName={rate.task}
         isSelected={!!selectedTask}
-        onTaskSelection={handleTaskSelection}
-        onRemoveTask={onRemoveTask}
+        onTaskSelection={handleLocalTaskSelection}
+        onRemoveTask={(taskId) => handleTaskSelection(taskId, false, siteId, siteName)}
       />
 
       {selectedTask && (

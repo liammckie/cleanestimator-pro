@@ -7,6 +7,8 @@ const SELECTED_TASKS_KEY = 'selected-tasks-context';
 interface TaskContextType {
   selectedTasks: Array<{
     taskId: string;
+    siteId?: string;
+    siteName?: string;
     quantity: number;
     timeRequired: number;
     frequency: {
@@ -15,9 +17,8 @@ interface TaskContextType {
     };
     productivityOverride?: number;
     selectedTool?: string;
-    siteName?: string;
   }>;
-  handleTaskSelection: (taskId: string, isSelected: boolean) => void;
+  handleTaskSelection: (taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => void;
   handleQuantityChange: (taskId: string, quantity: number) => void;
   handleFrequencyChange: (taskId: string, timesPerWeek: number) => void;
   handleProductivityOverride: (taskId: string, override: number) => void;
@@ -38,19 +39,17 @@ export const TaskProvider: React.FC<{
   children: React.ReactNode;
   onTasksChange: (tasks: TaskContextType['selectedTasks']) => void;
 }> = ({ children, onTasksChange }) => {
-  // Initialize state from localStorage
   const [selectedTasks, setSelectedTasks] = useState<TaskContextType['selectedTasks']>(() => {
     const savedTasks = localStorage.getItem(SELECTED_TASKS_KEY);
     return savedTasks ? JSON.parse(savedTasks) : [];
   });
 
-  // Save to localStorage whenever tasks change
   useEffect(() => {
     localStorage.setItem(SELECTED_TASKS_KEY, JSON.stringify(selectedTasks));
     onTasksChange(selectedTasks);
   }, [selectedTasks, onTasksChange]);
 
-  const handleTaskSelection = useCallback((taskId: string, isSelected: boolean) => {
+  const handleTaskSelection = useCallback((taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
     if (isSelected) {
       const rate = getRateById(taskId);
       if (!rate) {
@@ -60,6 +59,8 @@ export const TaskProvider: React.FC<{
       
       const newTask = {
         taskId,
+        siteId,
+        siteName,
         quantity: 0,
         timeRequired: 0,
         frequency: {
