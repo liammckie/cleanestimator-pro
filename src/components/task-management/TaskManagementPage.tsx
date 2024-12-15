@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { TaskForm } from './TaskForm';
 import { TaskList } from './TaskList';
 import { CsvImport } from './CsvImport';
@@ -16,6 +22,15 @@ export const TaskManagementPage = () => {
   const [tasks, setTasks] = useState<CleaningTask[]>(() => loadTasks());
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
   const { toast } = useToast();
+
+  // Group tasks by category
+  const tasksByCategory = tasks.reduce((acc, task) => {
+    if (!acc[task.category]) {
+      acc[task.category] = [];
+    }
+    acc[task.category].push(task);
+    return acc;
+  }, {} as Record<string, CleaningTask[]>);
 
   const handleTaskSelection = (task: CleaningTask) => {
     const existingTask = selectedTasks.find(t => t.id === task.id);
@@ -112,14 +127,32 @@ export const TaskManagementPage = () => {
             <TabsContent value="database">
               <Card>
                 <CardHeader>
-                  <CardTitle>Add New Task</CardTitle>
+                  <CardTitle>Task Categories</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <TaskForm onSubmit={(task) => {
-                    const newTask = { ...task, id: crypto.randomUUID() };
-                    setTasks(prev => [...prev, newTask]);
-                    saveTasks([...tasks, newTask]);
-                  }} />
+                  <Accordion type="single" collapsible className="w-full">
+                    {Object.entries(tasksByCategory).map(([category, categoryTasks]) => (
+                      <AccordionItem key={category} value={category}>
+                        <AccordionTrigger className="text-lg font-semibold">
+                          {category}
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-4 p-4">
+                            {categoryTasks.map((task) => (
+                              <TaskSelectionPanel
+                                key={task.id}
+                                task={task}
+                                onSelect={() => handleTaskSelection(task)}
+                                onQuantityChange={handleQuantityChange}
+                                onFrequencyChange={handleFrequencyChange}
+                                selectedTask={selectedTasks.find(t => t.id === task.id)}
+                              />
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </CardContent>
               </Card>
 
@@ -131,29 +164,21 @@ export const TaskManagementPage = () => {
                   <CsvImport onImport={handleImportTasks} />
                 </CardContent>
               </Card>
+            </TabsContent>
 
-              <Card className="mt-6">
+            <TabsContent value="scope">
+              <Card>
                 <CardHeader>
-                  <CardTitle>Task Database</CardTitle>
+                  <CardTitle>Selected Tasks</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <TaskList
-                    tasks={tasks}
-                    selectedTasks={selectedTasks}
-                    onTaskSelect={handleTaskSelection}
+                    tasks={selectedTasks}
                     onQuantityChange={handleQuantityChange}
                     onFrequencyChange={handleFrequencyChange}
                   />
                 </CardContent>
               </Card>
-            </TabsContent>
-
-            <TabsContent value="scope">
-              <TaskSelectionPanel
-                selectedTasks={selectedTasks}
-                onQuantityChange={handleQuantityChange}
-                onFrequencyChange={handleFrequencyChange}
-              />
             </TabsContent>
           </Tabs>
         </div>
