@@ -19,7 +19,10 @@ export const useCostCalculations = (
         ...site,
         area: {
           ...site.area,
-          selectedTasks: tasks,
+          selectedTasks: tasks.map(task => ({
+            ...task,
+            timeRequired: task.timeRequired || 0
+          })),
           totalTime: tasks.reduce((total, task) => total + (task.timeRequired || 0), 0)
         }
       } : site
@@ -28,16 +31,17 @@ export const useCostCalculations = (
     const totalMonthlyHours = calculateTotalMonthlyHours(updatedSites);
     const taskCosts = calculateTaskCosts(updatedSites, laborCosts.hourlyRate, laborCosts.onCosts);
     
+    console.log('Updated calculations:', {
+      totalMonthlyHours,
+      taskCosts,
+      laborRate: laborCosts.hourlyRate
+    });
+
     setLaborCosts(prev => ({
       ...prev,
       totalMonthlyHours,
       taskCosts
     }));
-
-    console.log('Updated labor costs:', {
-      totalMonthlyHours,
-      taskCosts
-    });
 
     toast({
       title: "Site Updated",
@@ -50,16 +54,19 @@ export const useCostCalculations = (
   const handleMarginChange = useCallback((margin: number) => {
     const totalCosts = sites.reduce((acc, site) => {
       const siteCosts = site.area?.selectedTasks?.reduce((taskAcc, task) => {
-        return taskAcc + (task.timeRequired || 0) * laborCosts.hourlyRate;
+        const monthlyHours = (task.timeRequired || 0) * (task.frequency?.timesPerMonth || 4.33);
+        return taskAcc + (monthlyHours * laborCosts.hourlyRate);
       }, 0) || 0;
       return acc + siteCosts;
     }, 0);
 
     const suggestedRevenue = totalCosts / (1 - (margin / 100));
+    
     console.log('Margin calculations:', {
       margin,
       totalCosts,
-      suggestedRevenue
+      suggestedRevenue,
+      sites
     });
 
     return suggestedRevenue;

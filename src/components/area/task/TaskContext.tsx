@@ -46,8 +46,34 @@ export const TaskProvider: React.FC<{
 
   useEffect(() => {
     localStorage.setItem(SELECTED_TASKS_KEY, JSON.stringify(selectedTasks));
+    console.log('Tasks changed:', selectedTasks);
     onTasksChange(selectedTasks);
   }, [selectedTasks, onTasksChange]);
+
+  const calculateTimeRequired = useCallback((
+    taskId: string,
+    quantity: number,
+    selectedTool: string | undefined,
+    frequency: { timesPerWeek: number; timesPerMonth: number }
+  ) => {
+    const productivity = calculateTaskProductivity(
+      taskId,
+      quantity,
+      selectedTool,
+      frequency,
+      quantity
+    );
+    
+    console.log('Calculated productivity:', {
+      taskId,
+      quantity,
+      selectedTool,
+      frequency,
+      productivity
+    });
+
+    return productivity?.timeRequired || 0;
+  }, []);
 
   const handleTaskSelection = useCallback((taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
     if (isSelected) {
@@ -79,92 +105,99 @@ export const TaskProvider: React.FC<{
   }, []);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
-    setSelectedTasks(prev => {
-      const updated = prev.map(task => {
-        if (task.taskId === taskId) {
-          const productivity = calculateTaskProductivity(
-            taskId,
-            quantity,
-            task.selectedTool,
-            task.frequency,
-            quantity
-          );
-          return { 
-            ...task, 
-            quantity, 
-            timeRequired: productivity?.timeRequired || 0 
-          };
-        }
-        return task;
-      });
-      return updated;
-    });
-  }, []);
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        const timeRequired = calculateTimeRequired(
+          taskId,
+          quantity,
+          task.selectedTool,
+          task.frequency
+        );
+        
+        console.log('Updated task time:', {
+          taskId,
+          quantity,
+          timeRequired
+        });
+
+        return { 
+          ...task, 
+          quantity,
+          timeRequired
+        };
+      }
+      return task;
+    }));
+  }, [calculateTimeRequired]);
 
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
-    setSelectedTasks(prev => {
-      const updated = prev.map(task => {
-        if (task.taskId === taskId) {
-          const frequency = {
-            timesPerWeek,
-            timesPerMonth: timesPerWeek * 4.33
-          };
-          const productivity = calculateTaskProductivity(
-            taskId,
-            task.quantity,
-            task.selectedTool,
-            frequency,
-            task.quantity
-          );
-          return { 
-            ...task, 
-            frequency, 
-            timeRequired: productivity?.timeRequired || 0 
-          };
-        }
-        return task;
-      });
-      return updated;
-    });
-  }, []);
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        const frequency = {
+          timesPerWeek,
+          timesPerMonth: timesPerWeek * 4.33
+        };
+        
+        const timeRequired = calculateTimeRequired(
+          taskId,
+          task.quantity,
+          task.selectedTool,
+          frequency
+        );
+
+        console.log('Updated task frequency:', {
+          taskId,
+          frequency,
+          timeRequired
+        });
+
+        return { 
+          ...task, 
+          frequency,
+          timeRequired
+        };
+      }
+      return task;
+    }));
+  }, [calculateTimeRequired]);
 
   const handleProductivityOverride = useCallback((taskId: string, override: number) => {
-    setSelectedTasks(prev => {
-      const updated = prev.map(task => {
-        if (task.taskId === taskId) {
-          return { 
-            ...task, 
-            productivityOverride: override,
-          };
-        }
-        return task;
-      });
-      return updated;
-    });
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        return { 
+          ...task, 
+          productivityOverride: override,
+        };
+      }
+      return task;
+    }));
   }, []);
 
   const handleToolChange = useCallback((taskId: string, tool: string) => {
-    setSelectedTasks(prev => {
-      const updated = prev.map(task => {
-        if (task.taskId === taskId) {
-          const productivity = calculateTaskProductivity(
-            taskId,
-            task.quantity,
-            tool,
-            task.frequency,
-            task.quantity
-          );
-          return { 
-            ...task, 
-            selectedTool: tool,
-            timeRequired: productivity?.timeRequired || 0 
-          };
-        }
-        return task;
-      });
-      return updated;
-    });
-  }, []);
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        const timeRequired = calculateTimeRequired(
+          taskId,
+          task.quantity,
+          tool,
+          task.frequency
+        );
+
+        console.log('Updated tool selection:', {
+          taskId,
+          tool,
+          timeRequired
+        });
+
+        return { 
+          ...task, 
+          selectedTool: tool,
+          timeRequired
+        };
+      }
+      return task;
+    }));
+  }, [calculateTimeRequired]);
 
   return (
     <TaskContext.Provider value={{
