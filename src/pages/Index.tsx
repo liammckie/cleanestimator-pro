@@ -17,8 +17,10 @@ const Index = () => {
   const [sites, setSites] = useState([]);
   const [activeTab, setActiveTab] = useState('sites');
   const [laborCosts, setLaborCosts] = useState({ 
-    hourlyRate: 0,
-    employmentType: 'contracted' as const
+    hourlyRate: 38, // Set default rate to $38
+    employmentType: 'contracted' as const,
+    totalMonthlyHours: 0,
+    taskCosts: []
   });
   const [equipmentCosts, setEquipmentCosts] = useState({ monthly: 0 });
   const [contractDetails, setContractDetails] = useState({
@@ -41,11 +43,13 @@ const Index = () => {
   }));
 
   const handleTasksChange = (tasks: any) => {
-    console.log('Tasks changed:', tasks);
-  };
-
-  const handleAreaChange = (area: any) => {
-    console.log('Area changed:', area);
+    console.log('Tasks changed in Index:', tasks);
+    // Update labor costs when tasks change
+    setLaborCosts(prev => ({
+      ...prev,
+      totalMonthlyHours: tasks.reduce((sum: number, task: any) => sum + (task.timeRequired || 0), 0),
+      taskCosts: tasks
+    }));
   };
 
   const selectedTasks = sites.flatMap(site => 
