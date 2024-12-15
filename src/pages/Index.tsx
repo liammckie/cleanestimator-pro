@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { DynamicMenu } from '@/components/ui/dynamic-menu';
 import { Tabs } from "@/components/ui/tabs";
-import { SidebarProvider } from '@/components/ui/sidebar';
 import { calculateCosts } from '@/utils/costCalculations';
 import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { menuOptions } from '@/components/navigation/MenuOptions';
@@ -92,21 +91,20 @@ const Index = () => {
                 Commercial Cleaning Estimation Tool
               </h1>
               
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                <div className="flex gap-6">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <div className="flex">
                   <DynamicMenu 
                     options={formattedMenuOptions} 
-                    className="bg-card rounded-lg border border-border w-[250px] shrink-0"
+                    className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
                   />
-                  <div className="flex-1 space-y-6">
+                  <div className="flex-1 px-6">
                     <MainNavigation />
                     {renderContent()}
                   </div>
-                  <div className="w-[250px] shrink-0">
-                    <SidebarProvider>
-                      <ScopeOfWorkSidebar selectedTasks={selectedTasks} sites={sites} />
-                    </SidebarProvider>
-                  </div>
+                  <ScopeOfWorkSidebar 
+                    selectedTasks={selectedTasks} 
+                    sites={sites} 
+                  />
                 </div>
               </Tabs>
             </div>
