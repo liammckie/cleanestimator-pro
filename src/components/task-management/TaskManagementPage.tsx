@@ -8,15 +8,15 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { TaskForm } from './TaskForm';
-import { TaskList } from './TaskList';
 import { CsvImport } from './CsvImport';
 import { CleaningTask, SelectedTask } from '@/data/types/taskManagement';
 import { loadTasks, saveTasks } from '@/utils/taskStorage';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { TaskProvider } from '../area/task/TaskContext';
 import { ScopeOfWorkSidebar } from '../ScopeOfWorkSidebar';
 import { calculateManHours, validateTaskInput } from '@/utils/manHourCalculations';
 import { TaskSelectionPanel } from './TaskSelectionPanel';
+import { ScopeContent } from './scope/ScopeContent';
 
 const SELECTED_TASKS_STORAGE_KEY = 'selected-tasks';
 
@@ -28,12 +28,10 @@ export const TaskManagementPage = () => {
   });
   const { toast } = useToast();
 
-  // Save selected tasks to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem(SELECTED_TASKS_STORAGE_KEY, JSON.stringify(selectedTasks));
   }, [selectedTasks]);
 
-  // Group tasks by category
   const tasksByCategory = tasks.reduce((acc, task) => {
     if (!acc[task.category]) {
       acc[task.category] = [];
@@ -114,6 +112,10 @@ export const TaskManagementPage = () => {
     }));
   };
 
+  const handleRemoveTask = (taskId: string) => {
+    setSelectedTasks(prev => prev.filter(task => task.id !== taskId));
+  };
+
   const handleImportTasks = (tasksToImport: Omit<CleaningTask, 'id'>[]) => {
     const newTasks = tasksToImport.map(task => ({
       ...task,
@@ -153,8 +155,6 @@ export const TaskManagementPage = () => {
                                 key={task.id}
                                 task={task}
                                 onSelect={() => handleTaskSelection(task)}
-                                onQuantityChange={handleQuantityChange}
-                                onFrequencyChange={handleFrequencyChange}
                                 selectedTask={selectedTasks.find(t => t.id === task.id)}
                               />
                             ))}
@@ -177,18 +177,12 @@ export const TaskManagementPage = () => {
             </TabsContent>
 
             <TabsContent value="scope">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Selected Tasks</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TaskList
-                    tasks={selectedTasks}
-                    onQuantityChange={handleQuantityChange}
-                    onFrequencyChange={handleFrequencyChange}
-                  />
-                </CardContent>
-              </Card>
+              <ScopeContent
+                selectedTasks={selectedTasks}
+                onQuantityChange={handleQuantityChange}
+                onFrequencyChange={handleFrequencyChange}
+                onRemoveTask={handleRemoveTask}
+              />
             </TabsContent>
           </Tabs>
         </div>
