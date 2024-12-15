@@ -22,21 +22,21 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Transform TaskGroup[] to CategoryGroup[] format with proper null checks
+  // Transform TaskGroup[] to CategoryGroup[] format
   const transformedGroups = (groups || []).map(group => {
-    if (!group) return null;
-    
+    if (!group?.name || !Array.isArray(group?.categories)) return null;
+
     return {
-      name: group.name || '',
-      categories: (group.categories || []).map(category => {
-        if (!category) return null;
-        
+      name: group.name,
+      categories: group.categories.map(category => {
+        if (!category?.name || !Array.isArray(category?.subcategories)) return null;
+
         return {
-          name: category.name || '',
-          subcategories: (category.subcategories || []).reduce((acc: string[], sub) => {
-            if (!sub || !Array.isArray(sub.tasks)) return acc;
+          name: category.name,
+          subcategories: category.subcategories.reduce((acc: string[], subcategory) => {
+            if (!subcategory?.tasks) return acc;
             
-            const taskNames = sub.tasks
+            const taskNames = subcategory.tasks
               .filter(task => task && typeof task === 'object' && task.task)
               .map(task => task.task);
               

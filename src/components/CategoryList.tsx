@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check } from "lucide-react";
 import { CommandGroup, CommandItem } from "@/components/ui/command";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface CategoryGroup {
@@ -25,88 +25,102 @@ export const CategoryList: React.FC<CategoryListProps> = ({
   searchQuery,
   onSelect,
 }) => {
-  const renderCategories = (categories: Array<{ name: string; subcategories: string[] }> = []) => {
-    if (!Array.isArray(categories)) return null;
+  // Ensure groups is an array
+  const safeGroups = Array.isArray(groups) ? groups : [];
 
-    return categories
-      .filter(category => category && typeof category === 'object')
-      .map((category) => {
-        if (!category?.name || !Array.isArray(category?.subcategories)) return null;
-
-        const filteredSubcategories = category.subcategories.filter(subcategory => 
-          subcategory && typeof subcategory === 'string' &&
-          subcategory.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-
-        if (filteredSubcategories.length === 0) return null;
-
-        return (
-          <AccordionItem key={category.name} value={category.name}>
-            <AccordionTrigger className="text-sm font-medium">
-              {category.name}
-            </AccordionTrigger>
-            <AccordionContent>
-              <CommandGroup>
-                {filteredSubcategories.map((subcategory) => (
-                  <CommandItem
-                    key={subcategory}
-                    value={subcategory}
-                    onSelect={() => onSelect(subcategory)}
-                    className="cursor-pointer"
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedValue === subcategory ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {subcategory}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </AccordionContent>
-          </AccordionItem>
-        );
-      })
-      .filter(Boolean);
+  // Filter tasks based on search query
+  const filterTasks = (tasks: string[]) => {
+    return tasks.filter(task => 
+      task.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   };
 
-  if (!Array.isArray(groups)) return null;
+  // Get tasks for a specific category
+  const getCategoryTasks = (categoryName: string) => {
+    const group = safeGroups.find(g => g.name === categoryName);
+    if (!group?.categories) return [];
+    
+    return group.categories.reduce((acc: string[], category) => {
+      if (category?.subcategories) {
+        return [...acc, ...category.subcategories];
+      }
+      return acc;
+    }, []);
+  };
 
-  const hasResults = groups.some(group => 
-    group?.categories?.some(category =>
-      category?.subcategories?.some(subcategory =>
-        subcategory?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    )
-  );
+  const coreCleaningTasks = filterTasks(getCategoryTasks('Core Cleaning'));
+  const specializedCleaningTasks = filterTasks(getCategoryTasks('Specialized Cleaning'));
+  const industrySpecificTasks = filterTasks(getCategoryTasks('Industry-Specific'));
 
-  if (!hasResults && searchQuery) {
+  const renderTaskList = (tasks: string[]) => {
+    return tasks.map((task) => (
+      <CommandItem
+        key={task}
+        value={task}
+        onSelect={() => onSelect(task)}
+        className="cursor-pointer"
+      >
+        <Check
+          className={cn(
+            "mr-2 h-4 w-4",
+            selectedValue === task ? "opacity-100" : "opacity-0"
+          )}
+        />
+        {task}
+      </CommandItem>
+    ));
+  };
+
+  if (!searchQuery && !coreCleaningTasks.length && !specializedCleaningTasks.length && !industrySpecificTasks.length) {
     return (
       <div className="p-4 text-sm text-muted-foreground text-center">
-        No matching tasks found.
+        Select a category to view available tasks.
+      </div>
+    );
+  }
+
+  if (searchQuery && !coreCleaningTasks.length && !specializedCleaningTasks.length && !industrySpecificTasks.length) {
+    return (
+      <div className="p-4 text-sm text-muted-foreground text-center">
+        No tasks found matching your search.
       </div>
     );
   }
 
   return (
-    <Accordion type="single" collapsible className="w-full">
-      {groups.map(group => {
-        if (!group?.name || !Array.isArray(group?.categories)) return null;
-        
-        return (
-          <AccordionItem key={group.name} value={group.name}>
-            <AccordionTrigger className="font-semibold">
-              {group.name}
-            </AccordionTrigger>
-            <AccordionContent>
-              <Accordion type="single" collapsible className="w-full">
-                {renderCategories(group.categories)}
-              </Accordion>
-            </AccordionContent>
-          </AccordionItem>
-        );
-      })}
-    </Accordion>
+    <div className="space-y-4 p-2">
+      {coreCleaningTasks.length > 0 && (
+        <Card>
+          <CardHeader className="py-3">
+            <CardTitle className="text-sm font-medium">Core Cleaning</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CommandGroup>{renderTaskList(coreCleaningTasks)}</CommandGroup>
+          </CardContent>
+        </Card>
+      )}
+
+      {specializedCleaningTasks.length > 0 && (
+        <Card>
+          <CardHeader className="py-3">
+            <CardTitle className="text-sm font-medium">Specialized Cleaning</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CommandGroup>{renderTaskList(specializedCleaningTasks)}</CommandGroup>
+          </CardContent>
+        </Card>
+      )}
+
+      {industrySpecificTasks.length > 0 && (
+        <Card>
+          <CardHeader className="py-3">
+            <CardTitle className="text-sm font-medium">Industry-Specific</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CommandGroup>{renderTaskList(industrySpecificTasks)}</CommandGroup>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 };
