@@ -7,9 +7,9 @@ import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { getMenuOptions } from '@/components/navigation/MenuOptions';
 import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
-import { TaskStack } from '@/components/task/TaskStack';
 import { TaskProvider } from '@/components/area/task/TaskContext';
 import { TaskManagementPage } from '@/components/task-management/TaskManagementPage';
+import { TaskStack } from '@/components/task/TaskStack';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -43,11 +43,11 @@ const Index = () => {
   return (
     <SettingsProvider>
       <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-background">
-          <TaskProvider onTasksChange={handleTasksChange}>
+        <TaskProvider onTasksChange={handleTasksChange}>
+          <div className="min-h-screen flex w-full bg-background">
             <TaskStack />
-            <div className="flex-1 py-8">
-              <div className="container mx-auto px-4">
+            <div className="flex-1">
+              <div className="container mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold text-primary mb-8">
                   Commercial Cleaning Estimation Tool
                 </h1>
@@ -82,8 +82,8 @@ const Index = () => {
                 </Tabs>
               </div>
             </div>
-          </TaskProvider>
-        </div>
+          </div>
+        </TaskProvider>
       </SidebarProvider>
     </SettingsProvider>
   );

@@ -22,7 +22,6 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Transform TaskGroup[] to CategoryGroup[] format
   const transformedGroups = (groups || []).map(group => {
     if (!group?.name || !Array.isArray(group?.categories)) return null;
 

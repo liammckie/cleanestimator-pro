@@ -25,17 +25,14 @@ export const CategoryList: React.FC<CategoryListProps> = ({
   searchQuery,
   onSelect,
 }) => {
-  // Ensure groups is an array
   const safeGroups = Array.isArray(groups) ? groups : [];
 
-  // Filter tasks based on search query
   const filterTasks = (tasks: string[]) => {
     return tasks.filter(task => 
       task.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
-  // Get tasks for a specific category
   const getCategoryTasks = (categoryName: string) => {
     const group = safeGroups.find(g => g.name === categoryName);
     if (!group?.categories) return [];
