@@ -4,7 +4,7 @@ import { Tabs } from "@/components/ui/tabs";
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { calculateCosts } from '@/utils/costCalculations';
 import { MainNavigation } from '@/components/navigation/MainNavigation';
-import { getMenuOptions } from '@/components/navigation/MenuOptions';
+import { menuOptions } from '@/components/navigation/MenuOptions';
 import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskProvider } from '@/components/area/task/TaskContext';
@@ -34,7 +34,11 @@ const Index = () => {
   const monthlyRevenue = costBreakdown.totalMonthlyCost * 1.5;
   const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
 
-  const menuOptions = getMenuOptions(setActiveTab);
+  const formattedMenuOptions = menuOptions.map(option => ({
+    name: option.label,
+    icon: option.icon,
+    onClick: () => setActiveTab(option.id)
+  }));
 
   const handleTasksChange = (tasks: any) => {
     console.log('Tasks changed:', tasks);
@@ -79,7 +83,7 @@ const Index = () => {
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                   <div className="grid grid-cols-[250px,1fr] gap-6">
                     <DynamicMenu 
-                      options={menuOptions} 
+                      options={formattedMenuOptions} 
                       className="bg-card rounded-lg border border-border"
                     />
                     <div className="space-y-6">

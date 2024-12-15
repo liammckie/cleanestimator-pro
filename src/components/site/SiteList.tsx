@@ -10,7 +10,6 @@ interface SiteListProps {
   onDeleteSite: (siteId: string) => void;
   onUpdateSiteName: (siteId: string, name: string) => void;
   onUpdateSiteAddress: (siteId: string, field: keyof Site['address'], value: string) => void;
-  onUpdateSiteArea: (siteId: string, area: Site['area']) => void;
 }
 
 export const SiteList: React.FC<SiteListProps> = ({
@@ -19,7 +18,6 @@ export const SiteList: React.FC<SiteListProps> = ({
   onDeleteSite,
   onUpdateSiteName,
   onUpdateSiteAddress,
-  onUpdateSiteArea
 }) => {
   return (
     <div className="space-y-6">
@@ -31,7 +29,6 @@ export const SiteList: React.FC<SiteListProps> = ({
           onDelete={onDeleteSite}
           onUpdateName={onUpdateSiteName}
           onUpdateAddress={onUpdateSiteAddress}
-          onUpdateArea={onUpdateSiteArea}
         />
       ))}
       

@@ -79,14 +79,6 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
     onSitesChange(updatedSites);
   };
 
-  const updateSiteArea = (siteId: string, area: Site['area']) => {
-    const updatedSites = sites.map(site => 
-      site.id === siteId ? { ...site, area } : site
-    );
-    setSites(updatedSites);
-    onSitesChange(updatedSites);
-  };
-
   return (
     <SiteList
       sites={sites}
@@ -94,7 +86,6 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
       onDeleteSite={removeSite}
       onUpdateSiteName={updateSiteName}
       onUpdateSiteAddress={updateSiteAddress}
-      onUpdateSiteArea={updateSiteArea}
     />
   );
 };
