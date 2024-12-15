@@ -44,6 +44,10 @@ const Index = () => {
     console.log('Tasks changed:', tasks);
   };
 
+  const handleAreaChange = (area: any) => {
+    console.log('Area changed:', area);
+  };
+
   const selectedTasks = sites.flatMap(site => 
     site.area?.selectedTasks?.map(task => ({
       ...task,
@@ -54,7 +58,7 @@ const Index = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'scope':
-        return <AreaContainer />;
+        return <AreaContainer onAreaChange={handleAreaChange} />;
       default:
         return (
           <MainContent
