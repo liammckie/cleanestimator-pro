@@ -1,67 +1,46 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { 
-  Menu, 
-  Grid, 
-  Settings, 
-  List, 
-  Globe,
-  User,
-  Wrench,
-  DollarSign,
-  FileText,
-  Layout,
-  CheckSquare 
-} from "lucide-react"
+import React from 'react';
+import { List, User, Wrench, FileText, Layout, CheckSquare, Settings, Globe, Calendar } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface MenuOption {
-  id: string
-  label: string
-  icon?: "menu" | "grid" | "settings" | "list" | "globe" | "user" | "wrench" | 
-        "dollar-sign" | "file-text" | "layout" | "check-square"
-  onClick?: () => void
-}
-
-const iconMap = {
-  menu: Menu,
-  grid: Grid,
-  settings: Settings,
-  list: List,
-  globe: Globe,
-  user: User,
-  wrench: Wrench,
-  "dollar-sign": DollarSign,
-  "file-text": FileText,
-  layout: Layout,
-  "check-square": CheckSquare
+  name: string;
+  icon: "list" | "user" | "wrench" | "file-text" | "layout" | "check-square" | "settings" | "globe" | "calendar";
+  onClick: () => void;
 }
 
 interface DynamicMenuProps {
-  options: MenuOption[]
-  className?: string
+  options: MenuOption[];
+  className?: string;
 }
 
-export function DynamicMenu({ options, className }: DynamicMenuProps) {
+const iconMap = {
+  list: List,
+  user: User,
+  wrench: Wrench,
+  "file-text": FileText,
+  layout: Layout,
+  "check-square": CheckSquare,
+  settings: Settings,
+  globe: Globe,
+  calendar: Calendar
+};
+
+export const DynamicMenu: React.FC<DynamicMenuProps> = ({ options, className }) => {
   return (
-    <ScrollArea className={cn("h-full w-full", className)}>
-      <div className="space-y-2 p-2">
-        {options.map((option) => {
-          const Icon = option.icon ? iconMap[option.icon] : undefined
-          return (
-            <Button
-              key={option.id}
-              variant="ghost"
-              className="w-full justify-start gap-2 bg-accent/50 hover:bg-accent/70"
-              onClick={option.onClick}
-            >
-              {Icon && <Icon className="h-4 w-4" />}
-              <span>{option.label}</span>
-            </Button>
-          )
-        })}
-      </div>
-    </ScrollArea>
-  )
-}
+    <nav className={cn("flex flex-col space-y-1", className)}>
+      {options.map((option) => {
+        const Icon = iconMap[option.icon];
+        return (
+          <button
+            key={option.name}
+            onClick={option.onClick}
+            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg hover:bg-accent hover:text-accent-foreground"
+          >
+            <Icon className="w-4 h-4" />
+            {option.name}
+          </button>
+        );
+      })}
+    </nav>
+  );
+};

@@ -1,48 +1,49 @@
-import { MenuOption } from "@/components/ui/dynamic-menu";
+import { MenuOption } from "../ui/dynamic-menu";
 
-export const getMenuOptions = (setActiveTab: (value: string) => void): MenuOption[] => {
-  return [
-    {
-      label: "Scope of Work",
-      id: "scope",
-      icon: "list",
-      onClick: () => setActiveTab("scope"),
-    },
-    {
-      label: "Labor",
-      id: "labor",
-      icon: "user",
-      onClick: () => setActiveTab("labor"),
-    },
-    {
-      label: "Equipment",
-      id: "equipment",
-      icon: "wrench",
-      onClick: () => setActiveTab("equipment"),
-    },
-    {
-      label: "On-Costs",
-      id: "oncosts",
-      icon: "dollar-sign",
-      onClick: () => setActiveTab("oncosts"),
-    },
-    {
-      label: "Contract",
-      id: "contract",
-      icon: "file-text",
-      onClick: () => setActiveTab("contract"),
-    },
-    {
-      label: "Overview",
-      id: "overview",
-      icon: "layout",
-      onClick: () => setActiveTab("overview"),
-    },
-    {
-      label: "Task Management",
-      id: "tasks",
-      icon: "check-square",
-      onClick: () => setActiveTab("tasks"),
-    },
-  ];
-};
+export const getMenuOptions = (setTab: (tab: string) => void): MenuOption[] => [
+  {
+    name: "Scope of Work",
+    icon: "list",
+    onClick: () => setTab("scope")
+  },
+  {
+    name: "Labor",
+    icon: "user",
+    onClick: () => setTab("labor")
+  },
+  {
+    name: "Equipment",
+    icon: "wrench",
+    onClick: () => setTab("equipment")
+  },
+  {
+    name: "Contract",
+    icon: "file-text",
+    onClick: () => setTab("contract")
+  },
+  {
+    name: "Roster",
+    icon: "calendar",
+    onClick: () => setTab("roster")
+  },
+  {
+    name: "Summary",
+    icon: "layout",
+    onClick: () => setTab("summary")
+  },
+  {
+    name: "Tasks",
+    icon: "check-square",
+    onClick: () => setTab("tasks")
+  },
+  {
+    name: "Settings",
+    icon: "settings",
+    onClick: () => setTab("settings")
+  },
+  {
+    name: "Overview",
+    icon: "globe",
+    onClick: () => setTab("overview")
+  }
+];
