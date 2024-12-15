@@ -94,7 +94,7 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
       onDeleteSite={removeSite}
       onUpdateSiteName={updateSiteName}
       onUpdateSiteAddress={updateSiteAddress}
-      onUpdateSiteArea={onUpdateSiteArea}
+      onUpdateSiteArea={updateSiteArea}
     />
   );
 };
