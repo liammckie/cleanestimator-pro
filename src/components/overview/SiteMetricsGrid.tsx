@@ -1,21 +1,24 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
-import { Building, Clock, CalendarDays, BarChart2, Users } from "lucide-react";
+import { Building, Clock, CalendarDays, BarChart2 } from "lucide-react";
+import { Site } from '@/data/types/site';
 
 interface SiteMetricsGridProps {
-  sites: Array<any>;
+  sites: Site[];
 }
 
-export const SiteMetricsGrid: React.FC<SiteMetricsGridProps> = ({ sites }) => {
-  const totalArea = sites.reduce((sum, site) => sum + site.area.squareMeters, 0);
-  const totalTasks = sites.reduce((sum, site) => sum + site.area.selectedTasks.length, 0);
-  const totalMonthlyTime = sites.reduce((sum, site) => sum + site.area.totalTime, 0);
+export const SiteMetricsGrid: React.FC<SiteMetricsGridProps> = ({ sites = [] }) => {
+  const validSites = Array.isArray(sites) ? sites : [];
+  
+  const totalArea = validSites.reduce((sum, site) => sum + (site?.area?.squareMeters || 0), 0);
+  const totalTasks = validSites.reduce((sum, site) => sum + (site?.area?.selectedTasks?.length || 0), 0);
+  const totalMonthlyTime = validSites.reduce((sum, site) => sum + (site?.area?.totalTime || 0), 0);
   const weeklyHours = totalMonthlyTime / 4.33;
 
   const metrics = [
     {
       label: 'Total Sites',
-      value: sites.length,
+      value: validSites.length,
       icon: Building,
       suffix: 'sites'
     },
