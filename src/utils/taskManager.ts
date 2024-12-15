@@ -1,4 +1,4 @@
-import { ProductivityRate, TaskSelection, Category } from '../types/productivity';
+import { ProductivityRate, TaskSelection, Category } from '../data/types/productivity';
 import { cleaningCategories } from '../data/categories/cleaningCategories';
 
 export const findTaskById = (taskId: string): ProductivityRate | undefined => {

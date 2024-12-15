@@ -24,16 +24,19 @@ class RatesManager {
 
   private initializeRates() {
     try {
-      // Initialize rates by category with proper error handling
       const initializeCategory = (category: string, rates: ProductivityRate[]) => {
         if (Array.isArray(rates)) {
-          this.ratesCache.set(category, rates);
+          this.ratesCache.set(category, rates.map(rate => ({
+            ...rate,
+            subcategory: rate.subcategory || rate.category // Ensure subcategory exists
+          })));
         } else {
           console.warn(`Invalid rates format for category: ${category}`);
           this.ratesCache.set(category, []);
         }
       };
 
+      // Initialize each category with proper type checking
       initializeCategory('carpet-maintenance', [
         ...(Array.isArray(carpetMaintenanceRates.spotting) ? carpetMaintenanceRates.spotting : []),
         ...(Array.isArray(carpetMaintenanceRates.vacuum) ? carpetMaintenanceRates.vacuum : []),
@@ -68,7 +71,6 @@ class RatesManager {
       initializeCategory('bundles', Array.isArray(bundledRates) ? bundledRates : []);
     } catch (error) {
       console.error('Error initializing rates:', error);
-      // Ensure the cache is initialized even if there's an error
       this.ratesCache = new Map();
     }
   }
