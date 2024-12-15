@@ -83,9 +83,9 @@ CommandEmpty.displayName = CommandPrimitive.Empty.displayName
 const CommandGroup = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Group>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
->(({ className, ...props }, ref) => {
-  // Ensure children prop exists and is not undefined before rendering
-  if (!props.children) {
+>(({ className, children, ...props }, ref) => {
+  // Return null if children is undefined or empty
+  if (!children || (Array.isArray(children) && children.length === 0)) {
     return null;
   }
 
@@ -97,8 +97,10 @@ const CommandGroup = React.forwardRef<
         className
       )}
       {...props}
-    />
-  );
+    >
+      {children}
+    </CommandPrimitive.Group>
+  )
 })
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName
