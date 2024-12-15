@@ -3,6 +3,7 @@ import { getRateById } from '@/data/rates/ratesManager';
 export interface TaskProductivity {
   baseRate: number;
   adjustedRate: number;
+  timeRequired: number;
   factors: {
     toolEfficiency: number;
     areaSize: number;
@@ -62,6 +63,7 @@ export const calculateTaskProductivity = (
   return {
     baseRate,
     adjustedRate,
+    timeRequired: quantity / adjustedRate,
     factors: {
       toolEfficiency,
       areaSize: areaSizeFactor,

@@ -75,14 +75,14 @@ export const TaskProvider: React.FC<{
     setSelectedTasks(prev => {
       const updated = prev.map(task => {
         if (task.taskId === taskId) {
-          const timeRequired = calculateTaskProductivity(
+          const productivity = calculateTaskProductivity(
             taskId,
             quantity,
             task.selectedTool,
             task.frequency,
             quantity
-          )?.timeRequired || 0;
-          return { ...task, quantity, timeRequired };
+          );
+          return { ...task, quantity, timeRequired: productivity?.timeRequired || 0 };
         }
         return task;
       });
@@ -99,14 +99,14 @@ export const TaskProvider: React.FC<{
             timesPerWeek,
             timesPerMonth: timesPerWeek * 4
           };
-          const timeRequired = calculateTaskProductivity(
+          const productivity = calculateTaskProductivity(
             taskId,
             task.quantity,
             task.selectedTool,
             frequency,
             task.quantity
-          )?.timeRequired || 0;
-          return { ...task, frequency, timeRequired };
+          );
+          return { ...task, frequency, timeRequired: productivity?.timeRequired || 0 };
         }
         return task;
       });
@@ -119,15 +119,14 @@ export const TaskProvider: React.FC<{
     setSelectedTasks(prev => {
       const updated = prev.map(task => {
         if (task.taskId === taskId) {
-          const timeRequired = calculateTaskProductivity(
+          const productivity = calculateTaskProductivity(
             taskId,
             task.quantity,
             task.selectedTool,
             task.frequency,
-            task.quantity,
-            override
-          )?.timeRequired || 0;
-          return { ...task, productivityOverride: override, timeRequired };
+            task.quantity
+          );
+          return { ...task, productivityOverride: override, timeRequired: productivity?.timeRequired || 0 };
         }
         return task;
       });
@@ -140,15 +139,14 @@ export const TaskProvider: React.FC<{
     setSelectedTasks(prev => {
       const updated = prev.map(task => {
         if (task.taskId === taskId) {
-          const timeRequired = calculateTaskProductivity(
+          const productivity = calculateTaskProductivity(
             taskId,
             task.quantity,
             tool,
             task.frequency,
-            task.quantity,
-            task.productivityOverride
-          )?.timeRequired || 0;
-          return { ...task, selectedTool: tool, timeRequired };
+            task.quantity
+          );
+          return { ...task, selectedTool: tool, timeRequired: productivity?.timeRequired || 0 };
         }
         return task;
       });
