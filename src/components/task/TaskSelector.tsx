@@ -35,10 +35,10 @@ export const TaskSelector: React.FC<TaskSelectorProps> = ({
         onValueChange={setSearchQuery}
       />
       <CommandEmpty>No tasks found.</CommandEmpty>
-      {cleaningTaskGroups.map(group => (
+      {cleaningTaskGroups?.map(group => (
         <CommandGroup key={group.id} heading={group.name}>
-          {group.categories.map(category => (
-            category.tasks.map((task) => (
+          {group.categories?.map(category => (
+            category.tasks?.map((task) => (
               <CommandItem
                 key={task.id}
                 value={task.name}
@@ -57,10 +57,10 @@ export const TaskSelector: React.FC<TaskSelectorProps> = ({
                   </span>
                 </div>
               </CommandItem>
-            ))
-          ))}
+            )) || []
+          )) || []}
         </CommandGroup>
-      ))}
+      )) || []}
     </Command>
   );
 };
