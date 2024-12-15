@@ -9,6 +9,7 @@ import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskStack } from '@/components/task/TaskStack';
 import { TaskProvider } from '@/components/area/task/TaskContext';
+import { TaskManagementPage } from '@/components/task-management/TaskManagementPage';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 

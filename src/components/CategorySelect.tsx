@@ -22,6 +22,15 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Transform TaskGroup[] to CategoryGroup[] format
+  const transformedGroups = groups.map(group => ({
+    name: group.name,
+    categories: group.categories.map(category => ({
+      name: category.name,
+      subcategories: category.subcategories.map(sub => sub.name)
+    }))
+  }));
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -43,7 +52,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
             onValueChange={setSearchQuery}
           />
           <CategoryList
-            groups={groups}
+            groups={transformedGroups}
             selectedValue={value}
             searchQuery={searchQuery}
             onSelect={(category) => {
