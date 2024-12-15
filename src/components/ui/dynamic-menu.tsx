@@ -2,12 +2,25 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Menu, Grid, Settings, List, Globe } from "lucide-react"
+import { 
+  Menu, 
+  Grid, 
+  Settings, 
+  List, 
+  Globe,
+  User,
+  Tool,
+  DollarSign,
+  FileText,
+  Layout,
+  CheckSquare 
+} from "lucide-react"
 
 export interface MenuOption {
   id: string
   label: string
-  icon?: "menu" | "grid" | "settings" | "list" | "globe"
+  icon?: "menu" | "grid" | "settings" | "list" | "globe" | "user" | "tool" | 
+        "dollar-sign" | "file-text" | "layout" | "check-square"
   onClick?: () => void
 }
 
@@ -17,6 +30,12 @@ const iconMap = {
   settings: Settings,
   list: List,
   globe: Globe,
+  user: User,
+  tool: Tool,
+  "dollar-sign": DollarSign,
+  "file-text": FileText,
+  layout: Layout,
+  "check-square": CheckSquare
 }
 
 interface DynamicMenuProps {
