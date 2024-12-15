@@ -9,7 +9,7 @@ import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskProvider } from '@/components/area/task/TaskContext';
 import { AreaContainer } from '@/components/area/AreaContainer';
-import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
+import { ScopeOfWork } from '@/components/scope/ScopeOfWork';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -90,7 +90,7 @@ const Index = () => {
                 </h1>
                 
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                  <div className="grid grid-cols-[250px,auto,250px] gap-6">
+                  <div className="grid grid-cols-[250px,1fr] gap-6">
                     <DynamicMenu 
                       options={formattedMenuOptions} 
                       className="bg-card rounded-lg border border-border"
@@ -99,11 +99,16 @@ const Index = () => {
                       <MainNavigation />
                       {renderContent()}
                     </div>
-                    <ScopeOfWorkSidebar selectedTasks={selectedTasks} sites={sites} />
                   </div>
                 </Tabs>
               </div>
             </div>
+            <ScopeOfWork sites={sites} onUpdateSite={(siteId, tasks) => {
+              const updatedSites = sites.map(site => 
+                site.id === siteId ? { ...site, area: { ...site.area, selectedTasks: tasks } } : site
+              );
+              setSites(updatedSites);
+            }} />
           </div>
         </TaskProvider>
       </SidebarProvider>

@@ -21,11 +21,11 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
   }, []);
 
   return (
-    <div className="grid grid-cols-[1fr,auto]">
+    <div className="fixed right-0 top-0 h-screen w-96 border-l bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 overflow-y-auto">
       <div className="p-6">
-        <CategoryList groups={taskGroups} />
+        <h2 className="text-lg font-semibold mb-4">Selected Tasks</h2>
+        <TaskStack />
       </div>
-      <TaskStack />
     </div>
   );
 };
