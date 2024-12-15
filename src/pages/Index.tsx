@@ -9,7 +9,7 @@ import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskProvider } from '@/components/area/task/TaskContext';
 import { TaskManagementPage } from '@/components/task-management/TaskManagementPage';
-import { TaskStack } from '@/components/task/TaskStack';
+import { ScopeAndTaskPage } from '@/components/scope/ScopeAndTaskPage';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -40,12 +40,36 @@ const Index = () => {
     console.log('Tasks changed:', tasks);
   };
 
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'tasks':
+        return <TaskManagementPage />;
+      case 'scope':
+        return <ScopeAndTaskPage sites={sites} />;
+      default:
+        return (
+          <MainContent
+            sites={sites}
+            onSitesChange={setSites}
+            laborCosts={laborCosts}
+            setLaborCosts={setLaborCosts}
+            equipmentCosts={equipmentCosts}
+            setEquipmentCosts={setEquipmentCosts}
+            contractDetails={contractDetails}
+            setContractDetails={setContractDetails}
+            costBreakdown={costBreakdown}
+            monthlyRevenue={monthlyRevenue}
+            overhead={overhead}
+          />
+        );
+    }
+  };
+
   return (
     <SettingsProvider>
       <SidebarProvider>
         <TaskProvider onTasksChange={handleTasksChange}>
           <div className="min-h-screen flex w-full bg-background">
-            <TaskStack />
             <div className="flex-1">
               <div className="container mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold text-primary mb-8">
@@ -60,23 +84,7 @@ const Index = () => {
                     />
                     <div className="space-y-6">
                       <MainNavigation />
-                      {activeTab === 'tasks' ? (
-                        <TaskManagementPage />
-                      ) : (
-                        <MainContent
-                          sites={sites}
-                          onSitesChange={setSites}
-                          laborCosts={laborCosts}
-                          setLaborCosts={setLaborCosts}
-                          equipmentCosts={equipmentCosts}
-                          setEquipmentCosts={setEquipmentCosts}
-                          contractDetails={contractDetails}
-                          setContractDetails={setContractDetails}
-                          costBreakdown={costBreakdown}
-                          monthlyRevenue={monthlyRevenue}
-                          overhead={overhead}
-                        />
-                      )}
+                      {renderContent()}
                     </div>
                   </div>
                 </Tabs>

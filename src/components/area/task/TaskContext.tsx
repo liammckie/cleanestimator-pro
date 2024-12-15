@@ -13,7 +13,10 @@ interface TaskContextType {
     };
     productivityOverride?: number;
     selectedTool?: string;
+    siteName?: string;
   }>;
+  selectedSite: string;
+  setSelectedSite: (siteId: string) => void;
   handleTaskSelection: (taskId: string, isSelected: boolean) => void;
   handleQuantityChange: (taskId: string, quantity: number) => void;
   handleFrequencyChange: (taskId: string, timesPerWeek: number) => void;
@@ -36,6 +39,7 @@ export const TaskProvider: React.FC<{
   onTasksChange: (tasks: TaskContextType['selectedTasks']) => void;
 }> = ({ children, onTasksChange }) => {
   const [selectedTasks, setSelectedTasks] = useState<TaskContextType['selectedTasks']>([]);
+  const [selectedSite, setSelectedSite] = useState<string>('');
 
   const calculateTimeRequired = useCallback((
     taskId: string, 
@@ -88,7 +92,8 @@ export const TaskProvider: React.FC<{
           timesPerWeek: 1,
           timesPerMonth: 4
         },
-        selectedTool: rate.tool // Use default tool from rate
+        selectedTool: rate.tool,
+        siteName: selectedSite
       };
 
       const updatedTasks = [...selectedTasks, newTask];
@@ -99,7 +104,7 @@ export const TaskProvider: React.FC<{
       setSelectedTasks(updatedTasks);
       onTasksChange(updatedTasks);
     }
-  }, [selectedTasks, onTasksChange]);
+  }, [selectedTasks, onTasksChange, selectedSite]);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
     const updatedTasks = selectedTasks.map(task => {
@@ -180,6 +185,8 @@ export const TaskProvider: React.FC<{
   return (
     <TaskContext.Provider value={{
       selectedTasks,
+      selectedSite,
+      setSelectedSite,
       handleTaskSelection,
       handleQuantityChange,
       handleFrequencyChange,
