@@ -67,7 +67,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children, onTasksCha
         if (!validateTaskData(task, quantity)) return task;
         
         const timeRequired = calculateTaskTime(
-          task.taskId,
+          taskId,
           quantity,
           task.selectedTool,
           task.frequency
@@ -92,7 +92,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children, onTasksCha
         };
         
         const timeRequired = calculateTaskTime(
-          task.taskId,
+          taskId,
           task.quantity,
           task.selectedTool,
           frequency
@@ -124,7 +124,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children, onTasksCha
     setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
         const timeRequired = calculateTaskTime(
-          task.taskId,
+          taskId,
           task.quantity,
           tool,
           task.frequency
