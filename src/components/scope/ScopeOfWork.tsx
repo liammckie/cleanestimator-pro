@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useTaskContext } from '../area/task/TaskContext';
 import { ToolSelect } from '../ToolSelect';
@@ -110,21 +110,18 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
                       </div>
 
                       {productivity && (
-                        <div className="mt-4 bg-accent/50 p-4 rounded-lg">
-                          <h4 className="font-medium mb-2">Time Requirements</h4>
-                          <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Time per service:</span>
-                              <p>{(productivity.timeRequired * 60).toFixed(1)} minutes</p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Monthly hours:</span>
-                              <p>{(productivity.timeRequired * selectedTask.frequency.timesPerMonth).toFixed(1)} hours</p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Productivity rate:</span>
-                              <p>{productivity.adjustedRate.toFixed(2)} {taskDetails.unit}/hour</p>
-                            </div>
+                        <div className="mt-4 grid grid-cols-3 gap-4 bg-accent/50 p-4 rounded-lg">
+                          <div>
+                            <span className="text-sm text-muted-foreground">Time per service:</span>
+                            <p className="font-medium">{(productivity.timeRequired * 60).toFixed(1)} minutes</p>
+                          </div>
+                          <div>
+                            <span className="text-sm text-muted-foreground">Monthly hours:</span>
+                            <p className="font-medium">{(productivity.timeRequired * selectedTask.frequency.timesPerMonth).toFixed(1)} hours</p>
+                          </div>
+                          <div>
+                            <span className="text-sm text-muted-foreground">Productivity rate:</span>
+                            <p className="font-medium">{productivity.adjustedRate.toFixed(2)} {taskDetails.unit}/hour</p>
                           </div>
                         </div>
                       )}
