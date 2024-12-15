@@ -1,7 +1,7 @@
 import { TaskGroup } from '../types/cleaning';
 import { coreCleaning } from './categories/coreCleaning';
 import { specializedCleaning } from './categories/specializedCleaning';
-import { industrySpecificCleaning } from './categories/industrySpecific';
+import { industrySpecific } from './categories/industrySpecific';
 
 export const cleaningTasks: TaskGroup[] = [
   {
@@ -11,7 +11,7 @@ export const cleaningTasks: TaskGroup[] = [
     categories: [
       coreCleaning,
       specializedCleaning,
-      industrySpecificCleaning
+      industrySpecific
     ]
   }
 ];
