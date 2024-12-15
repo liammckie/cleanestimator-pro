@@ -9,6 +9,7 @@ import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskStack } from '@/components/task/TaskStack';
 import { TaskProvider } from '@/components/area/task/TaskContext';
+import { TaskManagementPage } from '@/components/task-management/TaskManagementPage';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -60,19 +61,23 @@ const Index = () => {
                     />
                     <div className="space-y-6">
                       <MainNavigation />
-                      <MainContent
-                        sites={sites}
-                        onSitesChange={setSites}
-                        laborCosts={laborCosts}
-                        setLaborCosts={setLaborCosts}
-                        equipmentCosts={equipmentCosts}
-                        setEquipmentCosts={setEquipmentCosts}
-                        contractDetails={contractDetails}
-                        setContractDetails={setContractDetails}
-                        costBreakdown={costBreakdown}
-                        monthlyRevenue={monthlyRevenue}
-                        overhead={overhead}
-                      />
+                      {activeTab === 'tasks' ? (
+                        <TaskManagementPage />
+                      ) : (
+                        <MainContent
+                          sites={sites}
+                          onSitesChange={setSites}
+                          laborCosts={laborCosts}
+                          setLaborCosts={setLaborCosts}
+                          equipmentCosts={equipmentCosts}
+                          setEquipmentCosts={setEquipmentCosts}
+                          contractDetails={contractDetails}
+                          setContractDetails={setContractDetails}
+                          costBreakdown={costBreakdown}
+                          monthlyRevenue={monthlyRevenue}
+                          overhead={overhead}
+                        />
+                      )}
                     </div>
                   </div>
                 </Tabs>

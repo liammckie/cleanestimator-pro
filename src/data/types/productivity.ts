@@ -62,3 +62,12 @@ export interface Category {
     }>;
   }[];
 }
+
+export interface Task {
+  id: string;
+  category: string;
+  name: string;
+  productivityRate: number;
+  unit: string;
+  notes: string;
+}
