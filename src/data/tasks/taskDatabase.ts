@@ -1,56 +1,37 @@
-import { CleaningTask } from '../types/tasks';
+import { TaskGroup } from '../types/cleaning';
+import { coreCleaning } from './coreCleaning';
+import { specializedCleaning } from './specializedCleaning';
+import { industrySpecificCleaning } from './industrySpecificCleaning';
 
-export const cleaningTasks: CleaningTask[] = [
-  // Core Cleaning Tasks
+export const taskGroups: TaskGroup[] = [
   {
-    id: 'vacuum-standard',
-    category: 'Core Cleaning',
-    taskName: 'Vacuuming',
-    productivityRate: 400,
-    measurementUnit: 'SQM/hour',
-    notes: 'Standard carpet vacuuming',
-    defaultTool: 'Vacuum Cleaner'
-  },
-  {
-    id: 'toilet-cleaning',
-    category: 'Core Cleaning',
-    taskName: 'Toilet Cleaning',
-    productivityRate: 50,
-    measurementUnit: 'SQM/hour',
-    notes: 'Includes disinfecting and wiping',
-    defaultTool: 'Cleaning Kit'
-  },
-  // ... Add all other core cleaning tasks
-
-  // Specialized Cleaning Tasks
-  {
-    id: 'snow-removal',
-    category: 'Specialized Cleaning',
-    taskName: 'Snow Removal',
-    productivityRate: 150,
-    measurementUnit: 'SQM/hour',
-    notes: 'Seasonal task for exteriors',
-    defaultTool: 'Snow Equipment'
-  },
-  // ... Add all other specialized cleaning tasks
-
-  // Industry-Specific Tasks
-  {
-    id: 'infection-control',
-    category: 'Industry-Specific',
-    taskName: 'Infection Control',
-    productivityRate: 80,
-    measurementUnit: 'SQM/hour',
-    notes: 'Healthcare-specific sanitization',
-    defaultTool: 'Medical Grade Equipment'
-  },
-  // ... Add all other industry-specific tasks
+    id: 'cleaning-tasks',
+    name: 'Cleaning Tasks',
+    description: 'All cleaning task categories',
+    categories: [
+      coreCleaning,
+      specializedCleaning,
+      industrySpecificCleaning
+    ]
+  }
 ];
 
-export const getTasksByCategory = (category: string) => {
-  return cleaningTasks.filter(task => task.category === category);
+export const getAllTasks = () => {
+  return taskGroups.flatMap(group => 
+    group.categories.flatMap(category => 
+      category.tasks
+    )
+  );
+};
+
+export const getTasksByCategory = (categoryId: string) => {
+  const category = taskGroups
+    .flatMap(group => group.categories)
+    .find(cat => cat.id === categoryId);
+  
+  return category?.tasks || [];
 };
 
 export const getTaskById = (taskId: string) => {
-  return cleaningTasks.find(task => task.id === taskId);
+  return getAllTasks().find(task => task.id === taskId);
 };
