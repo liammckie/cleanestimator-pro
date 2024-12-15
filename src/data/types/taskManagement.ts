@@ -7,6 +7,7 @@ export interface CleaningTask {
   productivityRate: number;
   measurementUnit: 'SQM/hour' | 'Units/hour';
   notes?: string;
+  defaultTool?: string;
 }
 
 export interface TaskState {
