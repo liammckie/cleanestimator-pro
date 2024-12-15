@@ -81,15 +81,17 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
                 />
                 
                 <TaskList
-                  tasks={siteTasks}
+                  selectedTasks={siteTasks}
                   onQuantityChange={(taskId, quantity) => {
                     console.log('Updating quantity:', taskId, quantity);
                   }}
                   onFrequencyChange={(taskId, freq) => {
                     console.log('Updating frequency:', taskId, freq);
                   }}
-                  onRemoveTask={(taskId) => handleRemoveTask(taskId)}
-                  getTaskName={(taskId) => taskId}
+                  onToolChange={(taskId, tool) => {
+                    console.log('Updating tool:', taskId, tool);
+                  }}
+                  onRemoveTask={handleRemoveTask}
                 />
               </div>
             );
