@@ -11,12 +11,12 @@ import { toast } from '@/components/ui/use-toast';
  */
 export const useTaskModifiers = (
   selectedTasks: SelectedTask[],
-  setSelectedTasks: (tasks: SelectedTask[]) => void,
+  setSelectedTasks: (tasks: SelectedTask[] | ((prev: SelectedTask[]) => SelectedTask[])) => void,
   calculateTaskTime: any
 ) => {
   // Handle tool changes
   const handleToolChange = useCallback((taskId: string, tool: string) => {
-    setSelectedTasks(prev => prev.map(task => {
+    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
       if (task.taskId === taskId) {
         const timeRequired = calculateTaskTime(
           taskId,
@@ -37,7 +37,7 @@ export const useTaskModifiers = (
 
   // Handle labor rate changes
   const handleLaborRateChange = useCallback((taskId: string, rate: number) => {
-    setSelectedTasks(prev => prev.map(task => {
+    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
       if (task.taskId === taskId) {
         return {
           ...task,
@@ -50,7 +50,7 @@ export const useTaskModifiers = (
 
   // Handle productivity override
   const handleProductivityOverride = useCallback((taskId: string, override: number) => {
-    setSelectedTasks(prev => prev.map(task => {
+    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
       if (task.taskId === taskId) {
         const timeRequired = calculateTaskTime(
           taskId,
