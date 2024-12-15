@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { getProductivityRate } from '@/data/productivityRates';
 
 interface ProfitLossProps {
   revenue: number;
@@ -10,6 +11,16 @@ interface ProfitLossProps {
   equipmentCost: number;
   overhead: number;
   totalLaborHours: number;
+  selectedTasks?: Array<{
+    taskId: string;
+    quantity: number;
+    timeRequired: number;
+    frequency: {
+      timesPerWeek: number;
+      timesPerMonth: number;
+    };
+    siteName?: string;
+  }>;
   onMarginChange?: (margin: number) => void;
 }
 
@@ -19,6 +30,7 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
   equipmentCost,
   overhead,
   totalLaborHours,
+  selectedTasks = [],
   onMarginChange
 }) => {
   const [targetMargin, setTargetMargin] = useState(15);
@@ -38,6 +50,11 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
     if (onMarginChange) {
       onMarginChange(newMargin);
     }
+  };
+
+  const getTaskName = (taskId: string) => {
+    const rate = getProductivityRate(taskId);
+    return rate?.task || 'Unknown Task';
   };
 
   return (
@@ -76,6 +93,21 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
                 <span className="text-sm text-muted-foreground">Total Labor Hours</span>
                 <span>{totalLaborHours.toFixed(1)} hours</span>
               </div>
+              
+              {/* Task Breakdown */}
+              <div className="pl-4 space-y-1">
+                {selectedTasks.map((task, index) => (
+                  <div key={index} className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">
+                      {getTaskName(task.taskId)} ({task.timeRequired.toFixed(1)} hrs)
+                    </span>
+                    <span className="text-muted-foreground">
+                      ${(task.timeRequired * effectiveHourlyRate).toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Labor Cost (${effectiveHourlyRate.toFixed(2)}/hr)</span>
                 <span className="text-red-600">-${laborCost.toFixed(2)}</span>

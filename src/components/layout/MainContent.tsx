@@ -52,6 +52,16 @@ export const MainContent: React.FC<MainContentProps> = ({
     }, 0);
   };
 
+  const getAllSelectedTasks = () => {
+    return sites.reduce((allTasks: any[], site) => {
+      const siteTasks = site.area?.selectedTasks || [];
+      return [...allTasks, ...siteTasks.map(task => ({
+        ...task,
+        siteName: site.name
+      }))];
+    }, []);
+  };
+
   const handleAwardIncreaseChange = (increase: number) => {
     setAwardIncrease(increase);
     if (laborCosts.employmentType === 'direct') {
@@ -76,6 +86,7 @@ export const MainContent: React.FC<MainContentProps> = ({
   };
 
   const totalMonthlyHours = calculateTotalMonthlyHours();
+  const allSelectedTasks = getAllSelectedTasks();
 
   return (
     <>
@@ -126,6 +137,7 @@ export const MainContent: React.FC<MainContentProps> = ({
           equipmentCost={equipmentCosts.monthly}
           overhead={overhead}
           totalLaborHours={totalMonthlyHours}
+          selectedTasks={allSelectedTasks}
           onMarginChange={handleMarginChange}
         />
       </TabsContent>
