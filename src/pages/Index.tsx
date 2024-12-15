@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { getTaskGroups } from '@/data/rates/ratesManager';
 import { CategoryList } from '@/components/CategoryList';
 import { TaskStack } from '@/components/task/TaskStack';
+import { Tabs } from '@/components/ui/tabs';
 
 const Index = () => {
   const taskGroups = getTaskGroups();
@@ -30,15 +31,17 @@ const Index = () => {
   return (
     <TaskProvider onTasksChange={handleTasksChange}>
       <div className="min-h-screen">
-        <MainNavigation />
-        <div className="container mx-auto py-8">
-          <div className="flex gap-6">
-            <div className="flex-1">
-              <CategoryList groups={taskGroups} />
+        <Tabs defaultValue="sites">
+          <MainNavigation />
+          <div className="container mx-auto py-8">
+            <div className="flex gap-6">
+              <div className="flex-1">
+                <CategoryList groups={taskGroups} />
+              </div>
+              <TaskStack />
             </div>
-            <TaskStack />
           </div>
-        </div>
+        </Tabs>
         <Toaster />
       </div>
     </TaskProvider>
