@@ -56,7 +56,9 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h3 className="font-medium">{taskDetails.task}</h3>
-                          <p className="text-sm text-muted-foreground">{selectedTask.siteName}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {selectedTask.siteName} - Base Rate: {taskDetails.ratePerHour} {taskDetails.unit}/hour
+                          </p>
                         </div>
                         <Button
                           variant="ghost"
@@ -121,7 +123,7 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
                             </div>
                             <div>
                               <span className="text-muted-foreground">Productivity rate:</span>
-                              <p>{productivity.adjustedRate.toFixed(2)} {taskDetails.unit}</p>
+                              <p>{productivity.adjustedRate.toFixed(2)} {taskDetails.unit}/hour</p>
                             </div>
                           </div>
                         </div>
