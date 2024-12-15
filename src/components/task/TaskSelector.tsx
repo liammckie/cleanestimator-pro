@@ -27,6 +27,48 @@ export const TaskSelector: React.FC<TaskSelectorProps> = ({
     );
   }, [searchQuery]);
 
+  // Ensure we have valid task groups
+  const taskGroups = React.useMemo(() => {
+    return cleaningTaskGroups || [];
+  }, []);
+
+  // If we're searching, show filtered tasks
+  if (searchQuery) {
+    return (
+      <Command className="rounded-lg border shadow-md">
+        <CommandInput 
+          placeholder="Search tasks..." 
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
+        <CommandEmpty>No tasks found.</CommandEmpty>
+        <CommandGroup heading="Search Results">
+          {filteredTasks.map((task) => (
+            <CommandItem
+              key={task.id}
+              value={task.name}
+              onSelect={() => onTaskSelect(task.id)}
+            >
+              <Check
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  selectedTasks.includes(task.id) ? "opacity-100" : "opacity-0"
+                )}
+              />
+              <div className="flex flex-col">
+                <span>{task.name}</span>
+                <span className="text-sm text-muted-foreground">
+                  {task.rate} {task.unit}
+                </span>
+              </div>
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </Command>
+    );
+  }
+
+  // Show categorized view when not searching
   return (
     <Command className="rounded-lg border shadow-md">
       <CommandInput 
@@ -35,10 +77,10 @@ export const TaskSelector: React.FC<TaskSelectorProps> = ({
         onValueChange={setSearchQuery}
       />
       <CommandEmpty>No tasks found.</CommandEmpty>
-      {cleaningTaskGroups?.map(group => (
+      {taskGroups.map(group => (
         <CommandGroup key={group.id} heading={group.name}>
-          {group.categories?.map(category => (
-            category.tasks?.map((task) => (
+          {(group.categories || []).map(category => (
+            (category.tasks || []).map((task) => (
               <CommandItem
                 key={task.id}
                 value={task.name}
@@ -57,10 +99,10 @@ export const TaskSelector: React.FC<TaskSelectorProps> = ({
                   </span>
                 </div>
               </CommandItem>
-            )) || []
-          )) || []}
+            ))
+          ))}
         </CommandGroup>
-      )) || []}
+      ))}
     </Command>
   );
 };
