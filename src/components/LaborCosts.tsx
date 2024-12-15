@@ -11,26 +11,6 @@ import { AwardIncreaseManager } from './labor/AwardIncreaseManager';
 import { useTaskContext } from './area/task/TaskContext';
 import { useCostContext } from '@/contexts/CostContext';
 
-interface LaborCostsProps {
-  onLaborCostChange: (costs: { 
-    hourlyRate: number;
-    employmentType: 'contracted' | 'direct';
-    awardLevel?: number;
-    shiftType?: string;
-    onCosts?: OnCostsState;
-  }) => void;
-}
-
-export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => {
-  const { selectedTasks } = useTaskContext();
-  const { laborCosts, updateLaborRate } = useCostContext();
-  const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
-  const [contractedRate, setContractedRate] = useState<number>(38);
-  const [awardLevel, setAwardLevel] = useState<number>(1);
-  const [shiftType, setShiftType] = useState<string>('standard');
-  const [onCosts, setOnCosts] = useState<OnCostsState>(defaultOnCosts);
-  const [awardIncrease, setAwardIncrease] = useState<number>(0);
-
 const defaultOnCosts: OnCostsState = {
   statutoryOnCosts: [
     { name: 'Superannuation Guarantee', rate: 11.5, isEnabled: true, category: 'statutory', isMandatory: true },
@@ -55,6 +35,26 @@ const defaultOnCosts: OnCostsState = {
     { name: 'Administrative Costs', rate: 3, isEnabled: false, category: 'miscellaneous' },
   ],
 };
+
+interface LaborCostsProps {
+  onLaborCostChange: (costs: { 
+    hourlyRate: number;
+    employmentType: 'contracted' | 'direct';
+    awardLevel?: number;
+    shiftType?: string;
+    onCosts?: OnCostsState;
+  }) => void;
+}
+
+export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => {
+  const { selectedTasks } = useTaskContext();
+  const { laborCosts, updateLaborRate } = useCostContext();
+  const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
+  const [contractedRate, setContractedRate] = useState<number>(38);
+  const [awardLevel, setAwardLevel] = useState<number>(1);
+  const [shiftType, setShiftType] = useState<string>('standard');
+  const [onCosts, setOnCosts] = useState<OnCostsState>(defaultOnCosts);
+  const [awardIncrease, setAwardIncrease] = useState<number>(0);
 
   useEffect(() => {
     // Initialize with default contracted rate

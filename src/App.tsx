@@ -22,7 +22,10 @@ function App() {
             overhead={0}
             totalLaborHours={0}
             selectedTasks={[]}
-            onMarginChange={(margin) => console.log(margin)}
+            onMarginChange={(margin) => {
+              console.log(margin);
+              return margin; // Return the margin value instead of void
+            }}
           />
           <FinancialTabs
             laborCosts={{ hourlyRate: 0 }}
@@ -34,7 +37,10 @@ function App() {
             contractDetails={{}}
             setContractDetails={(details) => console.log(details)}
             taskCosts={[]}
-            onMarginChange={(margin) => console.log(margin)}
+            onMarginChange={(margin) => {
+              console.log(margin);
+              return margin; // Return the margin value instead of void
+            }}
           />
           <ScopeOfWorkSidebar selectedTasks={[]} />
           <TaskManagementPage />
