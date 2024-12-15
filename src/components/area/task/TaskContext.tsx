@@ -21,7 +21,6 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
   const { calculateTaskTime } = useTaskTimes();
 
-  // Update area data whenever tasks change
   useEffect(() => {
     if (onTasksChange) {
       const totalTime = selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0);
@@ -173,13 +172,39 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     }));
   }, [calculateTaskTime]);
 
+  const handleProductivityOverride = useCallback((taskId: string, override: number) => {
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        const timeRequired = calculateTaskTime(
+          taskId,
+          task.quantity,
+          task.selectedTool,
+          task.frequency
+        );
+        
+        return {
+          ...task,
+          productivityOverride: override,
+          timeRequired
+        };
+      }
+      return task;
+    }));
+    
+    toast({
+      title: "Productivity Updated",
+      description: "Task productivity rate has been updated."
+    });
+  }, [calculateTaskTime]);
+
   const value = {
     selectedTasks,
     handleTaskSelection,
     handleQuantityChange,
     handleFrequencyChange,
     handleToolChange,
-    handleLaborRateChange
+    handleLaborRateChange,
+    handleProductivityOverride
   };
 
   return (
