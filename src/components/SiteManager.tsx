@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Site } from '@/data/types/site';
 import { v4 as uuidv4 } from 'uuid';
 import { SiteList } from './site/SiteList';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface SiteManagerProps {
   onSitesChange: (sites: Site[]) => void;
@@ -13,6 +15,7 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
       id: uuidv4(),
       name: 'New Site',
       client: '',
+      daysPerWeek: 5,
       address: {
         street: '',
         suburb: '',
@@ -30,11 +33,12 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
   ]);
 
   const addSite = () => {
-    const clientName = sites[0]?.client || ''; // Use the client name from the first site
+    const clientName = sites[0]?.client || '';
     const newSite: Site = {
       id: uuidv4(),
       name: `New Site ${sites.length + 1}`,
       client: clientName,
+      daysPerWeek: 5,
       address: {
         street: '',
         suburb: '',
@@ -71,8 +75,16 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
   const updateSiteClient = (siteId: string, client: string) => {
     const updatedSites = sites.map(site => 
       site.id === siteId ? { ...site, client } : 
-      sites[0].id === siteId ? { ...site, client } : // If it's the first site, update client
-      { ...site, client } // For all other sites, also update client
+      sites[0].id === siteId ? { ...site, client } : 
+      { ...site, client }
+    );
+    setSites(updatedSites);
+    onSitesChange(updatedSites);
+  };
+
+  const updateSiteDaysPerWeek = (siteId: string, daysPerWeek: number) => {
+    const updatedSites = sites.map(site => 
+      site.id === siteId ? { ...site, daysPerWeek } : site
     );
     setSites(updatedSites);
     onSitesChange(updatedSites);
@@ -100,6 +112,7 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
       onUpdateSiteName={updateSiteName}
       onUpdateSiteClient={updateSiteClient}
       onUpdateSiteAddress={updateSiteAddress}
+      onUpdateSiteDaysPerWeek={updateSiteDaysPerWeek}
     />
   );
 };

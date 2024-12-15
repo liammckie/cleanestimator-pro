@@ -2,6 +2,7 @@ export interface Site {
   id: string;
   name: string;
   client: string;
+  daysPerWeek: number;
   address: {
     street: string;
     suburb: string;

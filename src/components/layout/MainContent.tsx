@@ -12,6 +12,7 @@ import { AwardSettings } from '@/components/settings/AwardSettings';
 import { useSettings } from '@/contexts/SettingsContext';
 import { SiteOverview } from '@/components/overview/SiteOverview';
 import { TaskManagementPage } from '@/components/task-management/TaskManagementPage';
+import { ScopeOfWork } from '@/components/scope/ScopeOfWork';
 
 interface MainContentProps {
   sites: any[];
@@ -52,10 +53,21 @@ export const MainContent: React.FC<MainContentProps> = ({
     }
   };
 
+  const handleUpdateSite = (siteId: string, tasks: any[]) => {
+    const updatedSites = sites.map(site => 
+      site.id === siteId ? { ...site, area: { ...site.area, selectedTasks: tasks } } : site
+    );
+    onSitesChange(updatedSites);
+  };
+
   return (
     <>
       <TabsContent value="sites" className="space-y-6">
         <SiteManager onSitesChange={onSitesChange} />
+      </TabsContent>
+
+      <TabsContent value="scope" className="space-y-6">
+        <ScopeOfWork sites={sites} onUpdateSite={handleUpdateSite} />
       </TabsContent>
 
       <TabsContent value="task-management" className="space-y-6">
