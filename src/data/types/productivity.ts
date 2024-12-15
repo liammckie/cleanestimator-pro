@@ -1,18 +1,35 @@
 export interface ProductivityRate {
   id: string;
   category: string;
+  subcategory: string;
   task: string;
   tool: string;
   unit: string;
   ratePerHour: number;
+  defaultQuantity?: number;
+  minimumQuantity?: number;
+  maximumQuantity?: number;
 }
 
-export interface IndustryGroup {
+export interface Category {
+  id: string;
   name: string;
-  categories: string[];
+  subcategories: Subcategory[];
 }
 
-export interface CategoryGroup {
+export interface Subcategory {
+  id: string;
   name: string;
-  rates: ProductivityRate[];
+  tasks: ProductivityRate[];
+}
+
+export interface TaskSelection {
+  taskId: string;
+  quantity: number;
+  frequency: {
+    timesPerWeek: number;
+    timesPerMonth: number;
+  };
+  selectedTool?: string;
+  productivityOverride?: number;
 }
