@@ -22,29 +22,40 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const transformedGroups = (groups || []).map(group => {
-    if (!group?.name || !Array.isArray(group?.categories)) return null;
+  const transformedGroups = React.useMemo(() => {
+    if (!Array.isArray(groups)) return [];
 
-    return {
-      name: group.name,
-      categories: group.categories.map(category => {
-        if (!category?.name || !Array.isArray(category?.subcategories)) return null;
+    return groups.reduce((acc: any[], group) => {
+      if (!group?.name || !Array.isArray(group?.categories)) return acc;
 
-        return {
-          name: category.name,
-          subcategories: category.subcategories.reduce((acc: string[], subcategory) => {
-            if (!subcategory?.tasks) return acc;
+      const transformedGroup = {
+        name: group.name,
+        categories: group.categories.reduce((catAcc: any[], category) => {
+          if (!category?.name || !Array.isArray(category?.subcategories)) return catAcc;
+
+          const tasks = category.subcategories.reduce((taskAcc: string[], subcategory) => {
+            if (!subcategory?.tasks) return taskAcc;
             
             const taskNames = subcategory.tasks
               .filter(task => task && typeof task === 'object' && task.task)
               .map(task => task.task);
               
-            return [...acc, ...taskNames];
-          }, [])
-        };
-      }).filter(Boolean)
-    };
-  }).filter(Boolean);
+            return [...taskAcc, ...taskNames];
+          }, []);
+
+          if (tasks.length === 0) return catAcc;
+
+          return [...catAcc, {
+            name: category.name,
+            subcategories: tasks
+          }];
+        }, [])
+      };
+
+      if (transformedGroup.categories.length === 0) return acc;
+      return [...acc, transformedGroup];
+    }, []);
+  }, [groups]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

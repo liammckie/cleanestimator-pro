@@ -28,20 +28,19 @@ export const CategoryList: React.FC<CategoryListProps> = ({
   const safeGroups = Array.isArray(groups) ? groups : [];
 
   const filterTasks = (tasks: string[]) => {
+    if (!Array.isArray(tasks)) return [];
     return tasks.filter(task => 
       task.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
-  const getCategoryTasks = (categoryName: string) => {
+  const getCategoryTasks = (categoryName: string): string[] => {
     const group = safeGroups.find(g => g.name === categoryName);
     if (!group?.categories) return [];
     
     return group.categories.reduce((acc: string[], category) => {
-      if (category?.subcategories) {
-        return [...acc, ...category.subcategories];
-      }
-      return acc;
+      if (!category?.subcategories) return acc;
+      return [...acc, ...category.subcategories];
     }, []);
   };
 
@@ -50,6 +49,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({
   const industrySpecificTasks = filterTasks(getCategoryTasks('Industry-Specific'));
 
   const renderTaskList = (tasks: string[]) => {
+    if (!Array.isArray(tasks)) return null;
     return tasks.map((task) => (
       <CommandItem
         key={task}
