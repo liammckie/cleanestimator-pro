@@ -1,19 +1,16 @@
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import { SiteManager } from '@/components/SiteManager';
-import { LaborCosts } from '@/components/LaborCosts';
 import { EquipmentCosts } from '@/components/EquipmentCosts';
 import { RosterManager } from '@/components/roster/RosterManager';
-import { ContractData } from '@/components/ContractData';
-import { ContractForecast } from '@/components/ContractForecast';
 import { CostSummary } from '@/components/CostSummary';
-import { ProfitLoss } from '@/components/ProfitLoss';
 import { AwardSettings } from '@/components/settings/AwardSettings';
 import { useSettings } from '@/contexts/SettingsContext';
 import { SiteOverview } from '@/components/overview/SiteOverview';
 import { TaskManagementPage } from '@/components/task-management/TaskManagementPage';
 import { ScopeOfWork } from '@/components/scope/ScopeOfWork';
-import { calculateTaskCosts, calculateTotalMonthlyHours } from '@/utils/costingCalculations';
+import { FinancialTabs } from '@/components/financial/FinancialTabs';
+import { useCostCalculations } from '@/hooks/useCostCalculations';
 
 interface MainContentProps {
   sites: any[];
@@ -43,37 +40,12 @@ export const MainContent: React.FC<MainContentProps> = ({
   overhead,
 }) => {
   const { awardIncrease, setAwardIncrease } = useSettings();
-
-  const handleUpdateSite = (siteId: string, tasks: any[]) => {
-    console.log('Updating site tasks:', { siteId, tasks });
-    const updatedSites = sites.map(site => 
-      site.id === siteId ? {
-        ...site,
-        area: {
-          ...site.area,
-          selectedTasks: tasks,
-          totalTime: tasks.reduce((total, task) => total + (task.timeRequired || 0), 0)
-        }
-      } : site
-    );
-    
-    onSitesChange(updatedSites);
-
-    // Update labor costs
-    const totalMonthlyHours = calculateTotalMonthlyHours(updatedSites);
-    const taskCosts = calculateTaskCosts(updatedSites, laborCosts.hourlyRate, laborCosts.onCosts);
-    
-    setLaborCosts(prev => ({
-      ...prev,
-      totalMonthlyHours,
-      taskCosts
-    }));
-
-    console.log('Updated labor costs:', {
-      totalMonthlyHours,
-      taskCosts
-    });
-  };
+  const { 
+    handleUpdateSite, 
+    handleMarginChange,
+    totalMonthlyHours,
+    taskCosts
+  } = useCostCalculations(sites, laborCosts, setLaborCosts);
 
   const handleAwardIncreaseChange = (increase: number) => {
     setAwardIncrease(increase);
@@ -84,15 +56,6 @@ export const MainContent: React.FC<MainContentProps> = ({
       }));
     }
   };
-
-  const handleMarginChange = (margin: number) => {
-    console.log('Margin changed:', margin);
-    // Update any relevant state or calculations based on the new margin
-    // This could include updating revenue targets or other financial calculations
-  };
-
-  const totalMonthlyHours = calculateTotalMonthlyHours(sites);
-  const taskCosts = calculateTaskCosts(sites, laborCosts.hourlyRate, laborCosts.onCosts);
 
   return (
     <>
@@ -111,13 +74,6 @@ export const MainContent: React.FC<MainContentProps> = ({
         <TaskManagementPage />
       </TabsContent>
 
-      <TabsContent value="labor" className="space-y-6">
-        <LaborCosts 
-          onLaborCostChange={setLaborCosts}
-          totalMonthlyHours={totalMonthlyHours}
-        />
-      </TabsContent>
-
       <TabsContent value="equipment" className="space-y-6">
         <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
       </TabsContent>
@@ -127,29 +83,19 @@ export const MainContent: React.FC<MainContentProps> = ({
         <CostSummary costs={costBreakdown} />
       </TabsContent>
 
-      <TabsContent value="contract" className="space-y-6">
-        <ContractData onContractChange={setContractDetails} />
-        <ContractForecast
-          baseRevenue={monthlyRevenue}
-          laborCost={costBreakdown.totalMonthlyCost}
-          equipmentCost={equipmentCosts.monthly}
-          overhead={overhead}
-          contractLength={contractDetails.lengthYears}
-          cpiIncreases={contractDetails.cpiIncreases}
-        />
-      </TabsContent>
-
-      <TabsContent value="summary" className="space-y-6">
-        <ProfitLoss
-          revenue={monthlyRevenue}
-          laborCost={costBreakdown.totalMonthlyCost}
-          equipmentCost={equipmentCosts.monthly}
-          overhead={overhead}
-          totalLaborHours={totalMonthlyHours}
-          selectedTasks={taskCosts}
-          onMarginChange={handleMarginChange}
-        />
-      </TabsContent>
+      <FinancialTabs
+        laborCosts={laborCosts}
+        setLaborCosts={setLaborCosts}
+        totalMonthlyHours={totalMonthlyHours}
+        monthlyRevenue={monthlyRevenue}
+        overhead={overhead}
+        costBreakdown={costBreakdown}
+        equipmentCosts={equipmentCosts}
+        contractDetails={contractDetails}
+        setContractDetails={setContractDetails}
+        taskCosts={taskCosts}
+        onMarginChange={handleMarginChange}
+      />
 
       <TabsContent value="settings" className="space-y-6">
         <AwardSettings
