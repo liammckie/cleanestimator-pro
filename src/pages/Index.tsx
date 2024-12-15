@@ -103,7 +103,9 @@ const Index = () => {
                     {renderContent()}
                   </div>
                   <div className="w-[250px] shrink-0">
-                    <ScopeOfWorkSidebar selectedTasks={selectedTasks} sites={sites} />
+                    <SidebarProvider>
+                      <ScopeOfWorkSidebar selectedTasks={selectedTasks} sites={sites} />
+                    </SidebarProvider>
                   </div>
                 </div>
               </Tabs>
