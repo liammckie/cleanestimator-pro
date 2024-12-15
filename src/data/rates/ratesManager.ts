@@ -1,5 +1,5 @@
 import { ProductivityRate, TaskGroup } from '../types/productivity';
-import { taskGroups } from '../categories/taskGroups';
+import { cleaningTasks } from '../tasks/cleaningTasks';
 
 class RatesManager {
   private static instance: RatesManager;
@@ -21,7 +21,7 @@ class RatesManager {
       // Flatten all tasks from groups, categories, and subcategories
       const allTasks: ProductivityRate[] = [];
       
-      taskGroups.forEach(group => {
+      cleaningTasks.forEach(group => {
         group.categories.forEach(category => {
           category.subcategories.forEach(subcategory => {
             subcategory.tasks.forEach(task => {
@@ -35,7 +35,7 @@ class RatesManager {
       this.ratesCache.set('all', allTasks);
 
       // Create category-specific caches
-      taskGroups.forEach(group => {
+      cleaningTasks.forEach(group => {
         group.categories.forEach(category => {
           const categoryTasks = allTasks.filter(task => task.category === category.name);
           if (categoryTasks.length > 0) {
@@ -66,7 +66,7 @@ class RatesManager {
   }
 
   public getTaskGroups(): TaskGroup[] {
-    return taskGroups;
+    return cleaningTasks;
   }
 
   public searchRates(query: string): ProductivityRate[] {

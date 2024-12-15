@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ListChecks } from "lucide-react";
 import { CategorySelect } from '../CategorySelect';
+import { getTaskGroups } from '@/data/rates/ratesManager';
 
 interface CategoryPanelProps {
   value: string;
@@ -10,6 +11,8 @@ interface CategoryPanelProps {
 }
 
 export const CategoryPanel: React.FC<CategoryPanelProps> = ({ value, onValueChange }) => {
+  const taskGroups = getTaskGroups();
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -22,6 +25,7 @@ export const CategoryPanel: React.FC<CategoryPanelProps> = ({ value, onValueChan
             value={value} 
             onValueChange={onValueChange}
             defaultTab="categories"
+            groups={taskGroups}
           />
         </div>
       </CardContent>

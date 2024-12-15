@@ -1,44 +1,26 @@
-import React, { useState, useCallback } from 'react';
-import { Command, CommandEmpty, CommandInput, CommandGroup } from "@/components/ui/command";
+import React, { useState } from 'react';
+import { Command, CommandInput } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { ChevronsUpDown } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { categoryGroups, industryGroups } from '@/utils/categoryGroups';
+import { Check, ChevronsUpDown } from "lucide-react";
 import { CategoryList } from './CategoryList';
-import { IndustryList } from './IndustryList';
+import { TaskGroup } from '@/data/types/productivity';
 
 interface CategorySelectProps {
   value: string;
   onValueChange: (value: string) => void;
-  defaultTab?: 'categories' | 'industries';
+  defaultTab?: string;
+  groups?: TaskGroup[];
 }
 
-export const CategorySelect: React.FC<CategorySelectProps> = ({ 
-  value = '', 
+export const CategorySelect: React.FC<CategorySelectProps> = ({
+  value,
   onValueChange,
-  defaultTab = 'categories'
+  defaultTab = 'categories',
+  groups = []
 }) => {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'categories' | 'industries'>(defaultTab);
-
-  const handleSelect = useCallback((selectedValue: string) => {
-    if (selectedValue) {
-      onValueChange(selectedValue);
-      setOpen(false);
-      setSearchQuery('');
-    }
-  }, [onValueChange]);
-
-  const getPlaceholderText = useCallback(() => {
-    if (!value) {
-      return defaultTab === 'industries' 
-        ? "Select industry (e.g., Healthcare, Corporate Offices)"
-        : "Select category (e.g., Floor Care, Surface Care)";
-    }
-    return value;
-  }, [defaultTab, value]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -47,54 +29,28 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between text-left font-normal"
+          className="w-full justify-between"
         >
-          {getPlaceholderText()}
+          {value || "Select category..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
         <Command>
-          <CommandInput 
-            placeholder={
-              activeTab === 'industries' 
-                ? "Search industries..." 
-                : "Search categories..."
-            }
+          <CommandInput
+            placeholder="Search categories..."
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
-          <CommandEmpty>No results found.</CommandEmpty>
-          <div className="border-t pt-2">
-            <Tabs defaultValue={activeTab} onValueChange={(value: string) => {
-              if (value === 'categories' || value === 'industries') {
-                setActiveTab(value);
-              }
-            }}>
-              <TabsList className="w-full">
-                <TabsTrigger value="categories" className="flex-1">Categories</TabsTrigger>
-                <TabsTrigger value="industries" className="flex-1">Industries</TabsTrigger>
-              </TabsList>
-              <div className="mt-2 max-h-[300px] overflow-y-auto">
-                <TabsContent value="categories">
-                  <CategoryList
-                    groups={categoryGroups || []}
-                    selectedValue={value}
-                    searchQuery={searchQuery}
-                    onSelect={handleSelect}
-                  />
-                </TabsContent>
-                <TabsContent value="industries">
-                  <IndustryList
-                    groups={industryGroups || []}
-                    selectedValue={value}
-                    searchQuery={searchQuery}
-                    onSelect={handleSelect}
-                  />
-                </TabsContent>
-              </div>
-            </Tabs>
-          </div>
+          <CategoryList
+            groups={groups}
+            selectedValue={value}
+            searchQuery={searchQuery}
+            onSelect={(category) => {
+              onValueChange(category);
+              setOpen(false);
+            }}
+          />
         </Command>
       </PopoverContent>
     </Popover>
