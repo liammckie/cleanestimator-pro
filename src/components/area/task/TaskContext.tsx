@@ -80,7 +80,7 @@ export const TaskProvider: React.FC<{
             quantity,
             task.selectedTool,
             task.frequency,
-            quantity
+            task.quantity
           );
           return { 
             ...task, 
