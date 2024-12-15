@@ -46,23 +46,36 @@ export const MainContent: React.FC<MainContentProps> = ({
   const calculateTotalMonthlyHours = () => {
     console.log('Calculating total hours from sites:', sites);
     return sites.reduce((total, site) => {
-      const siteTasks = site.area?.selectedTasks || [];
+      if (!site.area?.selectedTasks) return total;
+      
+      const siteTasks = site.area.selectedTasks;
       console.log(`Site ${site.name} tasks:`, siteTasks);
-      return total + siteTasks.reduce((siteTotal: number, task: any) => {
-        return siteTotal + (task.timeRequired || 0);
+      
+      const siteTotal = siteTasks.reduce((siteTotal: number, task: any) => {
+        const taskHours = task.timeRequired || 0;
+        console.log(`Task ${task.taskId} hours:`, taskHours);
+        return siteTotal + taskHours;
       }, 0);
+      
+      console.log(`Site ${site.name} total hours:`, siteTotal);
+      return total + siteTotal;
     }, 0);
   };
 
   const getAllSelectedTasks = () => {
     console.log('Getting all selected tasks from sites:', sites);
     const tasks = sites.reduce((allTasks: any[], site) => {
-      const siteTasks = site.area?.selectedTasks || [];
+      if (!site.area?.selectedTasks) return allTasks;
+      
+      const siteTasks = site.area.selectedTasks;
+      console.log(`Site ${site.name} tasks:`, siteTasks);
+      
       return [...allTasks, ...siteTasks.map(task => ({
         ...task,
         siteName: site.name
       }))];
     }, []);
+    
     console.log('All selected tasks:', tasks);
     return tasks;
   };
