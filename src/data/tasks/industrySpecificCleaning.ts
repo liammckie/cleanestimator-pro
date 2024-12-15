@@ -12,7 +12,6 @@ export const industrySpecificCleaning: TaskCategory = {
       rate: 80,
       unit: 'SQM/hour',
       category: 'Industry-Specific',
-      subcategory: 'Healthcare',
       notes: 'Healthcare-specific sanitization',
       defaultTool: 'Medical Grade Sanitization Equipment'
     },
@@ -22,7 +21,6 @@ export const industrySpecificCleaning: TaskCategory = {
       rate: 200,
       unit: 'SQM/hour',
       category: 'Industry-Specific',
-      subcategory: 'Education',
       notes: 'Education facilities cleaning',
       defaultTool: 'Classroom Cleaning Kit'
     },
@@ -32,7 +30,6 @@ export const industrySpecificCleaning: TaskCategory = {
       rate: 250,
       unit: 'SQM/hour',
       category: 'Industry-Specific',
-      subcategory: 'Retail/Grocery',
       notes: 'Covers shopping areas and entrances',
       defaultTool: 'Retail Cleaning Equipment'
     },
@@ -42,7 +39,6 @@ export const industrySpecificCleaning: TaskCategory = {
       rate: 150,
       unit: 'SQM/hour',
       category: 'Industry-Specific',
-      subcategory: 'Transportation',
       notes: 'Transportation hubs or fleets',
       defaultTool: 'Vehicle Cleaning Kit'
     },
@@ -52,7 +48,6 @@ export const industrySpecificCleaning: TaskCategory = {
       rate: 180,
       unit: 'SQM/hour',
       category: 'Industry-Specific',
-      subcategory: 'Hospitality',
       notes: 'Accommodation turnover service',
       defaultTool: 'Hospitality Cleaning Kit'
     },
@@ -62,7 +57,6 @@ export const industrySpecificCleaning: TaskCategory = {
       rate: 300,
       unit: 'SQM/hour',
       category: 'Industry-Specific',
-      subcategory: 'Industrial',
       notes: 'Cleaning industrial storage spaces',
       defaultTool: 'Industrial Cleaning Equipment'
     },
@@ -72,7 +66,6 @@ export const industrySpecificCleaning: TaskCategory = {
       rate: 100,
       unit: 'SQM/hour',
       category: 'Industry-Specific',
-      subcategory: 'Commercial Kitchens',
       notes: 'For commercial kitchens and food prep areas',
       defaultTool: 'Commercial Kitchen Cleaning Kit'
     },
@@ -82,7 +75,6 @@ export const industrySpecificCleaning: TaskCategory = {
       rate: 70,
       unit: 'SQM/hour',
       category: 'Industry-Specific',
-      subcategory: 'Healthcare',
       notes: 'Hospitals and healthcare rooms',
       defaultTool: 'Medical Grade Disinfection Kit'
     },
@@ -92,7 +84,6 @@ export const industrySpecificCleaning: TaskCategory = {
       rate: 150,
       unit: 'SQM/hour',
       category: 'Industry-Specific',
-      subcategory: 'Corporate Offices',
       notes: 'Quarterly or annual cleaning',
       defaultTool: 'Deep Cleaning Equipment'
     },
@@ -102,7 +93,6 @@ export const industrySpecificCleaning: TaskCategory = {
       rate: 200,
       unit: 'SQM/hour',
       category: 'Industry-Specific',
-      subcategory: 'Exteriors',
       notes: 'Sweeping and debris removal in parking spaces',
       defaultTool: 'Outdoor Cleaning Equipment'
     }
