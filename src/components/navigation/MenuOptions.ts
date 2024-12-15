@@ -2,12 +2,12 @@ import { MenuOption } from "../ui/dynamic-menu";
 
 export const getMenuOptions = (setTab: (tab: string) => void): MenuOption[] => [
   {
-    name: "Scope of Work",
+    name: "Scope & Tasks",
     icon: "list",
     onClick: () => setTab("scope")
   },
   {
-    name: "Labor",
+    name: "Labor Costs",
     icon: "user",
     onClick: () => setTab("labor")
   },
@@ -17,14 +17,14 @@ export const getMenuOptions = (setTab: (tab: string) => void): MenuOption[] => [
     onClick: () => setTab("equipment")
   },
   {
-    name: "Contract",
-    icon: "file-text",
-    onClick: () => setTab("contract")
-  },
-  {
     name: "Roster",
     icon: "calendar",
     onClick: () => setTab("roster")
+  },
+  {
+    name: "Contract",
+    icon: "file-text",
+    onClick: () => setTab("contract")
   },
   {
     name: "Summary",
@@ -32,17 +32,12 @@ export const getMenuOptions = (setTab: (tab: string) => void): MenuOption[] => [
     onClick: () => setTab("summary")
   },
   {
-    name: "Tasks",
-    icon: "check-square",
-    onClick: () => setTab("tasks")
-  },
-  {
     name: "Settings",
     icon: "settings",
     onClick: () => setTab("settings")
   },
   {
-    name: "Overview",
+    name: "Site Overview",
     icon: "globe",
     onClick: () => setTab("overview")
   }
