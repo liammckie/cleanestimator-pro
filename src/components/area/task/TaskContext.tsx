@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { calculateTaskProductivity } from '@/utils/productivityCalculations';
+import { useTaskTimes } from '@/hooks/useTaskTimes';
+import { validateTaskData } from '@/utils/taskValidation';
 import { getRateById } from '@/data/rates/ratesManager';
-
-const SELECTED_TASKS_KEY = 'selected-tasks-context';
+import { toast } from '@/components/ui/use-toast';
 
 interface TaskContextType {
   selectedTasks: Array<{
@@ -26,6 +26,7 @@ interface TaskContextType {
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
+const SELECTED_TASKS_KEY = 'selected-tasks-context';
 
 export const useTaskContext = () => {
   const context = useContext(TaskContext);
@@ -44,36 +45,13 @@ export const TaskProvider: React.FC<{
     return savedTasks ? JSON.parse(savedTasks) : [];
   });
 
+  const { calculateTaskTime } = useTaskTimes();
+
   useEffect(() => {
     localStorage.setItem(SELECTED_TASKS_KEY, JSON.stringify(selectedTasks));
-    console.log('Tasks changed:', selectedTasks);
+    console.log('Tasks updated:', selectedTasks);
     onTasksChange(selectedTasks);
   }, [selectedTasks, onTasksChange]);
-
-  const calculateTimeRequired = useCallback((
-    taskId: string,
-    quantity: number,
-    selectedTool: string | undefined,
-    frequency: { timesPerWeek: number; timesPerMonth: number }
-  ) => {
-    const productivity = calculateTaskProductivity(
-      taskId,
-      quantity,
-      selectedTool,
-      frequency,
-      quantity
-    );
-    
-    console.log('Calculated productivity:', {
-      taskId,
-      quantity,
-      selectedTool,
-      frequency,
-      productivity
-    });
-
-    return productivity?.timeRequired || 0;
-  }, []);
 
   const handleTaskSelection = useCallback((taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
     if (isSelected) {
@@ -96,25 +74,36 @@ export const TaskProvider: React.FC<{
         selectedTool: rate.tool
       };
 
-      setSelectedTasks(prev => [...prev, newTask]);
+      setSelectedTasks(prev => {
+        const updated = [...prev, newTask];
+        console.log('Added new task:', { newTask, updated });
+        return updated;
+      });
     } else {
-      setSelectedTasks(prev => prev.filter(task => 
-        !(task.taskId === taskId && task.siteId === siteId)
-      ));
+      setSelectedTasks(prev => {
+        const updated = prev.filter(task => 
+          !(task.taskId === taskId && task.siteId === siteId)
+        );
+        console.log('Removed task:', { taskId, siteId, updated });
+        return updated;
+      });
     }
   }, []);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
     setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
-        const timeRequired = calculateTimeRequired(
+        const rate = getRateById(taskId);
+        if (!validateTaskData(taskId, quantity, rate)) return task;
+        
+        const timeRequired = calculateTaskTime(
           taskId,
           quantity,
           task.selectedTool,
           task.frequency
         );
         
-        console.log('Updated task time:', {
+        console.log('Updated task quantity:', {
           taskId,
           quantity,
           timeRequired
@@ -128,7 +117,7 @@ export const TaskProvider: React.FC<{
       }
       return task;
     }));
-  }, [calculateTimeRequired]);
+  }, [calculateTaskTime]);
 
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
     setSelectedTasks(prev => prev.map(task => {
@@ -138,7 +127,7 @@ export const TaskProvider: React.FC<{
           timesPerMonth: timesPerWeek * 4.33
         };
         
-        const timeRequired = calculateTimeRequired(
+        const timeRequired = calculateTaskTime(
           taskId,
           task.quantity,
           task.selectedTool,
@@ -159,7 +148,7 @@ export const TaskProvider: React.FC<{
       }
       return task;
     }));
-  }, [calculateTimeRequired]);
+  }, [calculateTaskTime]);
 
   const handleProductivityOverride = useCallback((taskId: string, override: number) => {
     setSelectedTasks(prev => prev.map(task => {
@@ -176,7 +165,7 @@ export const TaskProvider: React.FC<{
   const handleToolChange = useCallback((taskId: string, tool: string) => {
     setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
-        const timeRequired = calculateTimeRequired(
+        const timeRequired = calculateTaskTime(
           taskId,
           task.quantity,
           tool,
@@ -197,17 +186,19 @@ export const TaskProvider: React.FC<{
       }
       return task;
     }));
-  }, [calculateTimeRequired]);
+  }, [calculateTaskTime]);
+
+  const value = {
+    selectedTasks,
+    handleTaskSelection,
+    handleQuantityChange,
+    handleFrequencyChange,
+    handleProductivityOverride,
+    handleToolChange
+  };
 
   return (
-    <TaskContext.Provider value={{
-      selectedTasks,
-      handleTaskSelection,
-      handleQuantityChange,
-      handleFrequencyChange,
-      handleProductivityOverride,
-      handleToolChange
-    }}>
+    <TaskContext.Provider value={value}>
       {children}
     </TaskContext.Provider>
   );
