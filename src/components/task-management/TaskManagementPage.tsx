@@ -4,34 +4,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TaskForm } from './TaskForm';
 import { TaskList } from './TaskList';
 import { CsvImport } from './CsvImport';
-import { CleaningTask } from '@/data/types/taskManagement';
+import { CleaningTask, SelectedTask } from '@/data/types/taskManagement';
 import { loadTasks, saveTasks } from '@/utils/taskStorage';
 import { useToast } from '@/components/ui/use-toast';
 import { TaskProvider } from '../area/task/TaskContext';
 import { ScopeOfWorkSidebar } from '../ScopeOfWorkSidebar';
-import { calculateTaskProductivity } from '@/utils/productivityCalculations';
+import { calculateManHours, validateTaskInput } from '@/utils/manHourCalculations';
 import { TaskSelectionPanel } from './TaskSelectionPanel';
-import { SelectedTask } from './types';
 
 export const TaskManagementPage = () => {
   const [tasks, setTasks] = useState<CleaningTask[]>(() => loadTasks());
-  const [editingTask, setEditingTask] = useState<CleaningTask | null>(null);
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
   const { toast } = useToast();
-
-  const handleAddTask = (taskData: Omit<CleaningTask, 'id'>) => {
-    const newTask: CleaningTask = {
-      ...taskData,
-      id: crypto.randomUUID(),
-    };
-    const updatedTasks = [...tasks, newTask];
-    setTasks(updatedTasks);
-    saveTasks(updatedTasks);
-    toast({
-      title: "Task Added",
-      description: "New task has been added to the database.",
-    });
-  };
 
   const handleTaskSelection = (task: CleaningTask) => {
     const existingTask = selectedTasks.find(t => t.id === task.id);
@@ -41,6 +25,7 @@ export const TaskManagementPage = () => {
         ...task,
         taskId: task.id,
         quantity: 0,
+        manHours: 0,
         frequency: {
           timesPerWeek: 1,
           timesPerMonth: 4.33
@@ -51,7 +36,7 @@ export const TaskManagementPage = () => {
       
       setSelectedTasks(prev => [...prev, newSelectedTask]);
       toast({
-        title: "Task Added to Scope",
+        title: "Task Added",
         description: `${task.taskName} has been added to your scope of work.`,
       });
     }
@@ -60,18 +45,19 @@ export const TaskManagementPage = () => {
   const handleQuantityChange = (taskId: string, quantity: number) => {
     setSelectedTasks(prev => prev.map(task => {
       if (task.id === taskId) {
-        const productivity = calculateTaskProductivity(
-          taskId,
+        if (!validateTaskInput(task, quantity)) return task;
+        
+        const manHours = calculateManHours(
+          task,
           quantity,
-          task.selectedTool,
-          task.frequency,
-          quantity
+          task.frequency
         );
         
         return {
           ...task,
           quantity,
-          timeRequired: productivity?.timeRequired || 0
+          manHours,
+          timeRequired: manHours / task.frequency.timesPerMonth
         };
       }
       return task;
@@ -86,18 +72,17 @@ export const TaskManagementPage = () => {
           timesPerMonth: timesPerWeek * 4.33
         };
         
-        const productivity = calculateTaskProductivity(
-          taskId,
+        const manHours = calculateManHours(
+          task,
           task.quantity,
-          task.selectedTool,
-          frequency,
-          task.quantity
+          frequency
         );
         
         return {
           ...task,
           frequency,
-          timeRequired: productivity?.timeRequired || 0
+          manHours,
+          timeRequired: manHours / frequency.timesPerMonth
         };
       }
       return task;
@@ -127,14 +112,14 @@ export const TaskManagementPage = () => {
             <TabsContent value="database">
               <Card>
                 <CardHeader>
-                  <CardTitle>{editingTask ? 'Edit Task' : 'Add New Task'}</CardTitle>
+                  <CardTitle>Add New Task</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <TaskForm
-                    onSubmit={handleAddTask}
-                    initialData={editingTask || undefined}
-                    mode={editingTask ? 'edit' : 'create'}
-                  />
+                  <TaskForm onSubmit={(task) => {
+                    const newTask = { ...task, id: crypto.randomUUID() };
+                    setTasks(prev => [...prev, newTask]);
+                    saveTasks([...tasks, newTask]);
+                  }} />
                 </CardContent>
               </Card>
 
@@ -154,10 +139,10 @@ export const TaskManagementPage = () => {
                 <CardContent>
                   <TaskList
                     tasks={tasks}
+                    selectedTasks={selectedTasks}
                     onTaskSelect={handleTaskSelection}
                     onQuantityChange={handleQuantityChange}
                     onFrequencyChange={handleFrequencyChange}
-                    selectedTasks={selectedTasks}
                   />
                 </CardContent>
               </Card>
@@ -179,7 +164,8 @@ export const TaskManagementPage = () => {
             quantity: task.quantity,
             timeRequired: task.timeRequired,
             frequency: task.frequency,
-            selectedTool: task.selectedTool
+            selectedTool: task.selectedTool,
+            siteName: undefined
           }))} 
           sites={[]} 
         />
