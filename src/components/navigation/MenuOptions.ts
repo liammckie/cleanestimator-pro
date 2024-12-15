@@ -3,7 +3,7 @@ import { MenuOption } from "../ui/dynamic-menu";
 export const getMenuOptions = (setTab: (tab: string) => void): MenuOption[] => [
   {
     name: "Sites",
-    icon: "building",
+    icon: "layout",
     onClick: () => setTab("sites")
   },
   {
