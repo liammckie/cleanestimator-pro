@@ -36,7 +36,7 @@ const Index = () => {
 
   const formattedMenuOptions = menuOptions.map(option => ({
     name: option.label,
-    icon: option.icon,
+    icon: option.icon as "layout" | "file-text" | "list" | "user" | "wrench" | "calendar" | "check-square" | "globe" | "settings",
     onClick: () => setActiveTab(option.id)
   }));
 
