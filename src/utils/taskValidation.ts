@@ -1,30 +1,14 @@
-import { toast } from "@/components/ui/use-toast";
-import { ProductivityRate } from '@/data/types/productivity';
+import { SelectedTask } from '@/components/area/task/types';
 
-export const validateTaskData = (
-  taskId: string,
-  quantity: number,
-  rate?: ProductivityRate
-) => {
-  if (!rate) {
-    console.error('No productivity rate found for task:', taskId);
-    toast({
-      title: "Task Error",
-      description: "Could not find productivity rate for task",
-      variant: "destructive"
-    });
-    return false;
-  }
-
-  if (!quantity || quantity <= 0) {
-    console.error('Invalid quantity for task:', taskId);
-    toast({
-      title: "Invalid Input",
-      description: "Please enter a valid quantity greater than 0",
-      variant: "destructive"
-    });
-    return false;
-  }
-
+export const validateTaskData = (task: SelectedTask, quantity: number): boolean => {
+  if (!task || quantity < 0) return false;
+  
+  // Basic validation checks
+  if (!task.taskId || !task.frequency) return false;
+  
+  // Validate frequency
+  if (task.frequency.timesPerWeek < 1 || task.frequency.timesPerWeek > 7) return false;
+  if (task.frequency.timesPerMonth < 1 || task.frequency.timesPerMonth > 31) return false;
+  
   return true;
 };
