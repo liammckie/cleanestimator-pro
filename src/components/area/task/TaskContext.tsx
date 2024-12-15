@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { getRateById } from '@/data/rates/ratesManager';
+import { calculateTaskProductivity } from '@/utils/productivityCalculations';
 
 interface TaskContextType {
   selectedTasks: Array<{
@@ -36,26 +37,48 @@ export const TaskProvider: React.FC<{
 }> = ({ children, onTasksChange }) => {
   const [selectedTasks, setSelectedTasks] = useState<TaskContextType['selectedTasks']>([]);
 
-  const calculateTimeRequired = (
+  const calculateTimeRequired = useCallback((
     taskId: string, 
     quantity: number, 
-    frequency: { timesPerWeek: number; timesPerMonth: number }, 
+    frequency: { timesPerWeek: number; timesPerMonth: number },
+    selectedTool?: string,
     productivityOverride?: number
   ): number => {
     const rate = getRateById(taskId);
-    if (!rate) return 0;
-    
-    const ratePerHour = productivityOverride || rate.ratePerHour;
-    if (!ratePerHour || ratePerHour <= 0) return 0;
-    
-    const baseTime = quantity / ratePerHour;
-    return baseTime * (frequency?.timesPerWeek || 1) * 4;
-  };
+    if (!rate) {
+      console.warn(`No rate found for task ID: ${taskId}`);
+      return 0;
+    }
 
-  const handleTaskSelection = (taskId: string, isSelected: boolean) => {
+    // Calculate productivity with all factors
+    const productivity = calculateTaskProductivity(
+      taskId,
+      quantity,
+      selectedTool,
+      frequency,
+      quantity // Using quantity as area size for now
+    );
+
+    if (!productivity) return 0;
+
+    const effectiveRate = productivityOverride || productivity.adjustedRate;
+    if (!effectiveRate || effectiveRate <= 0) return 0;
+
+    // Calculate time in minutes per month
+    const timePerUnit = 60 / effectiveRate; // Convert hourly rate to minutes per unit
+    const timeForQuantity = timePerUnit * quantity;
+    const timePerMonth = timeForQuantity * frequency.timesPerWeek * 4; // 4 weeks per month
+
+    return timePerMonth;
+  }, []);
+
+  const handleTaskSelection = useCallback((taskId: string, isSelected: boolean) => {
     if (isSelected) {
       const rate = getRateById(taskId);
-      if (!rate) return;
+      if (!rate) {
+        console.warn(`Cannot add task: No rate found for ID ${taskId}`);
+        return;
+      }
       
       const newTask = {
         taskId,
@@ -64,8 +87,10 @@ export const TaskProvider: React.FC<{
         frequency: {
           timesPerWeek: 1,
           timesPerMonth: 4
-        }
+        },
+        selectedTool: rate.tool // Use default tool from rate
       };
+
       const updatedTasks = [...selectedTasks, newTask];
       setSelectedTasks(updatedTasks);
       onTasksChange(updatedTasks);
@@ -74,15 +99,16 @@ export const TaskProvider: React.FC<{
       setSelectedTasks(updatedTasks);
       onTasksChange(updatedTasks);
     }
-  };
+  }, [selectedTasks, onTasksChange]);
 
-  const handleQuantityChange = (taskId: string, quantity: number) => {
+  const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
     const updatedTasks = selectedTasks.map(task => {
       if (task.taskId === taskId) {
         const timeRequired = calculateTimeRequired(
-          taskId, 
-          quantity, 
-          task.frequency, 
+          taskId,
+          quantity,
+          task.frequency,
+          task.selectedTool,
           task.productivityOverride
         );
         return { ...task, quantity, timeRequired };
@@ -91,9 +117,9 @@ export const TaskProvider: React.FC<{
     });
     setSelectedTasks(updatedTasks);
     onTasksChange(updatedTasks);
-  };
+  }, [selectedTasks, calculateTimeRequired, onTasksChange]);
 
-  const handleFrequencyChange = (taskId: string, timesPerWeek: number) => {
+  const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
     const updatedTasks = selectedTasks.map(task => {
       if (task.taskId === taskId) {
         const frequency = {
@@ -101,9 +127,10 @@ export const TaskProvider: React.FC<{
           timesPerMonth: timesPerWeek * 4
         };
         const timeRequired = calculateTimeRequired(
-          taskId, 
-          task.quantity, 
-          frequency, 
+          taskId,
+          task.quantity,
+          frequency,
+          task.selectedTool,
           task.productivityOverride
         );
         return { ...task, frequency, timeRequired };
@@ -112,15 +139,16 @@ export const TaskProvider: React.FC<{
     });
     setSelectedTasks(updatedTasks);
     onTasksChange(updatedTasks);
-  };
+  }, [selectedTasks, calculateTimeRequired, onTasksChange]);
 
-  const handleProductivityOverride = (taskId: string, override: number) => {
+  const handleProductivityOverride = useCallback((taskId: string, override: number) => {
     const updatedTasks = selectedTasks.map(task => {
       if (task.taskId === taskId) {
         const timeRequired = calculateTimeRequired(
-          taskId, 
-          task.quantity, 
-          task.frequency, 
+          taskId,
+          task.quantity,
+          task.frequency,
+          task.selectedTool,
           override
         );
         return { ...task, productivityOverride: override, timeRequired };
@@ -129,18 +157,25 @@ export const TaskProvider: React.FC<{
     });
     setSelectedTasks(updatedTasks);
     onTasksChange(updatedTasks);
-  };
+  }, [selectedTasks, calculateTimeRequired, onTasksChange]);
 
-  const handleToolChange = (taskId: string, tool: string) => {
+  const handleToolChange = useCallback((taskId: string, tool: string) => {
     const updatedTasks = selectedTasks.map(task => {
       if (task.taskId === taskId) {
-        return { ...task, selectedTool: tool };
+        const timeRequired = calculateTimeRequired(
+          taskId,
+          task.quantity,
+          task.frequency,
+          tool,
+          task.productivityOverride
+        );
+        return { ...task, selectedTool: tool, timeRequired };
       }
       return task;
     });
     setSelectedTasks(updatedTasks);
     onTasksChange(updatedTasks);
-  };
+  }, [selectedTasks, calculateTimeRequired, onTasksChange]);
 
   return (
     <TaskContext.Provider value={{
