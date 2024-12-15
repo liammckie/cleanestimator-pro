@@ -9,6 +9,7 @@ import { EmploymentTypeSelector } from './labor/EmploymentTypeSelector';
 import { DirectEmploymentOptions } from './labor/DirectEmploymentOptions';
 import { AwardIncreaseManager } from './labor/AwardIncreaseManager';
 import { useTaskContext } from './area/task/TaskContext';
+import { useCostContext } from '@/contexts/CostContext';
 
 interface LaborCostsProps {
   onLaborCostChange: (costs: { 
@@ -19,6 +20,16 @@ interface LaborCostsProps {
     onCosts?: OnCostsState;
   }) => void;
 }
+
+export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => {
+  const { selectedTasks } = useTaskContext();
+  const { laborCosts, updateLaborRate } = useCostContext();
+  const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
+  const [contractedRate, setContractedRate] = useState<number>(38);
+  const [awardLevel, setAwardLevel] = useState<number>(1);
+  const [shiftType, setShiftType] = useState<string>('standard');
+  const [onCosts, setOnCosts] = useState<OnCostsState>(defaultOnCosts);
+  const [awardIncrease, setAwardIncrease] = useState<number>(0);
 
 const defaultOnCosts: OnCostsState = {
   statutoryOnCosts: [
@@ -45,15 +56,6 @@ const defaultOnCosts: OnCostsState = {
   ],
 };
 
-export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => {
-  const { totalWeeklyHours } = useTaskContext();
-  const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
-  const [contractedRate, setContractedRate] = useState<number>(38);
-  const [awardLevel, setAwardLevel] = useState<number>(1);
-  const [shiftType, setShiftType] = useState<string>('standard');
-  const [onCosts, setOnCosts] = useState<OnCostsState>(defaultOnCosts);
-  const [awardIncrease, setAwardIncrease] = useState<number>(0);
-
   useEffect(() => {
     // Initialize with default contracted rate
     updateLaborCosts('contracted');
@@ -67,6 +69,7 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
   const handleContractedRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value) || 0;
     setContractedRate(value);
+    updateLaborRate(value);
     if (employmentType === 'contracted') {
       onLaborCostChange({
         hourlyRate: value,
@@ -139,8 +142,8 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
           <div className="grid gap-6">
             <div className="bg-accent/50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground mb-2">Monthly Hours Required</p>
-              <p className="text-2xl font-bold">{(totalWeeklyHours * 4.33).toFixed(1)} hours</p>
-              <p className="text-sm text-muted-foreground">Weekly Hours: {totalWeeklyHours.toFixed(1)}</p>
+              <p className="text-2xl font-bold">{laborCosts.totalMonthlyHours.toFixed(1)} hours</p>
+              <p className="text-sm text-muted-foreground">Weekly Hours: {laborCosts.totalWeeklyHours.toFixed(1)}</p>
             </div>
 
             <EmploymentTypeSelector

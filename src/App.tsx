@@ -1,24 +1,47 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import React from 'react';
+import { TaskProvider } from './components/area/task/TaskContext';
+import { CostProvider } from './contexts/CostContext';
+import { EquipmentCosts } from './components/EquipmentCosts';
+import { LaborCosts } from './components/LaborCosts';
+import { ProfitLoss } from './components/ProfitLoss';
+import { FinancialTabs } from './components/financial/FinancialTabs';
+import { ScopeOfWorkSidebar } from './components/ScopeOfWorkSidebar';
+import { TaskManagementPage } from './components/task-management/TaskManagementPage';
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <TaskProvider>
+      <CostProvider>
+        <div className="app-container">
+          <EquipmentCosts onEquipmentCostChange={(costs) => console.log(costs)} />
+          <LaborCosts onLaborCostChange={(costs) => console.log(costs)} />
+          <ProfitLoss
+            revenue={0}
+            laborCost={0}
+            equipmentCost={0}
+            overhead={0}
+            totalLaborHours={0}
+            selectedTasks={[]}
+            onMarginChange={(margin) => console.log(margin)}
+          />
+          <FinancialTabs
+            laborCosts={{ hourlyRate: 0 }}
+            setLaborCosts={(costs) => console.log(costs)}
+            monthlyRevenue={0}
+            overhead={0}
+            costBreakdown={{}}
+            equipmentCosts={{ monthly: 0 }}
+            contractDetails={{}}
+            setContractDetails={(details) => console.log(details)}
+            taskCosts={[]}
+            onMarginChange={(margin) => console.log(margin)}
+          />
+          <ScopeOfWorkSidebar selectedTasks={[]} />
+          <TaskManagementPage />
+        </div>
+      </CostProvider>
+    </TaskProvider>
+  );
+}
 
 export default App;
