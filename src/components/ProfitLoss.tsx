@@ -33,6 +33,7 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
   selectedTasks = [],
   onMarginChange
 }) => {
+  console.log('ProfitLoss received tasks:', selectedTasks);
   const [targetMargin, setTargetMargin] = useState(15);
   const totalCosts = laborCost + equipmentCost + overhead;
   const profit = revenue - totalCosts;
@@ -54,6 +55,7 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
 
   const getTaskName = (taskId: string) => {
     const rate = getProductivityRate(taskId);
+    console.log('Getting task name for:', taskId, 'Found rate:', rate);
     return rate?.task || 'Unknown Task';
   };
 
@@ -96,16 +98,20 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
               
               {/* Task Breakdown */}
               <div className="pl-4 space-y-1">
-                {selectedTasks.map((task, index) => (
-                  <div key={index} className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">
-                      {getTaskName(task.taskId)} ({task.timeRequired.toFixed(1)} hrs)
-                    </span>
-                    <span className="text-muted-foreground">
-                      ${(task.timeRequired * effectiveHourlyRate).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
+                {selectedTasks.length > 0 ? (
+                  selectedTasks.map((task, index) => (
+                    <div key={index} className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">
+                        {getTaskName(task.taskId)} ({task.timeRequired.toFixed(1)} hrs)
+                      </span>
+                      <span className="text-muted-foreground">
+                        ${(task.timeRequired * effectiveHourlyRate).toFixed(2)}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm text-muted-foreground">No tasks selected</div>
+                )}
               </div>
 
               <div className="flex justify-between items-center">

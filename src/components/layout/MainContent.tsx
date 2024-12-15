@@ -44,8 +44,10 @@ export const MainContent: React.FC<MainContentProps> = ({
   const { awardIncrease, setAwardIncrease } = useSettings();
 
   const calculateTotalMonthlyHours = () => {
+    console.log('Calculating total hours from sites:', sites);
     return sites.reduce((total, site) => {
       const siteTasks = site.area?.selectedTasks || [];
+      console.log(`Site ${site.name} tasks:`, siteTasks);
       return total + siteTasks.reduce((siteTotal: number, task: any) => {
         return siteTotal + (task.timeRequired || 0);
       }, 0);
@@ -53,13 +55,16 @@ export const MainContent: React.FC<MainContentProps> = ({
   };
 
   const getAllSelectedTasks = () => {
-    return sites.reduce((allTasks: any[], site) => {
+    console.log('Getting all selected tasks from sites:', sites);
+    const tasks = sites.reduce((allTasks: any[], site) => {
       const siteTasks = site.area?.selectedTasks || [];
       return [...allTasks, ...siteTasks.map(task => ({
         ...task,
         siteName: site.name
       }))];
     }, []);
+    console.log('All selected tasks:', tasks);
+    return tasks;
   };
 
   const handleAwardIncreaseChange = (increase: number) => {
@@ -79,6 +84,7 @@ export const MainContent: React.FC<MainContentProps> = ({
   };
 
   const handleUpdateSite = (siteId: string, tasks: any[]) => {
+    console.log('Updating site tasks:', { siteId, tasks });
     const updatedSites = sites.map(site => 
       site.id === siteId ? { ...site, area: { ...site.area, selectedTasks: tasks } } : site
     );
