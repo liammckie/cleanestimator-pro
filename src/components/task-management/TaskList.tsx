@@ -9,9 +9,15 @@ interface TaskListProps {
   tasks: CleaningTask[];
   onEditTask: (task: CleaningTask) => void;
   onDeleteTask: (taskId: string) => void;
+  mode?: 'default' | 'selection';  // Added mode prop with optional type
 }
 
-export const TaskList: React.FC<TaskListProps> = ({ tasks, onEditTask, onDeleteTask }) => {
+export const TaskList: React.FC<TaskListProps> = ({ 
+  tasks, 
+  onEditTask, 
+  onDeleteTask,
+  mode = 'default' // Default value if not provided
+}) => {
   const groupedTasks = tasks.reduce((acc, task) => {
     if (!acc[task.category]) {
       acc[task.category] = [];
@@ -56,20 +62,32 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks, onEditTask, onDeleteT
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onEditTask(task)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onDeleteTask(task.id)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
+                    {mode === 'default' && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onEditTask(task)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onDeleteTask(task.id)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
+                    {mode === 'selection' && (
+                      <Button
+                        variant="secondary"
+                        onClick={() => onEditTask(task)}
+                      >
+                        Add to Scope
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
