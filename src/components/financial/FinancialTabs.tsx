@@ -31,6 +31,9 @@ export const FinancialTabs: React.FC<FinancialTabsProps> = ({
   taskCosts,
   onMarginChange,
 }) => {
+  // Calculate total labor hours from task costs
+  const totalLaborHours = taskCosts.reduce((total, task) => total + task.timeRequired, 0);
+
   return (
     <>
       <TabsContent value="labor" className="space-y-6">
@@ -57,6 +60,7 @@ export const FinancialTabs: React.FC<FinancialTabsProps> = ({
           laborCost={costBreakdown.totalMonthlyCost}
           equipmentCost={equipmentCosts.monthly}
           overhead={overhead}
+          totalLaborHours={totalLaborHours}
           selectedTasks={taskCosts}
           onMarginChange={onMarginChange}
         />
