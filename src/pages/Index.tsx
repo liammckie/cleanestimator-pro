@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MainContent } from '@/components/layout/MainContent';
 import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { TaskProvider } from '@/components/area/task/TaskContext';
@@ -10,8 +10,25 @@ import { TaskStack } from '@/components/task/TaskStack';
 const Index = () => {
   const taskGroups = getTaskGroups();
 
+  const handleTasksChange = (tasks: Array<{
+    taskId: string;
+    siteId?: string;
+    siteName?: string;
+    quantity: number;
+    timeRequired: number;
+    frequency: {
+      timesPerWeek: number;
+      timesPerMonth: number;
+    };
+    productivityOverride?: number;
+    selectedTool?: string;
+  }>) => {
+    console.log('Tasks updated:', tasks);
+    // You can add additional logic here to handle task changes
+  };
+
   return (
-    <TaskProvider>
+    <TaskProvider onTasksChange={handleTasksChange}>
       <div className="min-h-screen">
         <MainNavigation />
         <div className="container mx-auto py-8">
