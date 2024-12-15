@@ -1,16 +1,16 @@
+import React from 'react';
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const MainNavigation = () => {
   return (
-    <TabsList className="grid w-full grid-cols-8">
-      <TabsTrigger value="scope">Scope & Tasks</TabsTrigger>
-      <TabsTrigger value="labor">Labor Costs</TabsTrigger>
+    <TabsList className="w-full justify-start border-b">
+      <TabsTrigger value="scope">Scope of Work</TabsTrigger>
+      <TabsTrigger value="labor">Labor</TabsTrigger>
       <TabsTrigger value="equipment">Equipment</TabsTrigger>
-      <TabsTrigger value="roster">Roster</TabsTrigger>
+      <TabsTrigger value="oncosts">On-Costs</TabsTrigger>
       <TabsTrigger value="contract">Contract</TabsTrigger>
-      <TabsTrigger value="summary">Summary</TabsTrigger>
-      <TabsTrigger value="settings">Settings</TabsTrigger>
-      <TabsTrigger value="overview">Site Overview</TabsTrigger>
+      <TabsTrigger value="overview">Overview</TabsTrigger>
+      <TabsTrigger value="tasks">Task Management</TabsTrigger>
     </TabsList>
   );
 };
