@@ -8,9 +8,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { getProductivityRate } from '@/data/productivityRates';
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
-import { Clock, BarChart2, MapPin, Building, Calendar, Wrench } from "lucide-react";
+import { Clock, BarChart2, MapPin, Building, Calendar, Wrench, Trash2, Edit2 } from "lucide-react";
 import { Site } from '@/data/types/site';
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTaskContext } from './area/task/TaskContext';
+import { toast } from './ui/use-toast';
 
 interface ScopeOfWorkSidebarProps {
   selectedTasks: Array<{
@@ -28,6 +33,16 @@ interface ScopeOfWorkSidebarProps {
 }
 
 export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selectedTasks, sites = [] }) => {
+  const { handleTaskSelection, handleQuantityChange, handleFrequencyChange } = useTaskContext();
+
+  const handleRemoveTask = (taskId: string, siteId?: string) => {
+    handleTaskSelection(taskId, false, siteId);
+    toast({
+      title: "Task Removed",
+      description: "Task has been removed from the scope.",
+    });
+  };
+
   // Group tasks by category
   const tasksByCategory = selectedTasks.reduce((acc, task) => {
     const rate = getProductivityRate(task.taskId);
@@ -107,19 +122,67 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({ selected
                         <div key={category} className="space-y-2">
                           <h4 className="text-sm font-medium text-muted-foreground">{category}</h4>
                           {siteCategoryTasks.map((task, index) => (
-                            <div key={`${task.taskId}-${index}`} className="pl-4 border-l-2 border-accent">
-                              <p className="text-sm font-medium">{task.rate.task}</p>
-                              <div className="flex flex-wrap gap-2 mt-1">
-                                <Badge variant="outline" className="text-xs">
-                                  <Calendar className="w-3 h-3 mr-1" />
-                                  {task.frequency.timesPerWeek}x/week
-                                </Badge>
-                                <Badge variant="outline" className="text-xs">
-                                  <Wrench className="w-3 h-3 mr-1" />
-                                  {task.selectedTool || task.rate.tool}
-                                </Badge>
+                            <Card key={`${task.taskId}-${index}`} className="p-4">
+                              <div className="flex justify-between items-start">
+                                <p className="text-sm font-medium">{task.rate.task}</p>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleRemoveTask(task.taskId, task.siteId)}
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
                               </div>
-                            </div>
+
+                              <div className="space-y-3 mt-3">
+                                {/* SQM/Quantity Input */}
+                                <div>
+                                  <label className="text-xs text-muted-foreground">
+                                    {task.rate.unit === 'm²' ? 'Area (SQM)' : 'Quantity'}
+                                  </label>
+                                  <Input
+                                    type="number"
+                                    value={task.quantity || ''}
+                                    onChange={(e) => handleQuantityChange(task.taskId, Number(e.target.value))}
+                                    className="h-8"
+                                  />
+                                </div>
+
+                                {/* Frequency Selection */}
+                                <div>
+                                  <label className="text-xs text-muted-foreground">
+                                    Frequency (times per week)
+                                  </label>
+                                  <Select
+                                    value={task.frequency.timesPerWeek.toString()}
+                                    onValueChange={(value) => handleFrequencyChange(task.taskId, Number(value))}
+                                  >
+                                    <SelectTrigger className="h-8">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
+                                        <SelectItem key={freq} value={freq.toString()}>
+                                          {freq}x per week
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                {/* Time Requirements */}
+                                <div className="bg-accent/50 p-2 rounded-lg space-y-1">
+                                  <div className="flex justify-between text-xs">
+                                    <span>Time per service:</span>
+                                    <span>{((task.timeRequired * 60) / task.frequency.timesPerWeek / 4.33).toFixed(1)} mins</span>
+                                  </div>
+                                  <div className="flex justify-between text-xs">
+                                    <span>Monthly hours:</span>
+                                    <span>{(task.timeRequired).toFixed(1)} hrs</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
                           ))}
                         </div>
                       );
