@@ -7,21 +7,21 @@ import { Trash2 } from "lucide-react";
 import { SelectedTask } from '@/components/area/task/types';
 
 interface TaskListProps {
-  tasks: SelectedTask[];
+  selectedTasks: SelectedTask[];
   onQuantityChange: (taskId: string, quantity: number) => void;
-  onFrequencyChange: (taskId: string, freq: number) => void;
-  onRemoveTask: (taskId: string) => void;
-  getTaskName: (taskId: string) => string;
+  onFrequencyChange: (taskId: string, timesPerWeek: number) => void;
+  onToolChange: (taskId: string, tool: string) => void;
+  onRemoveTask: (taskId: string, siteId?: string) => void;
 }
 
 export const TaskList = ({
-  tasks,
+  selectedTasks,
   onQuantityChange,
   onFrequencyChange,
-  onRemoveTask,
-  getTaskName
+  onToolChange,
+  onRemoveTask
 }: TaskListProps) => {
-  if (tasks.length === 0) {
+  if (selectedTasks.length === 0) {
     return (
       <div className="text-center p-8 text-muted-foreground">
         <p>No tasks selected. Add tasks from the task database to get started.</p>
@@ -31,12 +31,12 @@ export const TaskList = ({
 
   return (
     <div className="space-y-4">
-      {tasks.map((task) => (
+      {selectedTasks.map((task) => (
         <Card key={task.taskId} className="p-4">
           <CardContent className="space-y-4">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-medium">{getTaskName(task.taskId)}</h3>
+                <h3 className="font-medium">{task.taskId}</h3>
                 <p className="text-sm text-muted-foreground">
                   {task.frequency.timesPerWeek}x per week
                 </p>
@@ -44,7 +44,7 @@ export const TaskList = ({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => onRemoveTask(task.taskId)}
+                onClick={() => onRemoveTask(task.taskId, task.siteId)}
                 className="text-destructive hover:text-destructive/90"
               >
                 <Trash2 className="h-4 w-4" />
