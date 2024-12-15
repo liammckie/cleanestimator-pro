@@ -7,6 +7,7 @@ import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { getMenuOptions } from '@/components/navigation/MenuOptions';
 import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
+import { TaskStack } from '@/components/task/TaskStack';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -37,6 +38,7 @@ const Index = () => {
     <SettingsProvider>
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-background">
+          <TaskStack />
           <div className="flex-1 py-8">
             <div className="container mx-auto px-4">
               <h1 className="text-3xl font-bold text-primary mb-8">
