@@ -1,5 +1,5 @@
-import { ProductivityRate } from '../types/productivity';
-import { taskCategories } from '../categories/taskCategories';
+import { ProductivityRate, TaskGroup } from '../types/productivity';
+import { taskGroups } from '../categories/taskGroups';
 
 class RatesManager {
   private static instance: RatesManager;
@@ -18,15 +18,14 @@ class RatesManager {
 
   private initializeRates() {
     try {
-      // Flatten all tasks from categories and subcategories
+      // Flatten all tasks from groups, categories, and subcategories
       const allTasks: ProductivityRate[] = [];
       
-      taskCategories.forEach(category => {
-        category.subcategories.forEach(subcategory => {
-          subcategory.tasks.forEach(task => {
-            allTasks.push({
-              ...task,
-              subcategory: task.subcategory || subcategory.name
+      taskGroups.forEach(group => {
+        group.categories.forEach(category => {
+          category.subcategories.forEach(subcategory => {
+            subcategory.tasks.forEach(task => {
+              allTasks.push(task);
             });
           });
         });
@@ -35,12 +34,14 @@ class RatesManager {
       // Initialize the rates cache with the flattened tasks
       this.ratesCache.set('all', allTasks);
 
-      // Also create category-specific caches
-      taskCategories.forEach(category => {
-        const categoryTasks = allTasks.filter(task => task.category === category.name);
-        if (categoryTasks.length > 0) {
-          this.ratesCache.set(category.name, categoryTasks);
-        }
+      // Create category-specific caches
+      taskGroups.forEach(group => {
+        group.categories.forEach(category => {
+          const categoryTasks = allTasks.filter(task => task.category === category.name);
+          if (categoryTasks.length > 0) {
+            this.ratesCache.set(category.name, categoryTasks);
+          }
+        });
       });
     } catch (error) {
       console.error('Error initializing rates:', error);
@@ -54,7 +55,7 @@ class RatesManager {
 
   public getRateById(id: string): ProductivityRate | undefined {
     for (const rates of this.ratesCache.values()) {
-      const rate = rates.find(r => r && r.id === id);
+      const rate = rates.find(r => r.id === id);
       if (rate) return rate;
     }
     return undefined;
@@ -64,13 +65,17 @@ class RatesManager {
     return this.ratesCache.get('all') || [];
   }
 
+  public getTaskGroups(): TaskGroup[] {
+    return taskGroups;
+  }
+
   public searchRates(query: string): ProductivityRate[] {
     const searchTerm = query.toLowerCase();
     return this.getAllRates().filter(rate => 
-      rate &&
-      (rate.task.toLowerCase().includes(searchTerm) ||
+      rate.task.toLowerCase().includes(searchTerm) ||
       rate.tool.toLowerCase().includes(searchTerm) ||
-      rate.category.toLowerCase().includes(searchTerm))
+      rate.category.toLowerCase().includes(searchTerm) ||
+      rate.subcategory.toLowerCase().includes(searchTerm)
     );
   }
 }
@@ -80,4 +85,5 @@ export const ratesManager = RatesManager.getInstance();
 export const getRatesByCategory = (category: string) => ratesManager.getRatesByCategory(category);
 export const getRateById = (id: string) => ratesManager.getRateById(id);
 export const getAllRates = () => ratesManager.getAllRates();
+export const getTaskGroups = () => ratesManager.getTaskGroups();
 export const searchRates = (query: string) => ratesManager.searchRates(query);
