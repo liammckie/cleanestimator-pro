@@ -85,6 +85,12 @@ export const MainContent: React.FC<MainContentProps> = ({
     }
   };
 
+  const handleMarginChange = (margin: number) => {
+    console.log('Margin changed:', margin);
+    // Update any relevant state or calculations based on the new margin
+    // This could include updating revenue targets or other financial calculations
+  };
+
   const totalMonthlyHours = calculateTotalMonthlyHours(sites);
   const taskCosts = calculateTaskCosts(sites, laborCosts.hourlyRate, laborCosts.onCosts);
 
