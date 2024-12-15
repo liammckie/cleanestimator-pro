@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,16 +12,8 @@ import { getRateById } from '@/data/rates/ratesManager';
 import { Site } from '@/data/types/site';
 
 export const ScopeOfWorkPage = () => {
-  const [sites, setSites] = useState<Site[]>([]);
   const { selectedTasks, handleTaskSelection, handleQuantityChange, handleFrequencyChange, handleToolChange } = useTaskContext();
   const { toast } = useToast();
-
-  useEffect(() => {
-    const savedSites = localStorage.getItem('sites');
-    if (savedSites) {
-      setSites(JSON.parse(savedSites));
-    }
-  }, []);
 
   const handleRemoveTask = (taskId: string, siteId?: string) => {
     handleTaskSelection(taskId, false, siteId);
@@ -65,33 +57,6 @@ export const ScopeOfWorkPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {/* Site Selection */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Select Site</label>
-                    <Select
-                      value={selectedTask.siteId}
-                      onValueChange={(siteId) => {
-                        const site = sites.find(s => s.id === siteId);
-                        if (site) {
-                          handleTaskSelection(selectedTask.taskId, false, selectedTask.siteId);
-                          handleTaskSelection(selectedTask.taskId, true, site.id, site.name);
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose a site" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {sites.map((site) => (
-                          <SelectItem key={site.id} value={site.id}>
-                            {site.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Quantity Input */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">
                       {taskDetails.unit === 'SQM/hour' ? 'Area (SQM)' : `Quantity (${taskDetails.unit})`}
@@ -104,7 +69,6 @@ export const ScopeOfWorkPage = () => {
                     />
                   </div>
 
-                  {/* Tool Selection */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Tool Selection</label>
                     <ToolSelect
@@ -114,7 +78,6 @@ export const ScopeOfWorkPage = () => {
                     />
                   </div>
 
-                  {/* Frequency Selection */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Frequency (times per week)</label>
                     <Select
@@ -134,7 +97,6 @@ export const ScopeOfWorkPage = () => {
                     </Select>
                   </div>
 
-                  {/* Time Requirements Display */}
                   {productivity && (
                     <div className="mt-4 p-4 bg-accent/50 rounded-lg space-y-2">
                       <h4 className="font-medium">Time Requirements</h4>

@@ -72,7 +72,9 @@ export const TaskProvider: React.FC<{
 
       setSelectedTasks(prev => [...prev, newTask]);
     } else {
-      setSelectedTasks(prev => prev.filter(task => task.taskId !== taskId));
+      setSelectedTasks(prev => prev.filter(task => 
+        !(task.taskId === taskId && task.siteId === siteId)
+      ));
     }
   }, []);
 
@@ -95,10 +97,9 @@ export const TaskProvider: React.FC<{
         }
         return task;
       });
-      onTasksChange(updated);
       return updated;
     });
-  }, [onTasksChange]);
+  }, []);
 
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
     setSelectedTasks(prev => {
@@ -123,34 +124,24 @@ export const TaskProvider: React.FC<{
         }
         return task;
       });
-      onTasksChange(updated);
       return updated;
     });
-  }, [onTasksChange]);
+  }, []);
 
   const handleProductivityOverride = useCallback((taskId: string, override: number) => {
     setSelectedTasks(prev => {
       const updated = prev.map(task => {
         if (task.taskId === taskId) {
-          const productivity = calculateTaskProductivity(
-            taskId,
-            task.quantity,
-            task.selectedTool,
-            task.frequency,
-            task.quantity
-          );
           return { 
             ...task, 
             productivityOverride: override,
-            timeRequired: productivity?.timeRequired || 0 
           };
         }
         return task;
       });
-      onTasksChange(updated);
       return updated;
     });
-  }, [onTasksChange]);
+  }, []);
 
   const handleToolChange = useCallback((taskId: string, tool: string) => {
     setSelectedTasks(prev => {
@@ -171,10 +162,9 @@ export const TaskProvider: React.FC<{
         }
         return task;
       });
-      onTasksChange(updated);
       return updated;
     });
-  }, [onTasksChange]);
+  }, []);
 
   return (
     <TaskContext.Provider value={{
