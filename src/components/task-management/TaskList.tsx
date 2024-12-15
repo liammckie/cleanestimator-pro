@@ -6,16 +6,12 @@ import { CleaningTask } from '@/data/types/taskManagement';
 
 interface TaskListProps {
   tasks: CleaningTask[];
-  selectedTasks: Array<CleaningTask & { quantity: number }>;
-  onTaskSelect: (task: CleaningTask) => void;
   onQuantityChange: (taskId: string, quantity: number) => void;
   onFrequencyChange: (taskId: string, timesPerWeek: number) => void;
 }
 
 export const TaskList: React.FC<TaskListProps> = ({
   tasks,
-  selectedTasks,
-  onTaskSelect,
   onQuantityChange,
   onFrequencyChange
 }) => {
@@ -38,15 +34,20 @@ export const TaskList: React.FC<TaskListProps> = ({
             <TableCell>{task.productivityRate}</TableCell>
             <TableCell>{task.measurementUnit}</TableCell>
             <TableCell>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onTaskSelect(task)}
-                disabled={selectedTasks.some(t => t.id === task.id)}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add to Scope
-              </Button>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  className="w-20 px-2 py-1 border rounded"
+                  onChange={(e) => onQuantityChange(task.id, Number(e.target.value))}
+                  placeholder="Quantity"
+                />
+                <input
+                  type="number"
+                  className="w-20 px-2 py-1 border rounded"
+                  onChange={(e) => onFrequencyChange(task.id, Number(e.target.value))}
+                  placeholder="Times/week"
+                />
+              </div>
             </TableCell>
           </TableRow>
         ))}
