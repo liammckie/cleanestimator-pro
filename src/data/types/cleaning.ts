@@ -1,3 +1,9 @@
+export interface BaseCategory {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 export interface CleaningTask {
   id: string;
   name: string;
@@ -9,16 +15,10 @@ export interface CleaningTask {
   defaultTool?: string;
 }
 
-export interface TaskCategory {
-  id: string;
-  name: string;
-  description: string;
+export interface TaskCategory extends BaseCategory {
   tasks: CleaningTask[];
 }
 
-export interface TaskGroup {
-  id: string;
-  name: string;
-  description: string;
+export interface TaskGroup extends BaseCategory {
   categories: TaskCategory[];
 }
