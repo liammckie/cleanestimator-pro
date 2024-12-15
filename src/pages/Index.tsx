@@ -10,6 +10,7 @@ import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskProvider } from '@/components/area/task/TaskContext';
 import { AreaContainer } from '@/components/area/AreaContainer';
 import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
+import { AreaData } from '@/components/area/task/types';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -32,23 +33,7 @@ const Index = () => {
     },
   });
 
-  const handleAreaChange = (area: {
-    squareMeters: number;
-    spaceType: string;
-    industryType: string;
-    selectedTasks: Array<{
-      taskId: string;
-      quantity: number;
-      timeRequired: number;
-      frequency: {
-        timesPerWeek: number;
-        timesPerMonth: number;
-      };
-      productivityOverride?: number;
-      selectedTool?: string;
-    }>;
-    totalTime: number;
-  }) => {
+  const handleAreaChange = (area: AreaData) => {
     console.log('Area changed:', area);
     setLaborCosts(prev => ({
       ...prev,
@@ -66,16 +51,6 @@ const Index = () => {
     icon: option.icon as "layout" | "file-text" | "list" | "user" | "wrench" | "calendar" | "check-square" | "globe" | "settings",
     onClick: () => setActiveTab(option.id)
   }));
-
-  const handleTasksChange = (tasks: any) => {
-    console.log('Tasks changed in Index:', tasks);
-    // Update labor costs when tasks change
-    setLaborCosts(prev => ({
-      ...prev,
-      totalMonthlyHours: tasks.reduce((sum: number, task: any) => sum + (task.timeRequired || 0), 0),
-      taskCosts: tasks
-    }));
-  };
 
   const selectedTasks = sites.flatMap(site => 
     site.area?.selectedTasks?.map(task => ({

@@ -22,3 +22,11 @@ export interface TaskContextType {
   handleProductivityOverride: (taskId: string, override: number) => void;
   handleToolChange: (taskId: string, tool: string) => void;
 }
+
+export interface AreaData {
+  squareMeters: number;
+  spaceType: string;
+  industryType: string;
+  selectedTasks: SelectedTask[];
+  totalTime: number;
+}

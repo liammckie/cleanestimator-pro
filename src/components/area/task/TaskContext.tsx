@@ -3,20 +3,31 @@ import { useTaskTimes } from '@/hooks/useTaskTimes';
 import { validateTaskData } from '@/utils/taskValidation';
 import { getRateById } from '@/data/rates/ratesManager';
 import { toast } from '@/components/ui/use-toast';
-import { TaskContextType, SelectedTask } from './types';
+import { TaskContextType, SelectedTask, AreaData } from './types';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
-export const TaskProvider: React.FC<{
+interface TaskProviderProps {
   children: React.ReactNode;
-  onTasksChange?: (tasks: SelectedTask[]) => void;
-}> = ({ children, onTasksChange }) => {
+  onTasksChange?: (area: AreaData) => void;
+}
+
+export const TaskProvider: React.FC<TaskProviderProps> = ({ children, onTasksChange }) => {
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
   const { calculateTaskTime } = useTaskTimes();
 
   useEffect(() => {
     console.log('Tasks updated:', selectedTasks);
-    onTasksChange?.(selectedTasks);
+    if (onTasksChange) {
+      const areaData: AreaData = {
+        squareMeters: 0,
+        spaceType: '',
+        industryType: '',
+        selectedTasks,
+        totalTime: selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0)
+      };
+      onTasksChange(areaData);
+    }
   }, [selectedTasks, onTasksChange]);
 
   const handleTaskSelection = useCallback((taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
