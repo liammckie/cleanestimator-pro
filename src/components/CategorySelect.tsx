@@ -22,16 +22,30 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Transform TaskGroup[] to CategoryGroup[] format
-  const transformedGroups = groups.map(group => ({
-    name: group.name,
-    categories: group.categories.map(category => ({
-      name: category.name,
-      subcategories: category.subcategories.map(sub => 
-        sub.tasks.map(task => task.task)
-      ).flat()
-    }))
-  }));
+  // Transform TaskGroup[] to CategoryGroup[] format with proper null checks
+  const transformedGroups = (groups || []).map(group => {
+    if (!group) return null;
+    
+    return {
+      name: group.name || '',
+      categories: (group.categories || []).map(category => {
+        if (!category) return null;
+        
+        return {
+          name: category.name || '',
+          subcategories: (category.subcategories || []).reduce((acc: string[], sub) => {
+            if (!sub || !Array.isArray(sub.tasks)) return acc;
+            
+            const taskNames = sub.tasks
+              .filter(task => task && typeof task === 'object' && task.task)
+              .map(task => task.task);
+              
+            return [...acc, ...taskNames];
+          }, [])
+        };
+      }).filter(Boolean)
+    };
+  }).filter(Boolean);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
