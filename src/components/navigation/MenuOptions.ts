@@ -4,37 +4,44 @@ export const getMenuOptions = (setActiveTab: (value: string) => void): MenuOptio
   return [
     {
       label: "Scope of Work",
-      value: "scope",
+      id: "scope",
+      icon: "list",
       onClick: () => setActiveTab("scope"),
     },
     {
       label: "Labor",
-      value: "labor",
+      id: "labor",
+      icon: "user",
       onClick: () => setActiveTab("labor"),
     },
     {
       label: "Equipment",
-      value: "equipment",
+      id: "equipment",
+      icon: "tool",
       onClick: () => setActiveTab("equipment"),
     },
     {
       label: "On-Costs",
-      value: "oncosts",
+      id: "oncosts",
+      icon: "dollar-sign",
       onClick: () => setActiveTab("oncosts"),
     },
     {
       label: "Contract",
-      value: "contract",
+      id: "contract",
+      icon: "file-text",
       onClick: () => setActiveTab("contract"),
     },
     {
       label: "Overview",
-      value: "overview",
+      id: "overview",
+      icon: "layout",
       onClick: () => setActiveTab("overview"),
     },
     {
       label: "Task Management",
-      value: "tasks",
+      id: "tasks",
+      icon: "check-square",
       onClick: () => setActiveTab("tasks"),
     },
   ];
