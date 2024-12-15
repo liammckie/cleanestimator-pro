@@ -4,6 +4,7 @@ import { cleaningTasks } from '../tasks/cleaningTasks';
 class RatesManager {
   private static instance: RatesManager;
   private ratesCache: Map<string, ProductivityRate[]> = new Map();
+  private taskGroupsCache: TaskGroup[] = [];
 
   private constructor() {
     this.initializeRates();
@@ -18,14 +19,23 @@ class RatesManager {
 
   private initializeRates() {
     try {
+      // Initialize task groups cache first
+      this.taskGroupsCache = Array.isArray(cleaningTasks) ? cleaningTasks : [];
+
       // Flatten all tasks from groups, categories, and subcategories
       const allTasks: ProductivityRate[] = [];
       
-      cleaningTasks.forEach(group => {
+      this.taskGroupsCache.forEach(group => {
+        if (!group?.categories) return;
+        
         group.categories.forEach(category => {
+          if (!category?.subcategories) return;
+          
           category.subcategories.forEach(subcategory => {
+            if (!subcategory?.tasks) return;
+            
             subcategory.tasks.forEach(task => {
-              allTasks.push(task);
+              if (task) allTasks.push(task);
             });
           });
         });
@@ -35,8 +45,12 @@ class RatesManager {
       this.ratesCache.set('all', allTasks);
 
       // Create category-specific caches
-      cleaningTasks.forEach(group => {
+      this.taskGroupsCache.forEach(group => {
+        if (!group?.categories) return;
+        
         group.categories.forEach(category => {
+          if (!category?.name) return;
+          
           const categoryTasks = allTasks.filter(task => task.category === category.name);
           if (categoryTasks.length > 0) {
             this.ratesCache.set(category.name, categoryTasks);
@@ -46,6 +60,7 @@ class RatesManager {
     } catch (error) {
       console.error('Error initializing rates:', error);
       this.ratesCache = new Map();
+      this.taskGroupsCache = [];
     }
   }
 
@@ -66,7 +81,7 @@ class RatesManager {
   }
 
   public getTaskGroups(): TaskGroup[] {
-    return cleaningTasks;
+    return this.taskGroupsCache;
   }
 
   public searchRates(query: string): ProductivityRate[] {

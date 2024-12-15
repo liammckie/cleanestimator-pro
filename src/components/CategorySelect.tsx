@@ -34,14 +34,20 @@ export const CategorySelect = ({
   // Ensure we have valid groups to work with
   const validGroups = Array.isArray(groups) ? groups : [];
 
-  // Create a flat list of all categories from all groups
-  const categories = validGroups.flatMap(group => 
-    group.categories.map(category => ({
-      value: category.name.toLowerCase(),
-      label: category.name,
-      group: group.name
-    }))
-  );
+  // Create a flat list of all categories from all groups, with null checks
+  const categories = validGroups.reduce((acc, group) => {
+    if (!group?.categories) return acc;
+    
+    const groupCategories = group.categories
+      .filter(category => category && category.name) // Filter out invalid categories
+      .map(category => ({
+        value: category.name.toLowerCase(),
+        label: category.name,
+        group: group.name
+      }));
+    
+    return [...acc, ...groupCategories];
+  }, [] as Array<{ value: string; label: string; group: string }>);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -62,28 +68,34 @@ export const CategorySelect = ({
         <Command>
           <CommandInput placeholder="Search categories..." />
           <CommandEmpty>No category found.</CommandEmpty>
-          {validGroups.map((group) => (
-            <CommandGroup key={group.id} heading={group.name}>
-              {group.categories.map((category) => (
-                <CommandItem
-                  key={category.id}
-                  value={category.name.toLowerCase()}
-                  onSelect={(currentValue) => {
-                    onValueChange(currentValue === value ? '' : currentValue);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === category.name.toLowerCase() ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {category.name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          ))}
+          {validGroups.map((group) => {
+            if (!group?.categories?.length) return null;
+            
+            return (
+              <CommandGroup key={group.id} heading={group.name}>
+                {group.categories
+                  .filter(category => category && category.name)
+                  .map((category) => (
+                    <CommandItem
+                      key={category.id}
+                      value={category.name.toLowerCase()}
+                      onSelect={(currentValue) => {
+                        onValueChange(currentValue === value ? '' : currentValue);
+                        setOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          value === category.name.toLowerCase() ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {category.name}
+                    </CommandItem>
+                  ))}
+              </CommandGroup>
+            );
+          })}
         </Command>
       </PopoverContent>
     </Popover>
