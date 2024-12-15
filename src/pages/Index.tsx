@@ -9,7 +9,6 @@ import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskStack } from '@/components/task/TaskStack';
 import { TaskProvider } from '@/components/area/task/TaskContext';
-import { TaskManagementPage } from '@/components/task-management/TaskManagementPage';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -37,15 +36,14 @@ const Index = () => {
   const menuOptions = getMenuOptions(setActiveTab);
 
   const handleTasksChange = (tasks: any) => {
-    // This will be implemented later when we need to handle task changes
     console.log('Tasks changed:', tasks);
   };
 
   return (
     <SettingsProvider>
       <SidebarProvider>
-        <TaskProvider onTasksChange={handleTasksChange}>
-          <div className="min-h-screen flex w-full bg-background">
+        <div className="min-h-screen flex w-full bg-background">
+          <TaskProvider onTasksChange={handleTasksChange}>
             <TaskStack />
             <div className="flex-1 py-8">
               <div className="container mx-auto px-4">
@@ -83,8 +81,8 @@ const Index = () => {
                 </Tabs>
               </div>
             </div>
-          </div>
-        </TaskProvider>
+          </TaskProvider>
+        </div>
       </SidebarProvider>
     </SettingsProvider>
   );

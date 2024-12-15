@@ -9,6 +9,7 @@ export interface ProductivityRate {
   defaultQuantity?: number;
   minimumQuantity?: number;
   maximumQuantity?: number;
+  notes?: string;
 }
 
 export interface TaskCategory {
