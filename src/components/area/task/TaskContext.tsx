@@ -10,25 +10,42 @@ const TaskContext = createContext<TaskContextType | undefined>(undefined);
 interface TaskProviderProps {
   children: React.ReactNode;
   onTasksChange?: (area: AreaData) => void;
+  defaultLaborRate?: number;
 }
 
-export const TaskProvider: React.FC<TaskProviderProps> = ({ children, onTasksChange }) => {
+export const TaskProvider: React.FC<TaskProviderProps> = ({ 
+  children, 
+  onTasksChange,
+  defaultLaborRate = 38 
+}) => {
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
   const { calculateTaskTime } = useTaskTimes();
 
+  const calculateTotalLaborCost = useCallback((tasks: SelectedTask[]): number => {
+    return tasks.reduce((total, task) => {
+      const hourlyRate = task.laborRate || defaultLaborRate;
+      const monthlyHours = task.timeRequired;
+      return total + (hourlyRate * monthlyHours);
+    }, 0);
+  }, [defaultLaborRate]);
+
   useEffect(() => {
-    console.log('Tasks updated:', selectedTasks);
     if (onTasksChange) {
+      const totalTime = selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0);
+      const totalLaborCost = calculateTotalLaborCost(selectedTasks);
+      
       const areaData: AreaData = {
-        squareMeters: 0,
+        squareMeters: 0, // This should come from area input
         spaceType: '',
         industryType: '',
         selectedTasks,
-        totalTime: selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0)
+        totalTime,
+        totalLaborCost
       };
+      
       onTasksChange(areaData);
     }
-  }, [selectedTasks, onTasksChange]);
+  }, [selectedTasks, onTasksChange, calculateTotalLaborCost]);
 
   const handleTaskSelection = useCallback((taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
     if (isSelected) {
@@ -52,14 +69,16 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children, onTasksCha
           timesPerWeek: 1,
           timesPerMonth: 4.33
         },
-        selectedTool: rate.tool
+        selectedTool: rate.tool,
+        laborRate: defaultLaborRate,
+        laborType: 'contracted'
       };
 
       setSelectedTasks(prev => [...prev, newTask]);
     } else {
       setSelectedTasks(prev => prev.filter(task => task.taskId !== taskId));
     }
-  }, []);
+  }, [defaultLaborRate]);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
     setSelectedTasks(prev => prev.map(task => {
@@ -108,6 +127,19 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children, onTasksCha
     }));
   }, [calculateTaskTime]);
 
+  const handleLaborRateChange = useCallback((taskId: string, rate: number, type: 'contracted' | 'direct') => {
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        return {
+          ...task,
+          laborRate: rate,
+          laborType: type
+        };
+      }
+      return task;
+    }));
+  }, []);
+
   const handleProductivityOverride = useCallback((taskId: string, override: number) => {
     setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
@@ -146,7 +178,8 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children, onTasksCha
     handleQuantityChange,
     handleFrequencyChange,
     handleProductivityOverride,
-    handleToolChange
+    handleToolChange,
+    handleLaborRateChange
   };
 
   return (

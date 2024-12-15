@@ -12,6 +12,8 @@ export interface SelectedTask {
   frequency: TaskFrequency;
   productivityOverride?: number;
   selectedTool?: string;
+  laborRate?: number;
+  laborType?: 'contracted' | 'direct';
 }
 
 export interface TaskContextType {
@@ -21,6 +23,7 @@ export interface TaskContextType {
   handleFrequencyChange: (taskId: string, timesPerWeek: number) => void;
   handleProductivityOverride: (taskId: string, override: number) => void;
   handleToolChange: (taskId: string, tool: string) => void;
+  handleLaborRateChange: (taskId: string, rate: number, type: 'contracted' | 'direct') => void;
 }
 
 export interface AreaData {
@@ -29,4 +32,5 @@ export interface AreaData {
   industryType: string;
   selectedTasks: SelectedTask[];
   totalTime: number;
+  totalLaborCost: number;
 }
