@@ -65,7 +65,6 @@ export const MainContent: React.FC<MainContentProps> = ({
   const handleMarginChange = (margin: number) => {
     const totalCosts = costBreakdown.totalMonthlyCost + equipmentCosts.monthly + overhead;
     const newRevenue = totalCosts / (1 - (margin / 100));
-    // Update contract details or other relevant state here
     console.log('New revenue based on margin:', newRevenue);
   };
 
@@ -75,6 +74,8 @@ export const MainContent: React.FC<MainContentProps> = ({
     );
     onSitesChange(updatedSites);
   };
+
+  const totalMonthlyHours = calculateTotalMonthlyHours();
 
   return (
     <>
@@ -93,7 +94,7 @@ export const MainContent: React.FC<MainContentProps> = ({
       <TabsContent value="labor" className="space-y-6">
         <LaborCosts 
           onLaborCostChange={setLaborCosts}
-          totalMonthlyHours={calculateTotalMonthlyHours()}
+          totalMonthlyHours={totalMonthlyHours}
         />
       </TabsContent>
 
@@ -124,6 +125,7 @@ export const MainContent: React.FC<MainContentProps> = ({
           laborCost={costBreakdown.totalMonthlyCost}
           equipmentCost={equipmentCosts.monthly}
           overhead={overhead}
+          totalLaborHours={totalMonthlyHours}
           onMarginChange={handleMarginChange}
         />
       </TabsContent>
