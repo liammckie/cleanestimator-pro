@@ -3,14 +3,7 @@ import { Check } from "lucide-react";
 import { CommandGroup, CommandItem } from "@/components/ui/command";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-
-interface CategoryGroup {
-  name: string;
-  categories: {
-    name: string;
-    subcategories: string[];
-  }[];
-}
+import { CategoryGroup, CleaningTask } from '@/data/types/categories';
 
 interface CategoryListProps {
   groups: CategoryGroup[];
@@ -20,62 +13,59 @@ interface CategoryListProps {
 }
 
 export const CategoryList: React.FC<CategoryListProps> = ({
-  groups,
+  groups = [],
   selectedValue,
   searchQuery,
   onSelect,
 }) => {
-  // Ensure groups is an array
-  const safeGroups = Array.isArray(groups) ? groups : [];
-
-  const filterTasks = (tasks: string[] = []) => {
-    if (!Array.isArray(tasks)) return [];
+  const filterTasks = (tasks: CleaningTask[] = []): CleaningTask[] => {
     return tasks.filter(task => 
-      task && typeof task === 'string' && 
-      task.toLowerCase().includes(searchQuery.toLowerCase())
+      task?.task?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
-  const getCategoryTasks = (categoryName: string): string[] => {
-    // Find the group and ensure it exists with valid categories
-    const group = safeGroups.find(g => g?.name === categoryName);
-    if (!group?.categories || !Array.isArray(group.categories)) return [];
+  const getGroupTasks = (group: CategoryGroup): CleaningTask[] => {
+    if (!group?.categories) return [];
     
-    // Reduce categories to a flat array of subcategories
-    return group.categories.reduce((acc: string[], category) => {
-      if (!category?.subcategories || !Array.isArray(category.subcategories)) return acc;
-      return [...acc, ...category.subcategories];
+    return group.categories.reduce((allTasks: CleaningTask[], category) => {
+      if (!category?.subcategories) return allTasks;
+      
+      const categoryTasks = category.subcategories.reduce((subTasks: CleaningTask[], subcategory) => {
+        if (!subcategory?.tasks) return subTasks;
+        return [...subTasks, ...subcategory.tasks];
+      }, []);
+      
+      return [...allTasks, ...categoryTasks];
     }, []);
   };
 
-  // Get and filter tasks for each category
-  const coreCleaningTasks = filterTasks(getCategoryTasks('Core Cleaning'));
-  const specializedCleaningTasks = filterTasks(getCategoryTasks('Specialized Cleaning'));
-  const industrySpecificTasks = filterTasks(getCategoryTasks('Industry-Specific'));
+  const coreCleaning = groups.find(g => g.name === 'Core Cleaning Tasks');
+  const specializedCleaning = groups.find(g => g.name === 'Specialized Cleaning');
+  const industrySpecific = groups.find(g => g.name === 'Industry-Specific Cleaning');
 
-  const renderTaskList = (tasks: string[] = []) => {
-    if (!Array.isArray(tasks)) return null;
+  const coreCleaningTasks = coreCleaning ? filterTasks(getGroupTasks(coreCleaning)) : [];
+  const specializedCleaningTasks = specializedCleaning ? filterTasks(getGroupTasks(specializedCleaning)) : [];
+  const industrySpecificTasks = industrySpecific ? filterTasks(getGroupTasks(industrySpecific)) : [];
+
+  const renderTaskList = (tasks: CleaningTask[] = []) => {
     return tasks.map((task) => (
-      task && (
-        <CommandItem
-          key={task}
-          value={task}
-          onSelect={() => onSelect(task)}
-          className="cursor-pointer"
-        >
-          <Check
-            className={cn(
-              "mr-2 h-4 w-4",
-              selectedValue === task ? "opacity-100" : "opacity-0"
-            )}
-          />
-          {task}
-        </CommandItem>
-      )
+      <CommandItem
+        key={task.id}
+        value={task.task}
+        onSelect={() => onSelect(task.task)}
+        className="cursor-pointer"
+      >
+        <Check
+          className={cn(
+            "mr-2 h-4 w-4",
+            selectedValue === task.task ? "opacity-100" : "opacity-0"
+          )}
+        />
+        {task.task}
+      </CommandItem>
     ));
   };
 
-  // Show appropriate message when no tasks are available
   if (!searchQuery && !coreCleaningTasks.length && !specializedCleaningTasks.length && !industrySpecificTasks.length) {
     return (
       <div className="p-4 text-sm text-muted-foreground text-center">
@@ -84,7 +74,6 @@ export const CategoryList: React.FC<CategoryListProps> = ({
     );
   }
 
-  // Show message when search yields no results
   if (searchQuery && !coreCleaningTasks.length && !specializedCleaningTasks.length && !industrySpecificTasks.length) {
     return (
       <div className="p-4 text-sm text-muted-foreground text-center">

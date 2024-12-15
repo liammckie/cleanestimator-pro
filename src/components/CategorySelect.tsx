@@ -4,13 +4,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { ChevronsUpDown } from "lucide-react";
 import { CategoryList } from './CategoryList';
-import { TaskGroup } from '@/data/types/productivity';
+import { CategoryGroup } from '@/data/types/categories';
 
 interface CategorySelectProps {
   value: string;
   onValueChange: (value: string) => void;
   defaultTab?: string;
-  groups?: TaskGroup[];
+  groups?: CategoryGroup[];
 }
 
 export const CategorySelect: React.FC<CategorySelectProps> = ({
@@ -21,62 +21,6 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Safely transform groups with proper type checking and null safety
-  const transformedGroups = React.useMemo(() => {
-    if (!Array.isArray(groups)) return [];
-
-    return groups.reduce((acc: any[], group) => {
-      // Ensure group is valid
-      if (!group || typeof group !== 'object' || !group.name || !Array.isArray(group.categories)) {
-        return acc;
-      }
-
-      // Transform and filter categories
-      const categories = group.categories
-        .filter(category => category && typeof category === 'object')
-        .reduce((catAcc: any[], category) => {
-          // Ensure category has required properties
-          if (!category.name || !Array.isArray(category.subcategories)) {
-            return catAcc;
-          }
-
-          // Transform and filter subcategories
-          const tasks = category.subcategories
-            .filter(subcategory => subcategory && typeof subcategory === 'object')
-            .reduce((taskAcc: string[], subcategory) => {
-              if (!Array.isArray(subcategory?.tasks)) {
-                return taskAcc;
-              }
-
-              // Extract valid task names
-              const taskNames = subcategory.tasks
-                .filter(task => task && typeof task === 'object' && task.task)
-                .map(task => task.task);
-
-              return [...taskAcc, ...taskNames];
-            }, []);
-
-          if (tasks.length === 0) {
-            return catAcc;
-          }
-
-          return [...catAcc, {
-            name: category.name,
-            subcategories: tasks
-          }];
-        }, []);
-
-      if (categories.length === 0) {
-        return acc;
-      }
-
-      return [...acc, {
-        name: group.name,
-        categories
-      }];
-    }, []);
-  }, [groups]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -99,7 +43,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
             onValueChange={setSearchQuery}
           />
           <CategoryList
-            groups={transformedGroups}
+            groups={groups}
             selectedValue={value}
             searchQuery={searchQuery}
             onSelect={(category) => {
