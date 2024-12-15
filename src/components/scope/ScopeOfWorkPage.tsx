@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash, AlertCircle } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { CleaningTask } from '@/data/types/taskManagement';
 import { loadTasks, groupTasksByCategory } from '@/utils/taskStorage';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTaskContext } from '../area/task/TaskContext';
 import { Site } from '@/data/types/site';
+import { calculateTaskProductivity } from '@/utils/productivityCalculations';
 
 export const ScopeOfWorkPage = () => {
   const [availableTasks, setAvailableTasks] = useState<CleaningTask[]>([]);
@@ -56,127 +57,125 @@ export const ScopeOfWorkPage = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Scope of Work</h1>
+      <h1 className="text-3xl font-bold mb-8">Selected Tasks</h1>
       
       <div className="grid grid-cols-1 gap-6">
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Available Tasks</h2>
-          <div className="space-y-6">
-            {Object.entries(groupedAvailableTasks).map(([category, tasks]) => (
-              <Card key={category}>
-                <CardHeader>
-                  <CardTitle>{category}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {tasks.map((task) => (
-                      <div
-                        key={task.id}
-                        className="flex flex-col space-y-4 p-4 border rounded-lg"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-1">
-                            <h4 className="font-medium">{task.taskName}</h4>
-                            <Badge variant="secondary">
-                              {task.productivityRate} {task.measurementUnit}
-                            </Badge>
-                          </div>
-                        </div>
+        {selectedTasks.map((selectedTask) => {
+          const taskDetails = availableTasks.find(t => t.id === selectedTask.taskId);
+          if (!taskDetails) return null;
 
-                        <div className="space-y-4 pt-4 border-t">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Select Site</label>
-                            <Select
-                              onValueChange={(siteId) => {
-                                const site = sites.find(s => s.id === siteId);
-                                if (site) {
-                                  handleAddToScope(task.id, site.id, site.name);
-                                }
-                              }}
-                            >
-                              <SelectTrigger className="max-w-xs">
-                                <SelectValue placeholder="Choose a site" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {sites.map((site) => (
-                                  <SelectItem key={site.id} value={site.id}>
-                                    {site.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+          const productivity = calculateTaskProductivity(
+            selectedTask.taskId,
+            selectedTask.quantity,
+            selectedTask.selectedTool,
+            selectedTask.frequency,
+            selectedTask.quantity
+          );
 
-                          {sites.map(site => {
-                            const selectedTask = selectedTasks.find(
-                              t => t.taskId === task.id && t.siteId === site.id
-                            );
-
-                            if (!selectedTask) return null;
-
-                            return (
-                              <div key={`${task.id}-${site.id}`} className="space-y-4 pl-4 border-l-2">
-                                <div className="flex items-center justify-between">
-                                  <span className="font-medium">{site.name}</span>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleRemoveFromScope(task.id, site.id)}
-                                  >
-                                    <Trash className="h-4 w-4" />
-                                  </Button>
-                                </div>
-
-                                <div className="space-y-2">
-                                  <label className="text-sm font-medium">
-                                    {task.measurementUnit === 'SQM/hour' ? 'Area (SQM)' : 'Quantity'}
-                                  </label>
-                                  <Input
-                                    type="number"
-                                    value={selectedTask.quantity || ''}
-                                    onChange={(e) => handleQuantityChange(task.id, Number(e.target.value))}
-                                    placeholder={`Enter ${task.measurementUnit === 'SQM/hour' ? 'area' : 'quantity'}`}
-                                    className="max-w-xs"
-                                  />
-                                </div>
-
-                                <div className="space-y-2">
-                                  <label className="text-sm font-medium">Frequency (times per week)</label>
-                                  <Select
-                                    value={selectedTask.frequency.timesPerWeek.toString()}
-                                    onValueChange={(value) => handleFrequencyChange(task.id, Number(value))}
-                                  >
-                                    <SelectTrigger className="max-w-xs">
-                                      <SelectValue placeholder="Select frequency" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
-                                        <SelectItem key={freq} value={freq.toString()}>
-                                          {freq}x per week
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-
-                                {selectedTask.timeRequired > 0 && (
-                                  <div className="text-sm text-muted-foreground space-y-1">
-                                    <p>Monthly Hours: {(selectedTask.timeRequired * selectedTask.frequency.timesPerMonth).toFixed(2)}</p>
-                                    <p>Hours per Service: {selectedTask.timeRequired.toFixed(2)}</p>
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
+          return (
+            <Card key={`${selectedTask.taskId}-${selectedTask.siteId}`} className="w-full">
+              <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                  <span>{taskDetails.taskName}</span>
+                  <Badge variant="outline">
+                    {taskDetails.measurementUnit}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Site Selection */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Select Site</label>
+                    <Select
+                      value={selectedTask.siteId}
+                      onValueChange={(siteId) => {
+                        const site = sites.find(s => s.id === siteId);
+                        if (site) {
+                          handleTaskSelection(selectedTask.taskId, false, selectedTask.siteId);
+                          handleTaskSelection(selectedTask.taskId, true, site.id, site.name);
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a site" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sites.map((site) => (
+                          <SelectItem key={site.id} value={site.id}>
+                            {site.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+
+                  {/* Quantity Input */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      {taskDetails.measurementUnit === 'SQM/hour' ? 'Area (SQM)' : 'Quantity'}
+                    </label>
+                    <Input
+                      type="number"
+                      value={selectedTask.quantity || ''}
+                      onChange={(e) => handleQuantityChange(selectedTask.taskId, Number(e.target.value))}
+                      placeholder={`Enter ${taskDetails.measurementUnit === 'SQM/hour' ? 'area' : 'quantity'}`}
+                    />
+                  </div>
+
+                  {/* Frequency Selection */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Frequency (times per week)</label>
+                    <Select
+                      value={selectedTask.frequency.timesPerWeek.toString()}
+                      onValueChange={(value) => handleFrequencyChange(selectedTask.taskId, Number(value))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select frequency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
+                          <SelectItem key={freq} value={freq.toString()}>
+                            {freq}x per week
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Time Requirements Display */}
+                  {productivity && (
+                    <div className="mt-4 p-4 bg-accent/50 rounded-lg space-y-2">
+                      <h4 className="font-medium">Time Requirements</h4>
+                      <div className="text-sm space-y-1">
+                        <p>Time per service: {(productivity.timeRequired * 60).toFixed(1)} minutes</p>
+                        <p>Monthly hours: {(productivity.timeRequired * selectedTask.frequency.timesPerMonth).toFixed(1)} hours</p>
+                        <p>Productivity rate: {productivity.adjustedRate.toFixed(2)} {taskDetails.measurementUnit}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Remove Task Button */}
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleRemoveFromScope(selectedTask.taskId, selectedTask.siteId || '')}
+                    className="mt-4"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Remove Task
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+
+        {selectedTasks.length === 0 && (
+          <div className="text-center p-8 text-muted-foreground">
+            <p>No tasks selected. Add tasks from the task database to get started.</p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
