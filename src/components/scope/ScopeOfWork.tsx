@@ -21,6 +21,26 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
   const { selectedTasks, handleTaskSelection, handleQuantityChange, handleFrequencyChange, handleToolChange } = useTaskContext();
   const { toast } = useToast();
 
+  // Update site's tasks whenever selectedTasks changes
+  React.useEffect(() => {
+    if (sites.length > 0 && selectedTasks.length > 0) {
+      // For now, we'll add all tasks to the first site
+      const siteId = sites[0].id;
+      
+      // Format tasks for site storage
+      const formattedTasks = selectedTasks.map(task => ({
+        taskId: task.taskId,
+        quantity: task.quantity,
+        timeRequired: task.timeRequired,
+        frequency: task.frequency,
+        productivityOverride: task.productivityOverride
+      }));
+
+      console.log('Updating site tasks:', formattedTasks);
+      onUpdateSite(siteId, formattedTasks);
+    }
+  }, [selectedTasks, sites, onUpdateSite]);
+
   const handleRemoveTask = (taskId: string, siteId?: string) => {
     handleTaskSelection(taskId, false, siteId);
     toast({

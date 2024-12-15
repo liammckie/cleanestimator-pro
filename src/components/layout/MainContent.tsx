@@ -99,7 +99,14 @@ export const MainContent: React.FC<MainContentProps> = ({
   const handleUpdateSite = (siteId: string, tasks: any[]) => {
     console.log('Updating site tasks:', { siteId, tasks });
     const updatedSites = sites.map(site => 
-      site.id === siteId ? { ...site, area: { ...site.area, selectedTasks: tasks } } : site
+      site.id === siteId ? {
+        ...site,
+        area: {
+          ...site.area,
+          selectedTasks: tasks,
+          totalTime: tasks.reduce((total, task) => total + (task.timeRequired || 0), 0)
+        }
+      } : site
     );
     onSitesChange(updatedSites);
   };
