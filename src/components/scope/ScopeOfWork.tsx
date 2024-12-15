@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Trash2 } from "lucide-react";
+import { Trash2, Clock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useTaskContext } from '../area/task/TaskContext';
 import { ToolSelect } from '../ToolSelect';
@@ -18,8 +18,11 @@ interface ScopeOfWorkProps {
 }
 
 export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite }) => {
-  const { selectedTasks, handleTaskSelection, handleQuantityChange, handleFrequencyChange, handleToolChange } = useTaskContext();
+  const { selectedTasks, handleTaskSelection, handleQuantityChange, handleFrequencyChange, handleToolChange, totalWeeklyHours } = useTaskContext();
   const { toast } = useToast();
+
+  // Calculate monthly hours
+  const totalMonthlyHours = totalWeeklyHours * 4.33;
 
   // Update site's tasks whenever selectedTasks changes
   React.useEffect(() => {
@@ -57,6 +60,26 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
             <CardTitle>Scope of Work</CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Add Time Summary Card */}
+            <Card className="mb-6 bg-accent/50">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Clock className="h-5 w-5 text-primary" />
+                  <h3 className="font-medium text-lg">Time Requirements</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Weekly Hours</p>
+                    <p className="text-2xl font-bold">{totalWeeklyHours.toFixed(1)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Monthly Hours</p>
+                    <p className="text-2xl font-bold">{totalMonthlyHours.toFixed(1)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="space-y-4">
               {selectedTasks.map((selectedTask) => {
                 const taskDetails = getRateById(selectedTask.taskId);
