@@ -23,6 +23,7 @@ export interface TaskContextType {
   handleToolChange: (taskId: string, tool: string) => void;
   handleLaborRateChange: (taskId: string, rate: number) => void;
   handleProductivityOverride: (taskId: string, override: number) => void;
+  totalWeeklyHours: number;
 }
 
 export interface AreaData {

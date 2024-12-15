@@ -8,7 +8,6 @@ import { ContractForecast } from '@/components/ContractForecast';
 interface FinancialTabsProps {
   laborCosts: any;
   setLaborCosts: (costs: any) => void;
-  totalMonthlyHours: number;
   monthlyRevenue: number;
   overhead: number;
   costBreakdown: any;
@@ -22,7 +21,6 @@ interface FinancialTabsProps {
 export const FinancialTabs: React.FC<FinancialTabsProps> = ({
   laborCosts,
   setLaborCosts,
-  totalMonthlyHours,
   monthlyRevenue,
   overhead,
   costBreakdown,
@@ -37,7 +35,6 @@ export const FinancialTabs: React.FC<FinancialTabsProps> = ({
       <TabsContent value="labor" className="space-y-6">
         <LaborCosts 
           onLaborCostChange={setLaborCosts}
-          totalMonthlyHours={totalMonthlyHours}
         />
       </TabsContent>
 
