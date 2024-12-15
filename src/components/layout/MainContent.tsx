@@ -60,7 +60,7 @@ export const MainContent: React.FC<MainContentProps> = ({
 
   return (
     <>
-      <TabsContent value="scope" className="space-y-6">
+      <TabsContent value="sites" className="space-y-6">
         <SiteManager onSitesChange={onSitesChange} />
       </TabsContent>
 

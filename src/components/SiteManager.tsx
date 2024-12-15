@@ -11,38 +11,19 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
   const [sites, setSites] = useState<Site[]>([
     {
       id: uuidv4(),
-      name: 'Corporate Office Building',
+      name: 'New Site',
       address: {
-        street: '123 Business Avenue',
-        suburb: 'Central Business District',
-        state: 'NSW',
-        postcode: '2000'
+        street: '',
+        suburb: '',
+        state: '',
+        postcode: ''
       },
       area: {
-        squareMeters: 2500,
+        squareMeters: 0,
         spaceType: 'office',
         industryType: 'corporate',
-        selectedTasks: [
-          {
-            taskId: 'vacuum-carpet',
-            quantity: 1,
-            timeRequired: 2,
-            frequency: {
-              timesPerWeek: 5,
-              timesPerMonth: 20
-            }
-          },
-          {
-            taskId: 'clean-bathrooms',
-            quantity: 4,
-            timeRequired: 1.5,
-            frequency: {
-              timesPerWeek: 5,
-              timesPerMonth: 20
-            }
-          }
-        ],
-        totalTime: 70
+        selectedTasks: [],
+        totalTime: 0
       }
     }
   ]);
@@ -50,7 +31,7 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
   const addSite = () => {
     const newSite: Site = {
       id: uuidv4(),
-      name: `Site ${sites.length + 1}`,
+      name: `New Site ${sites.length + 1}`,
       address: {
         street: '',
         suburb: '',
@@ -113,7 +94,7 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
       onDeleteSite={removeSite}
       onUpdateSiteName={updateSiteName}
       onUpdateSiteAddress={updateSiteAddress}
-      onUpdateSiteArea={updateSiteArea}
+      onUpdateSiteArea={onUpdateSiteArea}
     />
   );
 };
