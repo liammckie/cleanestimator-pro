@@ -1,11 +1,5 @@
 import { ProductivityRate } from '../types/productivity';
-import { carpetMaintenanceRates } from './categories/carpetMaintenance';
-import { restroomRates } from './categories/restroom';
-import { specialistRates } from './categories/specialist';
-import { healthcareRates } from './categories/healthcare';
-import { kitchenRates } from './categories/kitchen';
-import { windowRates } from './categories/windows';
-import { bundledRates } from './bundledRates';
+import { taskCategories } from '../categories/taskCategories';
 
 class RatesManager {
   private static instance: RatesManager;
@@ -24,51 +18,30 @@ class RatesManager {
 
   private initializeRates() {
     try {
-      const initializeCategory = (category: string, rates: ProductivityRate[]) => {
-        if (Array.isArray(rates)) {
-          this.ratesCache.set(category, rates.map(rate => ({
-            ...rate,
-            subcategory: rate.subcategory || rate.category // Default to category if subcategory is missing
-          })));
-        } else {
-          console.warn(`Invalid rates format for category: ${category}`);
-          this.ratesCache.set(category, []);
+      // Flatten all tasks from categories and subcategories
+      const allTasks: ProductivityRate[] = [];
+      
+      taskCategories.forEach(category => {
+        category.subcategories.forEach(subcategory => {
+          subcategory.tasks.forEach(task => {
+            allTasks.push({
+              ...task,
+              subcategory: task.subcategory || subcategory.name
+            });
+          });
+        });
+      });
+
+      // Initialize the rates cache with the flattened tasks
+      this.ratesCache.set('all', allTasks);
+
+      // Also create category-specific caches
+      taskCategories.forEach(category => {
+        const categoryTasks = allTasks.filter(task => task.category === category.name);
+        if (categoryTasks.length > 0) {
+          this.ratesCache.set(category.name, categoryTasks);
         }
-      };
-
-      // Initialize each category with proper type checking
-      initializeCategory('carpet-maintenance', [
-        ...(Array.isArray(carpetMaintenanceRates.spotting) ? carpetMaintenanceRates.spotting : []),
-        ...(Array.isArray(carpetMaintenanceRates.vacuum) ? carpetMaintenanceRates.vacuum : []),
-        ...(Array.isArray(carpetMaintenanceRates.steam) ? carpetMaintenanceRates.steam : [])
-      ]);
-
-      initializeCategory('restroom', [
-        ...(Array.isArray(restroomRates.cleaning) ? restroomRates.cleaning : []),
-        ...(Array.isArray(restroomRates.maintenance) ? restroomRates.maintenance : [])
-      ]);
-
-      initializeCategory('specialist', [
-        ...(Array.isArray(specialistRates.medical) ? specialistRates.medical : []),
-        ...(Array.isArray(specialistRates.industrial) ? specialistRates.industrial : [])
-      ]);
-
-      initializeCategory('healthcare', [
-        ...(Array.isArray(healthcareRates.patientRooms) ? healthcareRates.patientRooms : []),
-        ...(Array.isArray(healthcareRates.clinicalAreas) ? healthcareRates.clinicalAreas : [])
-      ]);
-
-      initializeCategory('kitchen', [
-        ...(Array.isArray(kitchenRates.commercial) ? kitchenRates.commercial : []),
-        ...(Array.isArray(kitchenRates.industrial) ? kitchenRates.industrial : [])
-      ]);
-
-      initializeCategory('windows', [
-        ...(Array.isArray(windowRates.interior) ? windowRates.interior : []),
-        ...(Array.isArray(windowRates.exterior) ? windowRates.exterior : [])
-      ]);
-
-      initializeCategory('bundles', Array.isArray(bundledRates) ? bundledRates : []);
+      });
     } catch (error) {
       console.error('Error initializing rates:', error);
       this.ratesCache = new Map();
@@ -88,13 +61,7 @@ class RatesManager {
   }
 
   public getAllRates(): ProductivityRate[] {
-    const allRates: ProductivityRate[] = [];
-    this.ratesCache.forEach(rates => {
-      if (Array.isArray(rates)) {
-        allRates.push(...rates);
-      }
-    });
-    return allRates;
+    return this.ratesCache.get('all') || [];
   }
 
   public searchRates(query: string): ProductivityRate[] {
@@ -106,10 +73,6 @@ class RatesManager {
       rate.category.toLowerCase().includes(searchTerm))
     );
   }
-
-  public getBundledRates(): ProductivityRate[] {
-    return this.ratesCache.get('bundles') || [];
-  }
 }
 
 export const ratesManager = RatesManager.getInstance();
@@ -118,4 +81,3 @@ export const getRatesByCategory = (category: string) => ratesManager.getRatesByC
 export const getRateById = (id: string) => ratesManager.getRateById(id);
 export const getAllRates = () => ratesManager.getAllRates();
 export const searchRates = (query: string) => ratesManager.searchRates(query);
-export const getBundledRates = () => ratesManager.getBundledRates();

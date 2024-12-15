@@ -1,7 +1,7 @@
 export interface ProductivityRate {
   id: string;
   category: string;
-  subcategory?: string; // Made optional to maintain compatibility
+  subcategory?: string;
   task: string;
   tool: string;
   unit: string;
@@ -11,13 +11,13 @@ export interface ProductivityRate {
   maximumQuantity?: number;
 }
 
-export interface Category {
+export interface TaskCategory {
   id: string;
   name: string;
-  subcategories: Subcategory[];
+  subcategories: TaskSubcategory[];
 }
 
-export interface Subcategory {
+export interface TaskSubcategory {
   id: string;
   name: string;
   tasks: ProductivityRate[];
