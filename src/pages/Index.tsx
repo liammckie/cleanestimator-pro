@@ -10,12 +10,13 @@ import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskProvider } from '@/components/area/task/TaskContext';
 import { TaskManagementPage } from '@/components/task-management/TaskManagementPage';
 import { ScopeAndTaskPage } from '@/components/scope/ScopeAndTaskPage';
+import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
 const Index = () => {
   const [sites, setSites] = useState([]);
-  const [activeTab, setActiveTab] = useState('sites'); // Changed from 'scope' to 'sites'
+  const [activeTab, setActiveTab] = useState('sites');
   const [laborCosts, setLaborCosts] = useState({ 
     hourlyRate: 0,
     employmentType: 'contracted' as const
@@ -43,6 +44,13 @@ const Index = () => {
   const handleTasksChange = (tasks: any) => {
     console.log('Tasks changed:', tasks);
   };
+
+  const selectedTasks = sites.flatMap(site => 
+    site.area?.selectedTasks?.map(task => ({
+      ...task,
+      siteName: site.name
+    })) || []
+  );
 
   const renderContent = () => {
     switch (activeTab) {
@@ -81,7 +89,7 @@ const Index = () => {
                 </h1>
                 
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                  <div className="grid grid-cols-[250px,1fr] gap-6">
+                  <div className="grid grid-cols-[250px,auto,250px] gap-6">
                     <DynamicMenu 
                       options={formattedMenuOptions} 
                       className="bg-card rounded-lg border border-border"
@@ -90,6 +98,7 @@ const Index = () => {
                       <MainNavigation />
                       {renderContent()}
                     </div>
+                    <ScopeOfWorkSidebar selectedTasks={selectedTasks} sites={sites} />
                   </div>
                 </Tabs>
               </div>
