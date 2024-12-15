@@ -22,30 +22,44 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Safely transform groups with proper type checking and null safety
   const transformedGroups = React.useMemo(() => {
     if (!Array.isArray(groups)) return [];
 
     return groups.reduce((acc: any[], group) => {
-      if (!group?.name || !Array.isArray(group?.categories)) return acc;
+      // Ensure group is valid
+      if (!group || typeof group !== 'object' || !group.name || !Array.isArray(group.categories)) {
+        return acc;
+      }
 
+      // Transform and filter categories
       const categories = group.categories
         .filter(category => category && typeof category === 'object')
         .reduce((catAcc: any[], category) => {
-          if (!category?.name || !Array.isArray(category?.subcategories)) return catAcc;
+          // Ensure category has required properties
+          if (!category.name || !Array.isArray(category.subcategories)) {
+            return catAcc;
+          }
 
+          // Transform and filter subcategories
           const tasks = category.subcategories
             .filter(subcategory => subcategory && typeof subcategory === 'object')
             .reduce((taskAcc: string[], subcategory) => {
-              if (!Array.isArray(subcategory?.tasks)) return taskAcc;
-              
+              if (!Array.isArray(subcategory?.tasks)) {
+                return taskAcc;
+              }
+
+              // Extract valid task names
               const taskNames = subcategory.tasks
                 .filter(task => task && typeof task === 'object' && task.task)
                 .map(task => task.task);
-                
+
               return [...taskAcc, ...taskNames];
             }, []);
 
-          if (tasks.length === 0) return catAcc;
+          if (tasks.length === 0) {
+            return catAcc;
+          }
 
           return [...catAcc, {
             name: category.name,
@@ -53,8 +67,10 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
           }];
         }, []);
 
-      if (categories.length === 0) return acc;
-      
+      if (categories.length === 0) {
+        return acc;
+      }
+
       return [...acc, {
         name: group.name,
         categories

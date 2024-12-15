@@ -25,25 +25,30 @@ export const CategoryList: React.FC<CategoryListProps> = ({
   searchQuery,
   onSelect,
 }) => {
+  // Ensure groups is an array
   const safeGroups = Array.isArray(groups) ? groups : [];
 
   const filterTasks = (tasks: string[] = []) => {
     if (!Array.isArray(tasks)) return [];
     return tasks.filter(task => 
-      task?.toLowerCase().includes(searchQuery.toLowerCase())
+      task && typeof task === 'string' && 
+      task.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
   const getCategoryTasks = (categoryName: string): string[] => {
+    // Find the group and ensure it exists with valid categories
     const group = safeGroups.find(g => g?.name === categoryName);
     if (!group?.categories || !Array.isArray(group.categories)) return [];
     
+    // Reduce categories to a flat array of subcategories
     return group.categories.reduce((acc: string[], category) => {
       if (!category?.subcategories || !Array.isArray(category.subcategories)) return acc;
       return [...acc, ...category.subcategories];
     }, []);
   };
 
+  // Get and filter tasks for each category
   const coreCleaningTasks = filterTasks(getCategoryTasks('Core Cleaning'));
   const specializedCleaningTasks = filterTasks(getCategoryTasks('Specialized Cleaning'));
   const industrySpecificTasks = filterTasks(getCategoryTasks('Industry-Specific'));
@@ -51,23 +56,26 @@ export const CategoryList: React.FC<CategoryListProps> = ({
   const renderTaskList = (tasks: string[] = []) => {
     if (!Array.isArray(tasks)) return null;
     return tasks.map((task) => (
-      <CommandItem
-        key={task}
-        value={task}
-        onSelect={() => onSelect(task)}
-        className="cursor-pointer"
-      >
-        <Check
-          className={cn(
-            "mr-2 h-4 w-4",
-            selectedValue === task ? "opacity-100" : "opacity-0"
-          )}
-        />
-        {task}
-      </CommandItem>
+      task && (
+        <CommandItem
+          key={task}
+          value={task}
+          onSelect={() => onSelect(task)}
+          className="cursor-pointer"
+        >
+          <Check
+            className={cn(
+              "mr-2 h-4 w-4",
+              selectedValue === task ? "opacity-100" : "opacity-0"
+            )}
+          />
+          {task}
+        </CommandItem>
+      )
     ));
   };
 
+  // Show appropriate message when no tasks are available
   if (!searchQuery && !coreCleaningTasks.length && !specializedCleaningTasks.length && !industrySpecificTasks.length) {
     return (
       <div className="p-4 text-sm text-muted-foreground text-center">
@@ -76,6 +84,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({
     );
   }
 
+  // Show message when search yields no results
   if (searchQuery && !coreCleaningTasks.length && !specializedCleaningTasks.length && !industrySpecificTasks.length) {
     return (
       <div className="p-4 text-sm text-muted-foreground text-center">
