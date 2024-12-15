@@ -11,7 +11,8 @@ interface CategoryPanelProps {
 }
 
 export const CategoryPanel: React.FC<CategoryPanelProps> = ({ value, onValueChange }) => {
-  const taskGroups = getTaskGroups();
+  // Ensure we get a valid array of task groups
+  const taskGroups = getTaskGroups() || [];
 
   return (
     <Card>
