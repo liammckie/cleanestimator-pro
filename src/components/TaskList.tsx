@@ -77,13 +77,8 @@ export const TaskList: React.FC<TaskListProps> = ({
             <TaskItem
               key={rate.id}
               rate={rate}
-              selectedTask={selectedTasks?.find(task => task.taskId === rate.id)}
-              onTaskSelection={onTaskSelection}
-              onQuantityChange={onQuantityChange}
-              onFrequencyChange={onFrequencyChange}
-              onProductivityOverride={onProductivityOverride}
-              onRemoveTask={onRemoveTask}
-              onToolChange={onToolChange}
+              siteId={undefined}
+              siteName={undefined}
             />
           ))
         ) : (
