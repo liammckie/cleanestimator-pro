@@ -26,6 +26,16 @@ export const TaskTable = ({ tasks, onDeleteTask }: TaskTableProps) => {
     return acc;
   }, {} as Record<string, Task[]>);
 
+  if (tasks.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center text-muted-foreground">
+          No tasks available. Add tasks using the input form or import them from a CSV file.
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {Object.entries(groupedTasks).map(([category, categoryTasks]) => (
