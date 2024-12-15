@@ -114,16 +114,10 @@ export const TaskManagementPage = () => {
 
   const handleRemoveTask = (taskId: string) => {
     setSelectedTasks(prev => prev.filter(task => task.id !== taskId));
-  };
-
-  const handleImportTasks = (tasksToImport: Omit<CleaningTask, 'id'>[]) => {
-    const newTasks = tasksToImport.map(task => ({
-      ...task,
-      id: crypto.randomUUID(),
-    }));
-    const updatedTasks = [...tasks, ...newTasks];
-    setTasks(updatedTasks);
-    saveTasks(updatedTasks);
+    toast({
+      title: "Task Removed",
+      description: "Task has been removed from the scope of work.",
+    });
   };
 
   return (
@@ -154,8 +148,10 @@ export const TaskManagementPage = () => {
                               <TaskSelectionPanel
                                 key={task.id}
                                 task={task}
-                                onSelect={() => handleTaskSelection(task)}
                                 selectedTask={selectedTasks.find(t => t.id === task.id)}
+                                onSelect={() => handleTaskSelection(task)}
+                                onQuantityChange={handleQuantityChange}
+                                onFrequencyChange={handleFrequencyChange}
                               />
                             ))}
                           </div>
@@ -171,7 +167,15 @@ export const TaskManagementPage = () => {
                   <CardTitle>Import Tasks</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CsvImport onImport={handleImportTasks} />
+                  <CsvImport onImport={(tasksToImport) => {
+                    const newTasks = tasksToImport.map(task => ({
+                      ...task,
+                      id: crypto.randomUUID(),
+                    }));
+                    const updatedTasks = [...tasks, ...newTasks];
+                    setTasks(updatedTasks);
+                    saveTasks(updatedTasks);
+                  }} />
                 </CardContent>
               </Card>
             </TabsContent>
