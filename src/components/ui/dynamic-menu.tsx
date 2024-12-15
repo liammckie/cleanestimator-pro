@@ -9,7 +9,7 @@ import {
   List, 
   Globe,
   User,
-  Tool,
+  Wrench,
   DollarSign,
   FileText,
   Layout,
@@ -19,7 +19,7 @@ import {
 export interface MenuOption {
   id: string
   label: string
-  icon?: "menu" | "grid" | "settings" | "list" | "globe" | "user" | "tool" | 
+  icon?: "menu" | "grid" | "settings" | "list" | "globe" | "user" | "wrench" | 
         "dollar-sign" | "file-text" | "layout" | "check-square"
   onClick?: () => void
 }
@@ -31,7 +31,7 @@ const iconMap = {
   list: List,
   globe: Globe,
   user: User,
-  tool: Tool,
+  wrench: Wrench,
   "dollar-sign": DollarSign,
   "file-text": FileText,
   layout: Layout,

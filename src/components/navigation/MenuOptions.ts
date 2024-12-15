@@ -17,7 +17,7 @@ export const getMenuOptions = (setActiveTab: (value: string) => void): MenuOptio
     {
       label: "Equipment",
       id: "equipment",
-      icon: "tool",
+      icon: "wrench",
       onClick: () => setActiveTab("equipment"),
     },
     {
