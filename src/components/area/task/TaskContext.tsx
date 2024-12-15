@@ -80,7 +80,7 @@ export const TaskProvider: React.FC<{
             quantity,
             task.selectedTool,
             task.frequency,
-            task.quantity
+            quantity
           );
           return { 
             ...task, 
@@ -132,8 +132,7 @@ export const TaskProvider: React.FC<{
             task.quantity,
             task.selectedTool,
             task.frequency,
-            task.quantity,
-            override
+            task.quantity
           );
           return { 
             ...task, 
