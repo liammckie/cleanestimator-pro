@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { TaskForm } from './TaskForm';
-import { CsvImport } from './CsvImport';
 import { CleaningTask, SelectedTask } from '@/data/types/taskManagement';
-import { loadTasks, saveTasks } from '@/utils/taskStorage';
+import { loadTasks } from '@/utils/taskStorage';
 import { useToast } from '@/hooks/use-toast';
 import { TaskProvider } from '../area/task/TaskContext';
-import { ScopeOfWorkSidebar } from '../ScopeOfWorkSidebar';
 import { calculateManHours, validateTaskInput } from '@/utils/manHourCalculations';
-import { TaskSelectionPanel } from './TaskSelectionPanel';
+import { TaskDatabase } from './TaskDatabase';
 import { ScopeContent } from './scope/ScopeContent';
 
 const SELECTED_TASKS_STORAGE_KEY = 'selected-tasks';
@@ -31,14 +21,6 @@ export const TaskManagementPage = () => {
   useEffect(() => {
     localStorage.setItem(SELECTED_TASKS_STORAGE_KEY, JSON.stringify(selectedTasks));
   }, [selectedTasks]);
-
-  const tasksByCategory = tasks.reduce((acc, task) => {
-    if (!acc[task.category]) {
-      acc[task.category] = [];
-    }
-    acc[task.category].push(task);
-    return acc;
-  }, {} as Record<string, CleaningTask[]>);
 
   const handleTaskSelection = (task: CleaningTask) => {
     const existingTask = selectedTasks.find(t => t.id === task.id);
@@ -122,86 +104,33 @@ export const TaskManagementPage = () => {
 
   return (
     <TaskProvider onTasksChange={(tasks) => console.log('Tasks updated:', tasks)}>
-      <div className="grid grid-cols-[1fr,auto] gap-6">
-        <div className="space-y-6">
-          <Tabs defaultValue="database" className="space-y-6">
-            <TabsList>
-              <TabsTrigger value="database">Task Database</TabsTrigger>
-              <TabsTrigger value="scope">Scope of Work</TabsTrigger>
-            </TabsList>
+      <div className="space-y-6">
+        <Tabs defaultValue="database" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="database">Task Database</TabsTrigger>
+            <TabsTrigger value="scope">Scope of Work</TabsTrigger>
+          </TabsList>
 
-            <TabsContent value="database">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Task Categories</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Accordion type="single" collapsible className="w-full">
-                    {Object.entries(tasksByCategory).map(([category, categoryTasks]) => (
-                      <AccordionItem key={category} value={category}>
-                        <AccordionTrigger className="text-lg font-semibold">
-                          {category}
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-4 p-4">
-                            {categoryTasks.map((task) => (
-                              <TaskSelectionPanel
-                                key={task.id}
-                                task={task}
-                                selectedTask={selectedTasks.find(t => t.id === task.id)}
-                                onSelect={() => handleTaskSelection(task)}
-                                onQuantityChange={handleQuantityChange}
-                                onFrequencyChange={handleFrequencyChange}
-                              />
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </CardContent>
-              </Card>
+          <TabsContent value="database">
+            <TaskDatabase
+              tasks={tasks}
+              setTasks={setTasks}
+              selectedTasks={selectedTasks}
+              onTaskSelection={handleTaskSelection}
+              onQuantityChange={handleQuantityChange}
+              onFrequencyChange={handleFrequencyChange}
+            />
+          </TabsContent>
 
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Import Tasks</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CsvImport onImport={(tasksToImport) => {
-                    const newTasks = tasksToImport.map(task => ({
-                      ...task,
-                      id: crypto.randomUUID(),
-                    }));
-                    const updatedTasks = [...tasks, ...newTasks];
-                    setTasks(updatedTasks);
-                    saveTasks(updatedTasks);
-                  }} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="scope">
-              <ScopeContent
-                selectedTasks={selectedTasks}
-                onQuantityChange={handleQuantityChange}
-                onFrequencyChange={handleFrequencyChange}
-                onRemoveTask={handleRemoveTask}
-              />
-            </TabsContent>
-          </Tabs>
-        </div>
-        
-        <ScopeOfWorkSidebar 
-          selectedTasks={selectedTasks.map(task => ({
-            taskId: task.id,
-            quantity: task.quantity,
-            timeRequired: task.timeRequired,
-            frequency: task.frequency,
-            selectedTool: task.selectedTool,
-            siteName: undefined
-          }))} 
-          sites={[]} 
-        />
+          <TabsContent value="scope">
+            <ScopeContent
+              selectedTasks={selectedTasks}
+              onQuantityChange={handleQuantityChange}
+              onFrequencyChange={handleFrequencyChange}
+              onRemoveTask={handleRemoveTask}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </TaskProvider>
   );
