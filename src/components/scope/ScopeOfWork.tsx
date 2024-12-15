@@ -5,6 +5,7 @@ import { useTaskContext } from '../area/task/TaskContext';
 import { Site } from '@/data/types/site';
 import { TimeSummaryCard } from './TimeSummaryCard';
 import { TaskList } from './TaskList';
+import { calculateTaskProductivity } from '@/utils/productivityCalculations';
 
 interface ScopeOfWorkProps {
   sites: Site[];
