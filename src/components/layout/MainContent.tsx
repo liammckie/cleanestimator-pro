@@ -43,7 +43,6 @@ export const MainContent: React.FC<MainContentProps> = ({
   const { 
     handleUpdateSite, 
     handleMarginChange,
-    totalMonthlyHours,
     taskCosts
   } = useCostCalculations(sites, laborCosts, setLaborCosts);
 
@@ -86,7 +85,6 @@ export const MainContent: React.FC<MainContentProps> = ({
       <FinancialTabs
         laborCosts={laborCosts}
         setLaborCosts={setLaborCosts}
-        totalMonthlyHours={totalMonthlyHours}
         monthlyRevenue={monthlyRevenue}
         overhead={overhead}
         costBreakdown={costBreakdown}

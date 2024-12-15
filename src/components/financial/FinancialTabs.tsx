@@ -4,6 +4,7 @@ import { LaborCosts } from '@/components/LaborCosts';
 import { ProfitLoss } from '@/components/ProfitLoss';
 import { ContractData } from '@/components/ContractData';
 import { ContractForecast } from '@/components/ContractForecast';
+import { TaskCostBreakdown } from '@/utils/costingCalculations';
 
 interface FinancialTabsProps {
   laborCosts: any;
@@ -14,8 +15,8 @@ interface FinancialTabsProps {
   equipmentCosts: any;
   contractDetails: any;
   setContractDetails: (details: any) => void;
-  taskCosts: any[];
-  onMarginChange: (margin: number) => void;
+  taskCosts: TaskCostBreakdown[];
+  onMarginChange: (margin: number) => number;
 }
 
 export const FinancialTabs: React.FC<FinancialTabsProps> = ({
@@ -56,7 +57,6 @@ export const FinancialTabs: React.FC<FinancialTabsProps> = ({
           laborCost={costBreakdown.totalMonthlyCost}
           equipmentCost={equipmentCosts.monthly}
           overhead={overhead}
-          totalLaborHours={totalMonthlyHours}
           selectedTasks={taskCosts}
           onMarginChange={onMarginChange}
         />
