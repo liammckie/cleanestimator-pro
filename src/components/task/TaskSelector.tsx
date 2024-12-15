@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { cleaningTasks } from '@/data/tasks/taskDatabase';
@@ -14,64 +12,60 @@ interface TaskSelectorProps {
 
 export const TaskSelector: React.FC<TaskSelectorProps> = ({
   onTaskSelect,
-  selectedTasks,
+  selectedTasks = []
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Core Cleaning');
+  const [searchQuery, setSearchQuery] = React.useState('');
 
-  const filteredTasks = cleaningTasks.filter(task => 
-    task.category === activeCategory &&
-    (task.taskName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     task.notes.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredTasks = React.useMemo(() => {
+    const allTasks = cleaningTasks.flatMap(group => 
+      group.categories.flatMap(category => 
+        category.tasks.map(task => ({
+          ...task,
+          category: category.name
+        }))
+      )
+    );
+
+    if (!searchQuery) return allTasks;
+
+    return allTasks.filter(task => 
+      task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.notes?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Select Tasks</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="Core Cleaning" onValueChange={setActiveCategory}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="Core Cleaning">Core</TabsTrigger>
-            <TabsTrigger value="Specialized Cleaning">Specialized</TabsTrigger>
-            <TabsTrigger value="Industry-Specific">Industry</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value={activeCategory}>
-            <Command>
-              <CommandInput 
-                placeholder="Search tasks..." 
-                value={searchQuery}
-                onValueChange={setSearchQuery}
+    <Command className="rounded-lg border shadow-md">
+      <CommandInput 
+        placeholder="Search tasks..." 
+        value={searchQuery}
+        onValueChange={setSearchQuery}
+      />
+      <CommandEmpty>No tasks found.</CommandEmpty>
+      {cleaningTasks.map(group => (
+        <CommandGroup key={group.id} heading={group.name}>
+          {filteredTasks.map((task) => (
+            <CommandItem
+              key={task.id}
+              value={task.name}
+              onSelect={() => onTaskSelect(task.id)}
+            >
+              <Check
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  selectedTasks.includes(task.id) ? "opacity-100" : "opacity-0"
+                )}
               />
-              <CommandEmpty>No tasks found.</CommandEmpty>
-              <CommandGroup>
-                {filteredTasks.map((task: CleaningTask) => (
-                  <CommandItem
-                    key={task.id}
-                    value={task.taskName}
-                    onSelect={() => onTaskSelect(task.id)}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedTasks.includes(task.id) ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    <div className="flex flex-col">
-                      <span>{task.taskName}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {task.productivityRate} {task.measurementUnit}
-                      </span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+              <div className="flex flex-col">
+                <span>{task.name}</span>
+                <span className="text-sm text-muted-foreground">
+                  {task.rate} {task.unit}
+                </span>
+              </div>
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      ))}
+    </Command>
   );
 };

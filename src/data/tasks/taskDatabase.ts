@@ -1,9 +1,9 @@
 import { TaskGroup } from '../types/cleaning';
-import { coreCleaning } from './coreCleaning';
-import { specializedCleaning } from './specializedCleaning';
-import { industrySpecificCleaning } from './industrySpecificCleaning';
+import { coreCleaning } from './categories/coreCleaning';
+import { specializedCleaning } from './categories/specializedCleaning';
+import { industrySpecificCleaning } from './categories/industrySpecific';
 
-export const taskGroups: TaskGroup[] = [
+export const cleaningTasks: TaskGroup[] = [
   {
     id: 'cleaning-tasks',
     name: 'Cleaning Tasks',
@@ -17,7 +17,7 @@ export const taskGroups: TaskGroup[] = [
 ];
 
 export const getAllTasks = () => {
-  return taskGroups.flatMap(group => 
+  return cleaningTasks.flatMap(group => 
     group.categories.flatMap(category => 
       category.tasks
     )
@@ -25,7 +25,7 @@ export const getAllTasks = () => {
 };
 
 export const getTasksByCategory = (categoryId: string) => {
-  const category = taskGroups
+  const category = cleaningTasks
     .flatMap(group => group.categories)
     .find(cat => cat.id === categoryId);
   
