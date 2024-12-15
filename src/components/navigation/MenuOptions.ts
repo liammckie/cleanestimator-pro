@@ -7,7 +7,7 @@ export const getMenuOptions = (setTab: (tab: string) => void): MenuOption[] => [
     onClick: () => setTab("sites")
   },
   {
-    name: "Tasks",
+    name: "Task Database",
     icon: "list",
     onClick: () => setTab("tasks")
   },

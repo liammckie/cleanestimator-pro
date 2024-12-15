@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { Task } from '@/data/types/productivity';
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface TaskTableProps {
   tasks: Task[];
@@ -28,39 +29,43 @@ export const TaskTable = ({ tasks, onDeleteTask }: TaskTableProps) => {
   return (
     <div className="space-y-8">
       {Object.entries(groupedTasks).map(([category, categoryTasks]) => (
-        <div key={category} className="space-y-4">
-          <h2 className="text-2xl font-bold">{category}</h2>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Task Name</TableHead>
-                <TableHead>Productivity Rate</TableHead>
-                <TableHead>Unit</TableHead>
-                <TableHead>Notes</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {categoryTasks.map((task) => (
-                <TableRow key={task.id}>
-                  <TableCell>{task.name}</TableCell>
-                  <TableCell>{task.productivityRate}</TableCell>
-                  <TableCell>{task.unit}</TableCell>
-                  <TableCell>{task.notes}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onDeleteTask(task.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+        <Card key={category}>
+          <CardHeader>
+            <CardTitle>{category}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Task Name</TableHead>
+                  <TableHead>Productivity Rate</TableHead>
+                  <TableHead>Unit</TableHead>
+                  <TableHead>Notes</TableHead>
+                  <TableHead className="w-[100px]">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {categoryTasks.map((task) => (
+                  <TableRow key={task.id}>
+                    <TableCell className="font-medium">{task.name}</TableCell>
+                    <TableCell>{task.productivityRate}</TableCell>
+                    <TableCell>{task.unit}</TableCell>
+                    <TableCell>{task.notes}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onDeleteTask(task.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       ))}
     </div>
   );
