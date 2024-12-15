@@ -1,4 +1,4 @@
-import { TaskGroup } from '../types/cleaning';
+import { TaskGroup, TaskCategory } from '../types/cleaning';
 import { coreCleaning } from './categories/coreCleaning';
 import { specializedCleaning } from './categories/specializedCleaning';
 import { industrySpecific } from './categories/industrySpecific';
@@ -9,9 +9,9 @@ export const cleaningTasks: TaskGroup[] = [
     name: 'Cleaning Tasks',
     description: 'All cleaning task categories',
     categories: [
-      coreCleaning,
-      specializedCleaning,
-      industrySpecific
+      coreCleaning as TaskCategory,
+      specializedCleaning as TaskCategory,
+      industrySpecific as TaskCategory
     ]
   }
 ];
