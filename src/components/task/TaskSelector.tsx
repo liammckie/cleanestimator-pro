@@ -2,7 +2,7 @@ import React from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { cleaningTasks } from '@/data/tasks/taskDatabase';
+import { cleaningTaskGroups, getAllTasks } from '@/data/tasks/taskDatabase';
 import { CleaningTask } from '@/data/types/tasks';
 
 interface TaskSelectorProps {
@@ -17,14 +17,7 @@ export const TaskSelector: React.FC<TaskSelectorProps> = ({
   const [searchQuery, setSearchQuery] = React.useState('');
 
   const filteredTasks = React.useMemo(() => {
-    const allTasks = cleaningTasks.flatMap(group => 
-      group.categories.flatMap(category => 
-        category.tasks.map(task => ({
-          ...task,
-          category: category.name
-        }))
-      )
-    );
+    const allTasks = getAllTasks();
 
     if (!searchQuery) return allTasks;
 
@@ -42,27 +35,29 @@ export const TaskSelector: React.FC<TaskSelectorProps> = ({
         onValueChange={setSearchQuery}
       />
       <CommandEmpty>No tasks found.</CommandEmpty>
-      {cleaningTasks.map(group => (
+      {cleaningTaskGroups.map(group => (
         <CommandGroup key={group.id} heading={group.name}>
-          {filteredTasks.map((task) => (
-            <CommandItem
-              key={task.id}
-              value={task.name}
-              onSelect={() => onTaskSelect(task.id)}
-            >
-              <Check
-                className={cn(
-                  "mr-2 h-4 w-4",
-                  selectedTasks.includes(task.id) ? "opacity-100" : "opacity-0"
-                )}
-              />
-              <div className="flex flex-col">
-                <span>{task.name}</span>
-                <span className="text-sm text-muted-foreground">
-                  {task.rate} {task.unit}
-                </span>
-              </div>
-            </CommandItem>
+          {group.categories.map(category => (
+            category.tasks.map((task) => (
+              <CommandItem
+                key={task.id}
+                value={task.name}
+                onSelect={() => onTaskSelect(task.id)}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    selectedTasks.includes(task.id) ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                <div className="flex flex-col">
+                  <span>{task.name}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {task.rate} {task.unit}
+                  </span>
+                </div>
+              </CommandItem>
+            ))
           ))}
         </CommandGroup>
       ))}
