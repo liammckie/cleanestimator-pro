@@ -12,14 +12,10 @@ interface AreaContainerProps {
 export const AreaContainer: React.FC<AreaContainerProps> = ({ onAreaChange }) => {
   const [category, setCategory] = React.useState('');
 
-  const handleTasksChange = (area: AreaData) => {
-    onAreaChange(area);
-  };
-
   return (
     <div className="space-y-4">
       <CategoryPanel value={category} onValueChange={setCategory} />
-      <TaskProvider onTasksChange={handleTasksChange}>
+      <TaskProvider onTasksChange={onAreaChange}>
         <TaskManager category={category} />
         <TimeDisplay selectedTasks={[]} />
       </TaskProvider>
