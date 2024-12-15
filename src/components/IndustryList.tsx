@@ -18,19 +18,31 @@ export const IndustryList: React.FC<IndustryListProps> = ({
   searchQuery,
   onSelect,
 }) => {
-  if (!Array.isArray(groups)) return null;
+  // Ensure groups is an array and handle undefined/null case
+  const safeGroups = Array.isArray(groups) ? groups : [];
 
-  const filteredGroups = groups.filter(group => 
+  // Filter valid groups
+  const filteredGroups = safeGroups.filter(group => 
     group && 
     typeof group === 'object' &&
     group.name &&
     Array.isArray(group.categories)
   );
 
+  if (filteredGroups.length === 0) {
+    return (
+      <div className="p-4 text-sm text-muted-foreground text-center">
+        No industries available.
+      </div>
+    );
+  }
+
   return (
     <Accordion type="single" collapsible className="w-full">
       {filteredGroups.map(group => {
-        const filteredCategories = group.categories.filter(category =>
+        // Ensure categories is an array and filter by search query
+        const categories = Array.isArray(group.categories) ? group.categories : [];
+        const filteredCategories = categories.filter(category =>
           category && 
           typeof category === 'string' &&
           category.toLowerCase().includes(searchQuery.toLowerCase())
