@@ -8,6 +8,7 @@ import { getMenuOptions } from '@/components/navigation/MenuOptions';
 import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskStack } from '@/components/task/TaskStack';
+import { TaskProvider } from '@/components/area/task/TaskContext';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -34,44 +35,51 @@ const Index = () => {
 
   const menuOptions = getMenuOptions(setActiveTab);
 
+  const handleTasksChange = (tasks: any) => {
+    // This will be implemented later when we need to handle task changes
+    console.log('Tasks changed:', tasks);
+  };
+
   return (
     <SettingsProvider>
       <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-background">
-          <TaskStack />
-          <div className="flex-1 py-8">
-            <div className="container mx-auto px-4">
-              <h1 className="text-3xl font-bold text-primary mb-8">
-                Commercial Cleaning Estimation Tool
-              </h1>
-              
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                <div className="grid grid-cols-[250px,1fr] gap-6">
-                  <DynamicMenu 
-                    options={menuOptions} 
-                    className="bg-card rounded-lg border border-border"
-                  />
-                  <div className="space-y-6">
-                    <MainNavigation />
-                    <MainContent
-                      sites={sites}
-                      onSitesChange={setSites}
-                      laborCosts={laborCosts}
-                      setLaborCosts={setLaborCosts}
-                      equipmentCosts={equipmentCosts}
-                      setEquipmentCosts={setEquipmentCosts}
-                      contractDetails={contractDetails}
-                      setContractDetails={setContractDetails}
-                      costBreakdown={costBreakdown}
-                      monthlyRevenue={monthlyRevenue}
-                      overhead={overhead}
+        <TaskProvider onTasksChange={handleTasksChange}>
+          <div className="min-h-screen flex w-full bg-background">
+            <TaskStack />
+            <div className="flex-1 py-8">
+              <div className="container mx-auto px-4">
+                <h1 className="text-3xl font-bold text-primary mb-8">
+                  Commercial Cleaning Estimation Tool
+                </h1>
+                
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                  <div className="grid grid-cols-[250px,1fr] gap-6">
+                    <DynamicMenu 
+                      options={menuOptions} 
+                      className="bg-card rounded-lg border border-border"
                     />
+                    <div className="space-y-6">
+                      <MainNavigation />
+                      <MainContent
+                        sites={sites}
+                        onSitesChange={setSites}
+                        laborCosts={laborCosts}
+                        setLaborCosts={setLaborCosts}
+                        equipmentCosts={equipmentCosts}
+                        setEquipmentCosts={setEquipmentCosts}
+                        contractDetails={contractDetails}
+                        setContractDetails={setContractDetails}
+                        costBreakdown={costBreakdown}
+                        monthlyRevenue={monthlyRevenue}
+                        overhead={overhead}
+                      />
+                    </div>
                   </div>
-                </div>
-              </Tabs>
+                </Tabs>
+              </div>
             </div>
           </div>
-        </div>
+        </TaskProvider>
       </SidebarProvider>
     </SettingsProvider>
   );
