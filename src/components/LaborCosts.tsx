@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,7 @@ interface LaborCostsProps {
     shiftType?: string;
     onCosts?: OnCostsState;
   }) => void;
+  totalMonthlyHours?: number;
 }
 
 const defaultOnCosts: OnCostsState = {
@@ -44,13 +45,18 @@ const defaultOnCosts: OnCostsState = {
   ],
 };
 
-export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => {
+export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange, totalMonthlyHours = 0 }) => {
   const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
-  const [contractedRate, setContractedRate] = useState<number>(0);
+  const [contractedRate, setContractedRate] = useState<number>(38);
   const [awardLevel, setAwardLevel] = useState<number>(1);
   const [shiftType, setShiftType] = useState<string>('standard');
   const [onCosts, setOnCosts] = useState<OnCostsState>(defaultOnCosts);
   const [awardIncrease, setAwardIncrease] = useState<number>(0);
+
+  useEffect(() => {
+    // Initialize with default contracted rate
+    updateLaborCosts('contracted');
+  }, []);
 
   const handleEmploymentTypeChange = (value: 'contracted' | 'direct') => {
     setEmploymentType(value);
@@ -130,6 +136,11 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
         </CardHeader>
         <CardContent>
           <div className="grid gap-6">
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-2">Monthly Hours Required</p>
+              <p className="text-2xl font-bold">{totalMonthlyHours.toFixed(1)} hours</p>
+            </div>
+
             <EmploymentTypeSelector
               value={employmentType}
               onChange={handleEmploymentTypeChange}
@@ -141,6 +152,7 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
                 <Input
                   id="hourlyRate"
                   type="number"
+                  value={contractedRate}
                   placeholder="Enter hourly rate"
                   onChange={handleContractedRateChange}
                 />

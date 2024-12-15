@@ -43,6 +43,15 @@ export const MainContent: React.FC<MainContentProps> = ({
 }) => {
   const { awardIncrease, setAwardIncrease } = useSettings();
 
+  const calculateTotalMonthlyHours = () => {
+    return sites.reduce((total, site) => {
+      const siteTasks = site.area?.selectedTasks || [];
+      return total + siteTasks.reduce((siteTotal: number, task: any) => {
+        return siteTotal + (task.timeRequired || 0);
+      }, 0);
+    }, 0);
+  };
+
   const handleAwardIncreaseChange = (increase: number) => {
     setAwardIncrease(increase);
     if (laborCosts.employmentType === 'direct') {
@@ -82,7 +91,10 @@ export const MainContent: React.FC<MainContentProps> = ({
       </TabsContent>
 
       <TabsContent value="labor" className="space-y-6">
-        <LaborCosts onLaborCostChange={setLaborCosts} />
+        <LaborCosts 
+          onLaborCostChange={setLaborCosts}
+          totalMonthlyHours={calculateTotalMonthlyHours()}
+        />
       </TabsContent>
 
       <TabsContent value="equipment" className="space-y-6">
