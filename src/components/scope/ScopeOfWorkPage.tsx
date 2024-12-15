@@ -1,49 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
-import { CleaningTask } from '@/data/types/taskManagement';
-import { loadTasks, groupTasksByCategory } from '@/utils/taskStorage';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/use-toast';
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Trash2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import { useTaskContext } from '../area/task/TaskContext';
-import { Site } from '@/data/types/site';
-import { calculateTaskProductivity } from '@/utils/productivityCalculations';
 import { ToolSelect } from '../ToolSelect';
+import { calculateTaskProductivity } from '@/utils/productivityCalculations';
+import { getRateById } from '@/data/rates/ratesManager';
+import { Site } from '@/data/types/site';
 
 export const ScopeOfWorkPage = () => {
-  const [availableTasks, setAvailableTasks] = useState<CleaningTask[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
   const { selectedTasks, handleTaskSelection, handleQuantityChange, handleFrequencyChange, handleToolChange } = useTaskContext();
   const { toast } = useToast();
 
   useEffect(() => {
-    const tasks = loadTasks();
-    setAvailableTasks(tasks);
-    
     const savedSites = localStorage.getItem('sites');
     if (savedSites) {
       setSites(JSON.parse(savedSites));
     }
   }, []);
 
-  const handleRemoveFromScope = (taskId: string, siteId: string) => {
+  const handleRemoveTask = (taskId: string, siteId?: string) => {
     handleTaskSelection(taskId, false, siteId);
     toast({
       title: "Task Removed",
-      description: "Task has been removed from your scope of work.",
+      description: "Task has been removed from the scope.",
     });
   };
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Selected Tasks</h1>
+      <h1 className="text-3xl font-bold mb-8">Scope of Work</h1>
       
       <div className="grid grid-cols-1 gap-6">
         {selectedTasks.map((selectedTask) => {
-          const taskDetails = availableTasks.find(t => t.id === selectedTask.taskId);
+          const taskDetails = getRateById(selectedTask.taskId);
           if (!taskDetails) return null;
 
           const productivity = calculateTaskProductivity(
@@ -56,13 +50,18 @@ export const ScopeOfWorkPage = () => {
 
           return (
             <Card key={`${selectedTask.taskId}-${selectedTask.siteId}`} className="w-full">
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  <span>{taskDetails.taskName}</span>
-                  <Badge variant="outline">
-                    {taskDetails.measurementUnit}
-                  </Badge>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xl font-bold">
+                  {taskDetails.task}
                 </CardTitle>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleRemoveTask(selectedTask.taskId, selectedTask.siteId)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -95,22 +94,25 @@ export const ScopeOfWorkPage = () => {
                   {/* Quantity Input */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">
-                      {taskDetails.measurementUnit === 'SQM/hour' ? 'Area (SQM)' : 'Quantity'}
+                      {taskDetails.unit === 'SQM/hour' ? 'Area (SQM)' : `Quantity (${taskDetails.unit})`}
                     </label>
                     <Input
                       type="number"
                       value={selectedTask.quantity || ''}
                       onChange={(e) => handleQuantityChange(selectedTask.taskId, Number(e.target.value))}
-                      placeholder={`Enter ${taskDetails.measurementUnit === 'SQM/hour' ? 'area' : 'quantity'}`}
+                      placeholder={`Enter ${taskDetails.unit === 'SQM/hour' ? 'area' : 'quantity'}`}
                     />
                   </div>
 
                   {/* Tool Selection */}
-                  <ToolSelect
-                    taskId={selectedTask.taskId}
-                    currentTool={selectedTask.selectedTool || ''}
-                    onToolChange={handleToolChange}
-                  />
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Tool Selection</label>
+                    <ToolSelect
+                      taskId={selectedTask.taskId}
+                      currentTool={selectedTask.selectedTool || ''}
+                      onToolChange={handleToolChange}
+                    />
+                  </div>
 
                   {/* Frequency Selection */}
                   <div className="space-y-2">
@@ -139,21 +141,10 @@ export const ScopeOfWorkPage = () => {
                       <div className="text-sm space-y-1">
                         <p>Time per service: {(productivity.timeRequired * 60).toFixed(1)} minutes</p>
                         <p>Monthly hours: {(productivity.timeRequired * selectedTask.frequency.timesPerMonth).toFixed(1)} hours</p>
-                        <p>Productivity rate: {productivity.adjustedRate.toFixed(2)} {taskDetails.measurementUnit}</p>
+                        <p>Productivity rate: {productivity.adjustedRate.toFixed(2)} {taskDetails.unit}</p>
                       </div>
                     </div>
                   )}
-
-                  {/* Remove Task Button */}
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleRemoveFromScope(selectedTask.taskId, selectedTask.siteId || '')}
-                    className="mt-4"
-                  >
-                    <Trash className="h-4 w-4 mr-2" />
-                    Remove Task
-                  </Button>
                 </div>
               </CardContent>
             </Card>
