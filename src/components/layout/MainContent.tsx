@@ -46,7 +46,10 @@ export const MainContent: React.FC<MainContentProps> = ({
   const calculateTotalMonthlyHours = () => {
     console.log('Calculating total hours from sites:', sites);
     return sites.reduce((total, site) => {
-      if (!site.area?.selectedTasks) return total;
+      if (!site.area?.selectedTasks) {
+        console.log(`Site ${site.name} has no selected tasks`);
+        return total;
+      }
       
       const siteTasks = site.area.selectedTasks;
       console.log(`Site ${site.name} tasks:`, siteTasks);
@@ -65,7 +68,10 @@ export const MainContent: React.FC<MainContentProps> = ({
   const getAllSelectedTasks = () => {
     console.log('Getting all selected tasks from sites:', sites);
     const tasks = sites.reduce((allTasks: any[], site) => {
-      if (!site.area?.selectedTasks) return allTasks;
+      if (!site.area?.selectedTasks) {
+        console.log(`Site ${site.name} has no selected tasks`);
+        return allTasks;
+      }
       
       const siteTasks = site.area.selectedTasks;
       console.log(`Site ${site.name} tasks:`, siteTasks);
@@ -109,6 +115,13 @@ export const MainContent: React.FC<MainContentProps> = ({
       } : site
     );
     onSitesChange(updatedSites);
+
+    // Update labor costs when tasks change
+    const totalMonthlyHours = calculateTotalMonthlyHours();
+    setLaborCosts(prev => ({
+      ...prev,
+      totalMonthlyHours
+    }));
   };
 
   const totalMonthlyHours = calculateTotalMonthlyHours();
