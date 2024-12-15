@@ -73,7 +73,11 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
             
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Labor Cost ({totalLaborHours.toFixed(1)} hours @ ${effectiveHourlyRate.toFixed(2)}/hr)</span>
+                <span className="text-sm text-muted-foreground">Total Labor Hours</span>
+                <span>{totalLaborHours.toFixed(1)} hours</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Labor Cost (${effectiveHourlyRate.toFixed(2)}/hr)</span>
                 <span className="text-red-600">-${laborCost.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center">
