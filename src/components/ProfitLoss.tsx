@@ -1,56 +1,111 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 interface ProfitLossProps {
   revenue: number;
   laborCost: number;
   equipmentCost: number;
   overhead: number;
+  onMarginChange?: (margin: number) => void;
 }
 
 export const ProfitLoss: React.FC<ProfitLossProps> = ({
   revenue,
   laborCost,
   equipmentCost,
-  overhead
+  overhead,
+  onMarginChange
 }) => {
+  const [targetMargin, setTargetMargin] = useState(15);
   const totalCosts = laborCost + equipmentCost + overhead;
   const profit = revenue - totalCosts;
-  const profitMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
+  const actualMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
+  
+  // Calculate suggested revenue based on target margin
+  const suggestedRevenue = totalCosts / (1 - (targetMargin / 100));
+  const suggestedMonthlyRate = suggestedRevenue;
+  const suggestedHourlyRate = laborCost > 0 ? (suggestedRevenue / laborCost) * laborCost : 0;
+
+  const handleMarginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newMargin = parseFloat(e.target.value) || 0;
+    setTargetMargin(newMargin);
+    if (onMarginChange) {
+      onMarginChange(newMargin);
+    }
+  };
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Profit & Loss Statement</CardTitle>
+        <CardTitle>Financial Summary</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <div className="flex justify-between">
-            <span className="font-medium">Revenue</span>
-            <span className="text-green-600">${revenue.toFixed(2)}</span>
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Target Margin (%)</Label>
+              <Input
+                type="number"
+                value={targetMargin}
+                onChange={handleMarginChange}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Actual Margin</Label>
+              <p className="text-2xl font-bold mt-1">{actualMargin.toFixed(1)}%</p>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span className="font-medium">Labor Cost</span>
-            <span className="text-red-600">-${laborCost.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="font-medium">Equipment & Supplies</span>
-            <span className="text-red-600">-${equipmentCost.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="font-medium">Overhead</span>
-            <span className="text-red-600">-${overhead.toFixed(2)}</span>
-          </div>
-          <div className="border-t pt-2">
-            <div className="flex justify-between font-bold">
+
+          <Separator />
+
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="font-medium">Monthly Revenue</span>
+              <span className="text-green-600 font-bold">${revenue.toFixed(2)}</span>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Labor Cost</span>
+                <span className="text-red-600">-${laborCost.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Equipment & Supplies</span>
+                <span className="text-red-600">-${equipmentCost.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Overhead</span>
+                <span className="text-red-600">-${overhead.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="flex justify-between items-center font-bold">
               <span>Net Profit</span>
               <span className={profit >= 0 ? "text-green-600" : "text-red-600"}>
                 ${profit.toFixed(2)}
               </span>
             </div>
-            <div className="flex justify-between text-sm text-gray-600 mt-1">
-              <span>Profit Margin</span>
-              <span>{profitMargin.toFixed(1)}%</span>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-4">
+            <h3 className="font-medium">Suggested Rates (Based on Target Margin)</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm text-muted-foreground">Monthly Rate</Label>
+                <p className="text-xl font-bold">${suggestedMonthlyRate.toFixed(2)}</p>
+              </div>
+              <div>
+                <Label className="text-sm text-muted-foreground">Hourly Rate</Label>
+                <p className="text-xl font-bold">${suggestedHourlyRate.toFixed(2)}</p>
+              </div>
             </div>
           </div>
         </div>

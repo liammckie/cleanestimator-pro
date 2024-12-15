@@ -53,6 +53,13 @@ export const MainContent: React.FC<MainContentProps> = ({
     }
   };
 
+  const handleMarginChange = (margin: number) => {
+    const totalCosts = costBreakdown.totalMonthlyCost + equipmentCosts.monthly + overhead;
+    const newRevenue = totalCosts / (1 - (margin / 100));
+    // Update contract details or other relevant state here
+    console.log('New revenue based on margin:', newRevenue);
+  };
+
   const handleUpdateSite = (siteId: string, tasks: any[]) => {
     const updatedSites = sites.map(site => 
       site.id === siteId ? { ...site, area: { ...site.area, selectedTasks: tasks } } : site
@@ -105,17 +112,8 @@ export const MainContent: React.FC<MainContentProps> = ({
           laborCost={costBreakdown.totalMonthlyCost}
           equipmentCost={equipmentCosts.monthly}
           overhead={overhead}
+          onMarginChange={handleMarginChange}
         />
-        
-        <div className="mt-6 text-sm text-muted-foreground">
-          <p>* Overhead calculated at {15}% of revenue</p>
-          {costBreakdown.totalMonthlyMinutes > 0 && (
-            <p>* Total time required: {Math.round(costBreakdown.totalMonthlyMinutes)} minutes</p>
-          )}
-          {laborCosts.employmentType === 'direct' && (
-            <p>* On-costs per hour: ${((laborCosts.hourlyRate * (awardIncrease / 100)) || 0).toFixed(2)}</p>
-          )}
-        </div>
       </TabsContent>
 
       <TabsContent value="settings" className="space-y-6">
