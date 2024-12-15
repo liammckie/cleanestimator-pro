@@ -1,0 +1,1686 @@
+<lov-code>
+# Task Management System Codebase Overview
+
+## Components
+
+### TaskList.tsx
+```typescript
+import React, { useState } from 'react';
+import { TaskItem } from './TaskItem';
+import { getRatesByCategory } from '@/data/rates/ratesManager';
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { ProductivityRate } from '@/data/types/productivity';
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+
+interface TaskListProps {
+  category: string;
+  selectedTasks: Array<{
+    taskId: string;
+    quantity: number;
+    timeRequired: number;
+    frequency: {
+      timesPerWeek: number;
+      timesPerMonth: number;
+    };
+    productivityOverride?: number;
+    selectedTool?: string;
+  }>;
+  onTaskSelection: (taskId: string, isSelected: boolean) => void;
+  onQuantityChange: (taskId: string, quantity: number) => void;
+  onFrequencyChange: (taskId: string, timesPerWeek: number) => void;
+  onProductivityOverride: (taskId: string, override: number) => void;
+  onRemoveTask: (taskId: string) => void;
+  onToolChange: (taskId: string, tool: string) => void;
+}
+
+export const TaskList: React.FC<TaskListProps> = ({
+  category,
+  selectedTasks = [],
+  onTaskSelection,
+  onQuantityChange,
+  onFrequencyChange,
+  onProductivityOverride,
+  onRemoveTask,
+  onToolChange,
+}) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const { toast } = useToast();
+  const productivityRates = getRatesByCategory(category) || [];
+
+  const filteredRates = productivityRates
+    .filter(rate => rate && rate.category === category)
+    .filter(rate => {
+      if (!rate) return false;
+      const query = searchQuery.toLowerCase();
+      return (
+        rate.task.toLowerCase().includes(query) ||
+        rate.tool.toLowerCase().includes(query)
+      );
+    });
+
+  const handleRemove = (taskId: string) => {
+    onRemoveTask(taskId);
+    toast({
+      title: "Task Removed",
+      description: "Task has been removed from the scope of work.",
+    });
+  };
+
+  if (!category) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Please select a category to view available tasks.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <Input
+        type="text"
+        placeholder="Search tasks..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="mb-4"
+      />
+      <div className="grid gap-4">
+        {filteredRates.length > 0 ? (
+          filteredRates.map((rate: ProductivityRate) => {
+            const selectedTask = selectedTasks.find(task => task.taskId === rate.id);
+            
+            if (!selectedTask) return null;
+
+            return (
+              <Card key={rate.id} className="p-4">
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-medium">{rate.task}</h3>
+                      <p className="text-sm text-muted-foreground">{rate.tool}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemove(rate.id)}
+                      className="text-destructive hover:text-destructive/90"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Quantity ({rate.unit})</Label>
+                      <Input
+                        type="number"
+                        value={selectedTask.quantity || ''}
+                        onChange={(e) => onQuantityChange(rate.id, Number(e.target.value))}
+                        min={0}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Frequency (times per week)</Label>
+                      <Select
+                        value={selectedTask.frequency.timesPerWeek.toString()}
+                        onValueChange={(value) => onFrequencyChange(rate.id, Number(value))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select frequency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
+                            <SelectItem key={freq} value={freq.toString()}>
+                              {freq}x per week
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="bg-accent/50 p-4 rounded-lg space-y-2">
+                    <h4 className="font-medium">Time Requirements</h4>
+                    <div className="text-sm space-y-1">
+                      <p>Time per service: {((selectedTask.timeRequired * 60) / selectedTask.frequency.timesPerWeek / 4.33).toFixed(1)} minutes</p>
+                      <p>Monthly hours: {selectedTask.timeRequired.toFixed(1)} hours</p>
+                      <p>Productivity rate: {rate.ratePerHour.toFixed(2)} {rate.unit}/hour</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })
+        ) : (
+          <Alert>
+            <AlertDescription>
+              No tasks found for the selected category.
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
+    </div>
+  );
+};
+```
+
+### TaskItem.tsx
+```typescript
+import React, { useMemo, useCallback } from 'react';
+import { calculateTaskProductivity } from '@/utils/productivityCalculations';
+import { Card } from "@/components/ui/card";
+import { ProductivityCard } from './task/ProductivityCard';
+import { TimeDisplay } from './task/TimeDisplay';
+import { TaskControls } from './task/TaskControls';
+import { TaskHeader } from './task/TaskHeader';
+import { useTaskContext } from './area/task/TaskContext';
+
+interface TaskItemProps {
+  rate: {
+    id: string;
+    task: string;
+    tool: string;
+    unit: string;
+    ratePerHour: number;
+  };
+  siteId?: string;
+  siteName?: string;
+}
+
+export const TaskItem: React.FC<TaskItemProps> = ({
+  rate,
+  siteId,
+  siteName,
+}) => {
+  const { selectedTasks, handleTaskSelection, handleQuantityChange, handleFrequencyChange, handleProductivityOverride, handleToolChange } = useTaskContext();
+  
+  const selectedTask = selectedTasks.find(task => task.taskId === rate.id && task.siteId === siteId);
+
+  const productivity = useMemo(() => 
+    selectedTask ? calculateTaskProductivity(
+      rate.id,
+      selectedTask.quantity,
+      selectedTask.selectedTool,
+      selectedTask.frequency,
+      selectedTask.quantity
+    ) : null,
+  [rate.id, selectedTask]);
+
+  const handleLocalTaskSelection = useCallback((taskId: string, checked: boolean) => {
+    handleTaskSelection(taskId, checked, siteId, siteName);
+  }, [handleTaskSelection, siteId, siteName]);
+
+  return (
+    <div key={rate.id} className="flex flex-col gap-2 p-2 border rounded">
+      <TaskHeader
+        taskId={rate.id}
+        taskName={rate.task}
+        isSelected={!!selectedTask}
+        onTaskSelection={handleLocalTaskSelection}
+        onRemoveTask={(taskId) => handleTaskSelection(taskId, false, siteId, siteName)}
+      />
+
+      {selectedTask && (
+        <div className="ml-6 space-y-4">
+          <TaskControls
+            taskId={rate.id}
+            quantity={selectedTask.quantity}
+            frequency={selectedTask.frequency}
+            productivityOverride={selectedTask.productivityOverride}
+            selectedTool={selectedTask.selectedTool}
+            unit={rate.unit}
+            ratePerHour={rate.ratePerHour}
+            onQuantityChange={handleQuantityChange}
+            onFrequencyChange={handleFrequencyChange}
+            onProductivityOverride={handleProductivityOverride}
+            onToolChange={handleToolChange}
+          />
+
+          {productivity && (
+            <ProductivityCard productivity={productivity} />
+          )}
+
+          {selectedTask.timeRequired > 0 && (
+            <TimeDisplay
+              timeRequired={selectedTask.timeRequired}
+              frequency={selectedTask.frequency}
+            />
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+### LaborCosts.tsx
+```typescript
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cleaningAwardLevels } from '@/data/award/cleaningAward';
+import { OnCostsManager } from './OnCostsManager';
+import { OnCostsState } from '@/data/types/onCosts';
+import { EmploymentTypeSelector } from './labor/EmploymentTypeSelector';
+import { DirectEmploymentOptions } from './labor/DirectEmploymentOptions';
+import { AwardIncreaseManager } from './labor/AwardIncreaseManager';
+
+interface LaborCostsProps {
+  onLaborCostChange: (costs: { 
+    hourlyRate: number;
+    employmentType: 'contracted' | 'direct';
+    awardLevel?: number;
+    shiftType?: string;
+    onCosts?: OnCostsState;
+  }) => void;
+  totalMonthlyHours?: number;
+}
+
+const defaultOnCosts: OnCostsState = {
+  statutoryOnCosts: [
+    { name: 'Superannuation Guarantee', rate: 11.5, isEnabled: true, category: 'statutory', isMandatory: true },
+    { name: 'Workers Compensation', rate: 5, isEnabled: true, category: 'statutory', isMandatory: true },
+    { name: 'Payroll Tax', rate: 4.75, isEnabled: true, category: 'statutory', isMandatory: true },
+    { name: 'Leave Entitlements', rate: 8.33, isEnabled: true, category: 'statutory', isMandatory: true },
+  ],
+  employmentOnCosts: [
+    { name: 'Casual Loading', rate: 25, isEnabled: false, category: 'employment' },
+    { name: 'Training Allowance', rate: 2, isEnabled: false, category: 'employment' },
+  ],
+  recruitmentOnCosts: [
+    { name: 'Recruitment & Advertising', rate: 3, isEnabled: false, category: 'recruitment' },
+    { name: 'Training & Induction', rate: 2, isEnabled: false, category: 'recruitment' },
+  ],
+  overheadOnCosts: [
+    { name: 'Uniforms & PPE', rate: 2, isEnabled: false, category: 'overhead' },
+    { name: 'Equipment & Tools', rate: 3, isEnabled: false, category: 'overhead' },
+  ],
+  miscellaneousOnCosts: [
+    { name: 'Insurance', rate: 2, isEnabled: false, category: 'miscellaneous' },
+    { name: 'Administrative Costs', rate: 3, isEnabled: false, category: 'miscellaneous' },
+  ],
+};
+
+export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange, totalMonthlyHours = 0 }) => {
+  const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
+  const [contractedRate, setContractedRate] = useState<number>(38);
+  const [awardLevel, setAwardLevel] = useState<number>(1);
+  const [shiftType, setShiftType] = useState<string>('standard');
+  const [onCosts, setOnCosts] = useState<OnCostsState>(defaultOnCosts);
+  const [awardIncrease, setAwardIncrease] = useState<number>(0);
+
+  useEffect(() => {
+    // Initialize with default contracted rate
+    updateLaborCosts('contracted');
+  }, []);
+
+  const handleEmploymentTypeChange = (value: 'contracted' | 'direct') => {
+    setEmploymentType(value);
+    updateLaborCosts(value);
+  };
+
+  const handleContractedRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value) || 0;
+    setContractedRate(value);
+    if (employmentType === 'contracted') {
+      onLaborCostChange({
+        hourlyRate: value,
+        employmentType
+      });
+    }
+  };
+
+  const calculateAdjustedRate = (baseRate: number): number => {
+    return baseRate * (1 + (awardIncrease / 100));
+  };
+
+  const updateLaborCosts = (type: 'contracted' | 'direct' = employmentType) => {
+    if (type === 'contracted') {
+      onLaborCostChange({
+        hourlyRate: contractedRate,
+        employmentType: type
+      });
+    } else {
+      const selectedLevel = cleaningAwardLevels.find(level => level.level === awardLevel);
+      const baseRate = selectedLevel?.payRates[shiftType as keyof typeof selectedLevel.payRates] || 0;
+      const adjustedRate = calculateAdjustedRate(baseRate);
+      
+      onLaborCostChange({
+        hourlyRate: adjustedRate,
+        employmentType: type,
+        awardLevel,
+        shiftType,
+        onCosts
+      });
+    }
+  };
+
+  const handleAwardLevelChange = (value: string) => {
+    const level = parseInt(value);
+    setAwardLevel(level);
+    if (employmentType === 'direct') {
+      updateLaborCosts();
+    }
+  };
+
+  const handleShiftTypeChange = (value: string) => {
+    setShiftType(value);
+    if (employmentType === 'direct') {
+      updateLaborCosts();
+    }
+  };
+
+  const handleOnCostsChange = (newOnCosts: OnCostsState) => {
+    setOnCosts(newOnCosts);
+    if (employmentType === 'direct') {
+      updateLaborCosts();
+    }
+  };
+
+  const handleAwardIncreaseChange = (increase: number) => {
+    setAwardIncrease(increase);
+    if (employmentType === 'direct') {
+      updateLaborCosts();
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Labor Costs</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-6">
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-2">Monthly Hours Required</p>
+              <p className="text-2xl font-bold">{totalMonthlyHours.toFixed(1)} hours</p>
+            </div>
+
+            <EmploymentTypeSelector
+              value={employmentType}
+              onChange={handleEmploymentTypeChange}
+            />
+
+            {employmentType === 'contracted' ? (
+              <div className="space-y-2">
+                <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
+                <Input
+                  id="hourlyRate"
+                  type="number"
+                  value={contractedRate}
+                  placeholder="Enter hourly rate"
+                  onChange={handleContractedRateChange}
+                />
+              </div>
+            ) : (
+              <>
+                <DirectEmploymentOptions
+                  awardLevel={awardLevel}
+                  shiftType={shiftType}
+                  onAwardLevelChange={handleAwardLevelChange}
+                  onShiftTypeChange={handleShiftTypeChange}
+                />
+                <AwardIncreaseManager
+                  currentIncrease={awardIncrease}
+                  onAwardIncreaseChange={handleAwardIncreaseChange}
+                />
+              </>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {employmentType === 'direct' && (
+        <OnCostsManager
+          onCosts={onCosts}
+          onOnCostsChange={handleOnCostsChange}
+        />
+      )}
+    </div>
+  );
+};
+```
+
+### ScopeOfWorkSidebar.tsx
+```typescript
+import React from 'react';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+} from "@/components/ui/sidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { getProductivityRate } from '@/data/productivityRates';
+import { Card } from "@/components/ui/card";
+import { Building, Clock } from "lucide-react";
+import { Site } from '@/data/types/site';
+import { useTaskContext } from './area/task/TaskContext';
+import { toast } from './ui/use-toast';
+import { TaskList } from './scope/TaskList';
+import { SiteSummaryCard } from './scope/SiteSummaryCard';
+
+interface ScopeOfWorkSidebarProps {
+  selectedTasks: Array<{
+    taskId: string;
+    quantity: number;
+    timeRequired: number;
+    frequency: {
+      timesPerWeek: number;
+      timesPerMonth: number;
+    };
+    siteName?: string;
+  }>;
+  sites?: Site[];
+}
+
+export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
+  selectedTasks,
+  sites = []
+}) => {
+  const { handleTaskSelection, handleQuantityChange, handleFrequencyChange } = useTaskContext();
+
+  const handleRemoveTask = (taskId: string, siteId?: string) => {
+    handleTaskSelection(taskId, false, siteId);
+    toast({
+      title: "Task Removed",
+      description: "Task has been removed from the scope.",
+    });
+  };
+
+  // Calculate total monthly time
+  const totalMonthlyTime = selectedTasks.reduce((sum, task) => 
+    sum + (task.timeRequired || 0), 0) * 60;
+
+  // Calculate total weekly hours
+  const weeklyHours = totalMonthlyTime / (4.33 * 60);
+
+  // Group tasks by site
+  const tasksBySite = selectedTasks.reduce((acc, task) => {
+    const siteName = task.siteName || 'Default Site';
+    if (!acc[siteName]) {
+      acc[siteName] = [];
+    }
+    acc[siteName].push(task);
+    return acc;
+  }, {} as Record<string, typeof selectedTasks>);
+
+  const getTaskName = (taskId: string) => {
+    const rate = getProductivityRate(taskId);
+    return rate?.task || 'Unknown Task';
+  };
+
+  return (
+    <Sidebar className="border-r w-96">
+      <SidebarHeader className="border-b px-6 py-4 bg-accent">
+        <h2 className="text-2xl font-semibold text-primary">Scope Summary</h2>
+      </SidebarHeader>
+      <SidebarContent>
+        <ScrollArea className="h-[calc(100vh-5rem)] px-6">
+          <div className="space-y-6 py-6">
+            {/* Overview Cards */}
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="p-4 bg-accent/50">
+                <div className="flex items-center space-x-2">
+                  <Building className="w-4 h-4 text-primary" />
+                  <p className="text-sm font-medium">Sites</p>
+                </div>
+                <p className="text-2xl font-bold mt-2">{sites.length}</p>
+              </Card>
+              
+              <Card className="p-4 bg-accent/50">
+                <div className="flex items-center space-x-2">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <p className="text-sm font-medium">Weekly Hours</p>
+                </div>
+                <p className="text-2xl font-bold mt-2">{weeklyHours.toFixed(1)}</p>
+              </Card>
+            </div>
+
+            {/* Sites Summary */}
+            {Object.entries(tasksBySite).map(([siteName, siteTasks]) => {
+              const siteMonthlyTime = siteTasks.reduce((sum, task) => 
+                sum + (task.timeRequired || 0), 0) * 60;
+              const siteWeeklyTime = siteMonthlyTime / 4.33;
+              
+              return (
+                <div key={siteName} className="space-y-4">
+                  <SiteSummaryCard
+                    siteName={siteName}
+                    weeklyHours={siteWeeklyTime / 60}
+                    monthlyHours={siteMonthlyTime / 60}
+                  />
+                  
+                  <TaskList
+                    tasks={siteTasks}
+                    onQuantityChange={handleQuantityChange}
+                    onFrequencyChange={handleFrequencyChange}
+                    onRemoveTask={(taskId) => handleRemoveTask(taskId)}
+                    getTaskName={getTaskName}
+                  />
+                </div>
+              );
+            })}
+
+            {selectedTasks.length === 0 && (
+              <div className="flex flex-col items-center justify-center space-y-4 text-center p-8">
+                <Clock className="w-12 h-12 text-muted-foreground" />
+                <p className="text-muted-foreground text-lg">
+                  No tasks selected. Select tasks to build your scope of work.
+                </p>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </SidebarContent>
+    </Sidebar>
+  );
+};
+```
+
+### CostSummary.tsx
+```typescript
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CostBreakdown } from '@/utils/costCalculations';
+
+interface CostSummaryProps {
+  costs: CostBreakdown;
+}
+
+export const CostSummary: React.FC<CostSummaryProps> = ({ costs }) => {
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Labor Requirements Summary</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h3 className="font-medium text-sm text-muted-foreground">Monthly Time</h3>
+              <p className="text-2xl font-bold">{Math.round(costs.suggestedMonthlyHours)} hours</p>
+              <p className="text-sm text-muted-foreground">({Math.round(costs.totalMonthlyMinutes)} minutes)</p>
+            </div>
+            <div>
+              <h3 className="font-medium text-sm text-muted-foreground">Weekly Time</h3>
+              <p className="text-2xl font-bold">{Math.round(costs.suggestedWeeklyHours)} hours</p>
+            </div>
+          </div>
+
+          <div className="border-t pt-4">
+            <h3 className="font-medium mb-2">Labor Cost Breakdown</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Base Labor Rate</span>
+                <span>${costs.laborCostPerHour.toFixed(2)}/hour</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Monthly Hours</span>
+                <span>{Math.round(costs.suggestedMonthlyHours)} hours</span>
+              </div>
+              <div className="flex justify-between font-medium">
+                <span>Total Monthly Labor Cost</span>
+                <span>${costs.totalMonthlyCost.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t pt-4">
+            <h3 className="font-medium mb-2">Suggested Staffing</h3>
+            <div className="space-y-2">
+              {costs.rosterSuggestion.fullTimeStaff > 0 && (
+                <p>Full-time staff: {costs.rosterSuggestion.fullTimeStaff}</p>
+              )}
+              {costs.rosterSuggestion.partTimeStaff > 0 && (
+                <p>Part-time staff: {costs.rosterSuggestion.partTimeStaff}</p>
+              )}
+              {costs.rosterSuggestion.casualStaff > 0 && (
+                <p>Casual staff: {costs.rosterSuggestion.casualStaff}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+```
+
+### OnCostsManager.tsx
+```typescript
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { OnCost, OnCostsState } from '@/data/types/onCosts';
+import { OnCostCategory } from './oncosts/OnCostCategory';
+import { useToast } from "@/components/ui/use-toast";
+
+interface OnCostsManagerProps {
+  onCosts: OnCostsState;
+  onOnCostsChange: (newOnCosts: OnCostsState) => void;
+}
+
+export const OnCostsManager: React.FC<OnCostsManagerProps> = ({
+  onCosts,
+  onOnCostsChange,
+}) => {
+  const { toast } = useToast();
+
+  const handleOnCostToggle = (category: keyof OnCostsState, index: number) => {
+    const newOnCosts = { ...onCosts };
+    newOnCosts[category][index].isEnabled = !newOnCosts[category][index].isEnabled;
+    onOnCostsChange(newOnCosts);
+  };
+
+  const handleRateChange = (category: keyof OnCostsState, index: number, value: string) => {
+    const newOnCosts = { ...onCosts };
+    newOnCosts[category][index].rate = parseFloat(value) || 0;
+    onOnCostsChange(newOnCosts);
+  };
+
+  const handleNameChange = (category: keyof OnCostsState, index: number, value: string) => {
+    const newOnCosts = { ...onCosts };
+    newOnCosts[category][index].name = value;
+    onOnCostsChange(newOnCosts);
+  };
+
+  const handleAddItem = (category: keyof OnCostsState) => {
+    const newOnCosts = { ...onCosts };
+    const newItem: OnCost = {
+      name: `New ${category.replace(/([A-Z])/g, ' $1').trim().slice(0, -8)} Item`,
+      rate: 0,
+      isEnabled: true,
+      category: category.replace('OnCosts', '') as OnCost['category']
+    };
+    
+    newOnCosts[category] = [...newOnCosts[category], newItem];
+    onOnCostsChange(newOnCosts);
+    
+    toast({
+      title: "New item added",
+      description: `Added new item to ${category.replace(/([A-Z])/g, ' $1').trim().slice(0, -8)}`,
+    });
+  };
+
+  const categories: Array<{key: keyof OnCostsState; title: string}> = [
+    { key: 'statutoryOnCosts', title: 'Statutory On-Costs' },
+    { key: 'employmentOnCosts', title: 'Employment-Specific On-Costs' },
+    { key: 'recruitmentOnCosts', title: 'Recruitment & Onboarding Costs' },
+    { key: 'overheadOnCosts', title: 'Business Overheads' },
+    { key: 'miscellaneousOnCosts', title: 'Miscellaneous On-Costs' },
+  ];
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Company On-Costs</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {categories.map(({ key, title }) => (
+          <OnCostCategory
+            key={key}
+            title={title}
+            category={key}
+            items={onCosts[key]}
+            onItemToggle={(index) => handleOnCostToggle(key, index)}
+            onRateChange={(index, value) => handleRateChange(key, index, value)}
+            onNameChange={(index, value) => handleNameChange(key, index, value)}
+            onAddItem={() => handleAddItem(key)}
+          />
+        ))}
+      </CardContent>
+    </Card>
+  );
+};
+```
+
+## Task Management
+
+### TaskManagementPage.tsx
+```typescript
+import React, { useState, useEffect } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CleaningTask, SelectedTask } from '@/data/types/taskManagement';
+import { loadTasks } from '@/utils/taskStorage';
+import { useToast } from '@/hooks/use-toast';
+import { TaskProvider } from '../area/task/TaskContext';
+import { calculateManHours, validateTaskInput } from '@/utils/manHourCalculations';
+import { TaskDatabase } from './TaskDatabase';
+import { ScopeContent } from './scope/ScopeContent';
+
+const SELECTED_TASKS_STORAGE_KEY = 'selected-tasks';
+
+export const TaskManagementPage = () => {
+  const [tasks, setTasks] = useState<CleaningTask[]>(() => loadTasks());
+  const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>(() => {
+    const savedTasks = localStorage.getItem(SELECTED_TASKS_STORAGE_KEY);
+    return savedTasks ? JSON.parse(savedTasks) : [];
+  });
+  const { toast } = useToast();
+
+  useEffect(() => {
+    localStorage.setItem(SELECTED_TASKS_STORAGE_KEY, JSON.stringify(selectedTasks));
+  }, [selectedTasks]);
+
+  const handleTaskSelection = (task: CleaningTask) => {
+    const existingTask = selectedTasks.find(t => t.id === task.id);
+    
+    if (!existingTask) {
+      const newSelectedTask: SelectedTask = {
+        ...task,
+        taskId: task.id,
+        quantity: 0,
+        manHours: 0,
+        frequency: {
+          timesPerWeek: 1,
+          timesPerMonth: 4.33
+        },
+        timeRequired: 0,
+        selectedTool: task.defaultTool
+      };
+      
+      setSelectedTasks(prev => [...prev, newSelectedTask]);
+      toast({
+        title: "Task Added",
+        description: `${task.taskName} has been added to your scope of work.`,
+      });
+    }
+  };
+
+  const handleQuantityChange = (taskId: string, quantity: number) => {
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.id === taskId) {
+        if (!validateTaskInput(task, quantity)) return task;
+        
+        const manHours = calculateManHours(
+          task,
+          quantity,
+          task.frequency
+        );
+        
+        return {
+          ...task,
+          quantity,
+          manHours,
+          timeRequired: manHours / task.frequency.timesPerMonth
+        };
+      }
+      return task;
+    }));
+  };
+
+  const handleFrequencyChange = (taskId: string, timesPerWeek: number) => {
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.id === taskId) {
+        const frequency = {
+          timesPerWeek,
+          timesPerMonth: timesPerWeek * 4.33
+        };
+        
+        const manHours = calculateManHours(
+          task,
+          task.quantity,
+          frequency
+        );
+        
+        return {
+          ...task,
+          frequency,
+          manHours,
+          timeRequired: manHours / frequency.timesPerMonth
+        };
+      }
+      return task;
+    }));
+  };
+
+  const handleRemoveTask = (taskId: string) => {
+    setSelectedTasks(prev => prev.filter(task => task.id !== taskId));
+    toast({
+      title: "Task Removed",
+      description: "Task has been removed from the scope of work.",
+    });
+  };
+
+  return (
+    <TaskProvider onTasksChange={(tasks) => console.log('Tasks updated:', tasks)}>
+      <div className="space-y-6">
+        <Tabs defaultValue="database" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="database">Task Database</TabsTrigger>
+            <TabsTrigger value="scope">Scope of Work</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="database">
+            <TaskDatabase
+              tasks={tasks}
+              setTasks={setTasks}
+              selectedTasks={selectedTasks}
+              onTaskSelection={handleTaskSelection}
+              onQuantityChange={handleQuantityChange}
+              onFrequencyChange={handleFrequencyChange}
+            />
+          </TabsContent>
+
+          <TabsContent value="scope">
+            <ScopeContent
+              selectedTasks={selectedTasks}
+              onQuantityChange={handleQuantityChange}
+              onFrequencyChange={handleFrequencyChange}
+              onRemoveTask={handleRemoveTask}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </TaskProvider>
+  );
+};
+```
+
+### TaskDatabase.tsx
+```typescript
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { TaskSelectionPanel } from './TaskSelectionPanel';
+import { CsvImport } from './CsvImport';
+import { CleaningTask, SelectedTask } from '@/data/types/taskManagement';
+import { saveTasks } from '@/utils/taskStorage';
+
+interface TaskDatabaseProps {
+  tasks: CleaningTask[];
+  setTasks: (tasks: CleaningTask[]) => void;
+  selectedTasks: SelectedTask[];
+  onTaskSelection: (task: CleaningTask) => void;
+  onQuantityChange: (taskId: string, quantity: number) => void;
+  onFrequencyChange: (taskId: string, timesPerWeek: number) => void;
+}
+
+export const TaskDatabase: React.FC<TaskDatabaseProps> = ({
+  tasks,
+  setTasks,
+  selectedTasks,
+  onTaskSelection,
+  onQuantityChange,
+  onFrequencyChange,
+}) => {
+  const tasksByCategory = tasks.reduce((acc, task) => {
+    if (!acc[task.category]) {
+      acc[task.category] = [];
+    }
+    acc[task.category].push(task);
+    return acc;
+  }, {} as Record<string, CleaningTask[]>);
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Task Categories</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Accordion type="single" collapsible className="w-full">
+            {Object.entries(tasksByCategory).map(([category, categoryTasks]) => (
+              <AccordionItem key={category} value={category}>
+                <AccordionTrigger className="text-lg font-semibold">
+                  {category}
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-4 p-4">
+                    {categoryTasks.map((task) => (
+                      <TaskSelectionPanel
+                        key={task.id}
+                        task={task}
+                        selectedTask={selectedTasks.find(t => t.id === task.id)}
+                        onSelect={() => onTaskSelection(task)}
+                        onQuantityChange={onQuantityChange}
+                        onFrequencyChange={onFrequencyChange}
+                      />
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Import Tasks</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <CsvImport onImport={(tasksToImport) => {
+            const newTasks = tasksToImport.map(task => ({
+              ...task,
+              id: crypto.randomUUID(),
+            }));
+            const updatedTasks = [...tasks, ...newTasks];
+            setTasks(updatedTasks);
+            saveTasks(updatedTasks);
+          }} />
+        </CardContent>
+      </Card>
+    </>
+  );
+};
+```
+
+### TaskSelectionPanel.tsx
+```typescript
+import React from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CleaningTask, SelectedTask } from '@/data/types/taskManagement';
+
+interface TaskSelectionPanelProps {
+  task: CleaningTask;
+  selectedTask?: SelectedTask;
+  onSelect: () => void;
+  onQuantityChange: (taskId: string, quantity: number) => void;
+  onFrequencyChange: (taskId: string, timesPerWeek: number) => void;
+}
+
+export const TaskSelectionPanel: React.FC<TaskSelectionPanelProps> = ({
+  task,
+  selectedTask,
+  onSelect,
+  onQuantityChange,
+  onFrequencyChange,
+}) => {
+  const isSelected = !!selectedTask;
+
+  return (
+    <Card className="w-full">
+      <CardContent className="pt-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-medium">{task.taskName}</h3>
+            <p className="text-sm text-muted-foreground">
+              {task.productivityRate} {task.measurementUnit}
+            </p>
+          </div>
+          <Button
+            variant={isSelected ? "secondary" : "default"}
+            onClick={onSelect}
+          >
+            {isSelected ? "Selected" : "Add Task"}
+          </Button>
+        </div>
+
+        {isSelected && (
+          <div className="space-y-4">
+            <div>
+              <Label>
+                {task.measurementUnit === 'SQM/hour' ? 'Area (SQM)' : 'Unit Count'}
+              </Label>
+              <Input
+                type="number"
+                value={selectedTask.quantity || ''}
+                onChange={(e) => onQuantityChange(task.id, Number(e.target.value))}
+                placeholder={`Enter ${task.measurementUnit === 'SQM/hour' ? 'area' : 'units'}`}
+              />
+            </div>
+
+            <div>
+              <Label>Frequency (times per week)</Label>
+              <Select
+                value={selectedTask.frequency.timesPerWeek.toString()}
+                onValueChange={(value) => onFrequencyChange(task.id, Number(value))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select frequency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
+                    <SelectItem key={freq} value={freq.toString()}>
+                      {freq}x per week
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedTask.manHours > 0 && (
+              <div className="text-sm text-muted-foreground">
+                <p>Monthly Hours: {selectedTask.manHours.toFixed(2)}</p>
+                <p>Hours per Service: {(selectedTask.manHours / selectedTask.frequency.timesPerMonth).toFixed(2)}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+```
+
+## Hooks
+
+### useTaskOperations.ts
+```typescript
+import { useCallback } from 'react';
+import { SelectedTask } from '@/components/area/task/types';
+import { toast } from '@/components/ui/use-toast';
+import { getRateById } from '@/data/rates/ratesManager';
+import { validateTaskData } from '@/utils/taskValidation';
+
+/**
+ * Custom hook for task operations (add, remove, update)
+ * @param selectedTasks Current selected tasks array
+ * @param setSelectedTasks Function to update selected tasks
+ * @param calculateTaskTime Function to calculate task time
+ * @param defaultLaborRate Default labor rate for new tasks
+ * @returns Object containing task operation functions
+ */
+export const useTaskOperations = (
+  selectedTasks: SelectedTask[],
+  setSelectedTasks: (tasks: SelectedTask[] | ((prev: SelectedTask[]) => SelectedTask[])) => void,
+  calculateTaskTime: any,
+  defaultLaborRate: number = 38
+) => {
+  // Handle task selection/deselection
+  const handleTaskSelection = useCallback((
+    taskId: string,
+    isSelected: boolean,
+    siteId?: string,
+    siteName?: string
+  ) => {
+    if (isSelected) {
+      const rate = getRateById(taskId);
+      if (!rate) {
+        toast({
+          title: "Error",
+          description: `Could not find rate for task ${taskId}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const newTask: SelectedTask = {
+        taskId,
+        siteId,
+        siteName,
+        quantity: 0,
+        timeRequired: 0,
+        frequency: {
+          timesPerWeek: 1,
+          timesPerMonth: 4.33
+        },
+        selectedTool: rate.tool,
+        laborRate: defaultLaborRate
+      };
+
+      setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => [...prev, newTask]);
+      
+      toast({
+        title: "Task Added",
+        description: `${rate.task} has been added to your scope.`
+      });
+    } else {
+      setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => 
+        prev.filter(task => task.taskId !== taskId)
+      );
+      
+      toast({
+        title: "Task Removed",
+        description: "Task has been removed from the scope."
+      });
+    }
+  }, [setSelectedTasks, defaultLaborRate]);
+
+  // Handle quantity changes
+  const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
+    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
+      if (task.taskId === taskId) {
+        if (!validateTaskData(task, quantity)) return task;
+        
+        const timeRequired = calculateTaskTime(
+          taskId,
+          quantity,
+          task.selectedTool,
+          task.frequency
+        );
+        
+        return {
+          ...task,
+          quantity,
+          timeRequired
+        };
+      }
+      return task;
+    }));
+  }, [calculateTaskTime, setSelectedTasks]);
+
+  // Handle frequency changes
+  const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
+    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
+      if (task.taskId === taskId) {
+        const frequency = {
+          timesPerWeek,
+          timesPerMonth: timesPerWeek * 4.33
+        };
+        
+        const timeRequired = calculateTaskTime(
+          taskId,
+          task.quantity,
+          task.selectedTool,
+          frequency
+        );
+        
+        return {
+          ...task,
+          frequency,
+          timeRequired
+        };
+      }
+      return task;
+    }));
+  }, [calculateTaskTime, setSelectedTasks]);
+
+  return {
+    handleTaskSelection,
+    handleQuantityChange,
+    handleFrequencyChange
+  };
+};
+```
+
+### useTaskModifiers.ts
+```typescript
+import { useCallback } from 'react';
+import { SelectedTask } from '@/components/area/task/types';
+import { toast } from '@/components/ui/use-toast';
+
+/**
+ * Custom hook for modifying task properties (tools, labor rates, productivity)
+ * @param selectedTasks Current selected tasks array
+ * @param setSelectedTasks Function to update selected tasks
+ * @param calculateTaskTime Function to calculate task time
+ * @returns Object containing task modification functions
+ */
+export const useTaskModifiers = (
+  selectedTasks: SelectedTask[],
+  setSelectedTasks: (tasks: SelectedTask[] | ((prev: SelectedTask[]) => SelectedTask[])) => void,
+  calculateTaskTime: any
+) => {
+  // Handle tool changes
+  const handleToolChange = useCallback((taskId: string, tool: string) => {
+    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
+      if (task.taskId === taskId) {
+        const timeRequired = calculateTaskTime(
+          taskId,
+          task.quantity,
+          tool,
+          task.frequency
+        );
+        
+        return {
+          ...task,
+          selectedTool: tool,
+          timeRequired
+        };
+      }
+      return task;
+    }));
+  }, [calculateTaskTime, setSelectedTasks]);
+
+  // Handle labor rate changes
+  const handleLaborRateChange = useCallback((taskId: string, rate: number) => {
+    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
+      if (task.taskId === taskId) {
+        return {
+          ...task,
+          laborRate: rate
+        };
+      }
+      return task;
+    }));
+  }, [setSelectedTasks]);
+
+  // Handle productivity override
+  const handleProductivityOverride = useCallback((taskId: string, override: number) => {
+    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
+      if (task.taskId === taskId) {
+        const timeRequired = calculateTaskTime(
+          taskId,
+          task.quantity,
+          task.selectedTool,
+          task.frequency,
+          override
+        );
+        
+        return {
+          ...task,
+          productivityOverride: override,
+          timeRequired
+        };
+      }
+      return task;
+    }));
+
+    toast({
+      title: "Productivity Updated",
+      description: "Task productivity rate has been updated."
+    });
+  }, [calculateTaskTime, setSelectedTasks]);
+
+  return {
+    handleToolChange,
+    handleLaborRateChange,
+    handleProductivityOverride
+  };
+};
+```
+
+### useTaskTimes.tsx
+```typescript
+import { useCallback } from 'react';
+import { calculateTaskProductivity } from '@/utils/productivityCalculations';
+import { TaskFrequency } from '@/components/area/task/types';
+
+export const calculateTaskTime = (
+  taskId: string,
+  quantity: number,
+  selectedTool: string | undefined,
+  frequency: TaskFrequency
+): number => {
+  const productivity = calculateTaskProductivity(
+    taskId,
+    quantity,
+    selectedTool,
+    frequency,
+    quantity
+  );
+  
+  console.log('Task time calculation:', {
+    taskId,
+    quantity,
+    selectedTool,
+    frequency,
+    productivity
+  });
+
+  return productivity?.timeRequired || 0;
+};
+
+export const useTaskTimes = () => {
+  const calculateTaskTimeCallback = useCallback(calculateTaskTime, []);
+
+  return { calculateTaskTime: calculateTaskTimeCallback };
+};
+```
+
+### useTaskManagement.ts
+```typescript
+import { useState, useCallback, useEffect } from 'react';
+import { SelectedTask, AreaData } from '@/components/area/task/types';
+import { useTaskTimes } from './useTaskTimes';
+import { toast } from '@/components/ui/use-toast';
+import { validateTaskData } from '@/utils/taskValidation';
+import { getRateById } from '@/data/rates/ratesManager';
+
+/**
+ * Custom hook for managing task-related state and operations
+ * @param onTasksChange Callback function when tasks are updated
+ * @param defaultLaborRate Default labor rate for new tasks
+ * @returns Object containing task state and management functions
+ */
+export const useTaskManagement = (
+  onTasksChange?: (area: AreaData) => void,
+  defaultLaborRate: number = 38
+) => {
+  // Main state for selected tasks
+  const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
+  const { calculateTaskTime } = useTaskTimes();
+
+  // Update area data whenever tasks change
+  useEffect(() => {
+    if (onTasksChange) {
+      const totalTime = selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0);
+      const totalLaborCost = selectedTasks.reduce((sum, task) => {
+        const hourlyRate = task.laborRate || defaultLaborRate;
+        return sum + (task.timeRequired * hourlyRate);
+      }, 0);
+
+      const areaData: AreaData = {
+        squareMeters: 0,
+        spaceType: '',
+        industryType: '',
+        selectedTasks: selectedTasks.map(task => ({
+          taskId: task.taskId,
+          quantity: task.quantity,
+          timeRequired: task.timeRequired,
+          frequency: task.frequency,
+          productivityOverride: task.productivityOverride,
+          selectedTool: task.selectedTool,
+          laborRate: task.laborRate || defaultLaborRate
+        })),
+        totalTime,
+        totalLaborCost
+      };
+
+      console.log('Updating area data:', areaData);
+      onTasksChange(areaData);
+    }
+  }, [selectedTasks, onTasksChange, defaultLaborRate]);
+
+  return {
+    selectedTasks,
+    setSelectedTasks,
+    calculateTaskTime
+  };
+};
+```
+
+## Utils
+
+### costCalculations.ts
+```typescript
+import { Site } from '@/data/types/site';
+import { getProductivityRate } from '@/data/productivityRates';
+
+export interface CostBreakdown {
+  totalMonthlyMinutes: number;
+  suggestedMonthlyHours: number;
+  suggestedWeeklyHours: number;
+  laborCostPerHour: number;
+  totalMonthlyCost: number;
+  rosterSuggestion: {
+    fullTimeStaff: number;
+    partTimeStaff: number;
+    casualStaff: number;
+  };
+}
+
+const HOURS_PER_WEEK = 38; // Standard full-time hours
+const WEEKS_PER_MONTH = 4.33;
+
+export const calculateCosts = (
+  sites: Site[],
+  laborRate: number
+): CostBreakdown => {
+  // Calculate total minutes across all sites
+  const totalMonthlyMinutes = sites.reduce((total, site) => {
+    return total + (site.area.totalTime * 60);
+  }, 0);
+
+  const suggestedMonthlyHours = totalMonthlyMinutes / 60;
+  const suggestedWeeklyHours = suggestedMonthlyHours / WEEKS_PER_MONTH;
+
+  // Calculate staff requirements
+  const fullTimeEquivalent = suggestedWeeklyHours / HOURS_PER_WEEK;
+  
+  // Calculate suggested staff mix
+  const fullTimeStaff = Math.floor(fullTimeEquivalent);
+  const remainingHours = (fullTimeEquivalent - fullTimeStaff) * HOURS_PER_WEEK;
+  const partTimeStaff = remainingHours > 15 ? Math.ceil(remainingHours / 20) : 0;
+  const casualStaff = remainingHours > 0 && remainingHours <= 15 ? 1 : 0;
+
+  return {
+    totalMonthlyMinutes,
+    suggestedMonthlyHours,
+    suggestedWeeklyHours,
+    laborCostPerHour: laborRate,
+    totalMonthlyCost: suggestedMonthlyHours * laborRate,
+    rosterSuggestion: {
+      fullTimeStaff,
+      partTimeStaff,
+      casualStaff
+    }
+  };
+};
+
+export const calculateTaskTime = (
+  taskId: string,
+  quantity: number,
+  frequency: { timesPerWeek: number; timesPerMonth: number },
+  productivityOverride?: number
+): number => {
+  const rate = getProductivityRate(taskId);
+  if (!rate) return 0;
+
+  const ratePerHour = productivityOverride || rate.ratePerHour;
+  const baseTime = quantity / ratePerHour; // Hours per service
+  return baseTime * frequency.timesPerWeek * WEEKS_PER_MONTH; // Monthly hours
+};
+```
+
+### costingCalculations.ts
+```typescript
+import { Site } from '@/data/types/site';
+import { OnCostsState } from '@/data/types/onCosts';
+import { getProductivityRate } from '@/data/productivityRates';
+
+export interface TaskCostBreakdown {
+  taskId: string;
+  siteName: string;
+  timeRequired: number;
+  monthlyCost: number;
+}
+
+export const calculateTaskCosts = (
+  sites: Site[],
+  laborRate: number,
+  onCosts?: OnCostsState
+): TaskCostBreakdown[] => {
+  const taskCosts: TaskCostBreakdown[] = [];
+  
+  sites.forEach(site => {
+    if (!site.area?.selectedTasks) return;
+    
+    site.area.selectedTasks.forEach(task => {
+      if (!task.timeRequired) {
+        console.log('Task has no time requirement:', task);
+        return;
+      }
+
+      // Calculate monthly hours based on frequency and time required
+      const monthlyHours = task.timeRequired * (task.frequency?.timesPerMonth || 4.33);
+      
+      // Calculate base labor cost
+      const baseCost = monthlyHours * laborRate;
+      
+      // Calculate additional costs if onCosts are provided
+      let totalCost = baseCost;
+      if (onCosts) {
+        const totalOnCostPercentage = Object.values(onCosts).reduce((total, category) => {
+          return total + category.reduce((sum, cost) => {
+            return sum + (cost.isEnabled ? cost.rate : 0);
+          }, 0);
+        }, 0);
+        
+        totalCost = baseCost * (1 + (totalOnCostPercentage / 100));
+      }
+
+      taskCosts.push({
+        taskId: task.taskId,
+        siteName: site.name,
+        timeRequired: monthlyHours,
+        monthlyCost: totalCost
+      });
+
+      console.log('Task cost calculated:', {
+        taskId: task.taskId,
+        monthlyHours,
+        baseCost,
+        totalCost,
+        laborRate
+      });
+    });
+  });
+
+  return taskCosts;
+};
+
+export const calculateTotalMonthlyHours = (sites: Site[]): number => {
+  return sites.reduce((total, site) => {
+    if (!site.area?.selectedTasks) return total;
+    
+    return total + site.area.selectedTasks.reduce((siteTotal, task) => {
+      const monthlyHours = (task.timeRequired || 0) * (task.frequency?.timesPerMonth || 4.33);
+      console.log('Monthly hours for task:', {
+        taskId: task.taskId,
+        monthlyHours,
+        timeRequired: task.timeRequired,
+        frequency: task.frequency
+      });
+      return siteTotal + monthlyHours;
+    }, 0);
+  }, 0);
+};
+
+export const calculateEquipmentCosts = (equipmentCosts: { monthly: number }): number => {
+  return equipmentCosts.monthly || 0;
+};
+```
+
+### ratesManager.ts
+```typescript
+import { ProductivityRate, TaskGroup } from '../types/productivity';
+import { cleaningTasks } from '../tasks/cleaningTasks';
+
+class RatesManager {
+  private static instance: RatesManager;
+  private ratesCache: Map<string, ProductivityRate[]> = new Map();
+  private taskGroupsCache: TaskGroup[] = [];
+
+  private constructor() {
+    this.initializeRates();
+  }
+
+  public static getInstance(): RatesManager {
+    if (!RatesManager.instance) {
+      RatesManager.instance = new RatesManager();
+    }
+    return RatesManager.instance;
+  }
+
+  private initializeRates() {
+    try {
+      // Initialize task groups cache first
+      this.taskGroupsCache = Array.isArray(cleaningTasks) ? cleaningTasks : [];
+
+      // Flatten all tasks from groups, categories, and subcategories
+      const allTasks: ProductivityRate[] = [];
+      
+      this.taskGroupsCache.forEach(group => {
+        if (!group?.categories) return;
+        
+        group.categories.forEach(category => {
+          if (!category?.subcategories) return;
+          
+          category.subcategories.forEach(subcategory => {
+            if (!subcategory?.tasks) return;
+            
+            subcategory.tasks.forEach(task => {
+              if (task) allTasks.push(task);
+            });
+          });
+        });
+      });
+
+      // Initialize the rates cache with the flattened tasks
+      this.ratesCache.set('all', allTasks);
+
+      // Create category-specific caches
+      this.taskGroupsCache.forEach(group => {
+        if (!group?.categories) return;
+        
+        group.categories.forEach(category => {
+          if (!category?.name) return;
+          
+          const categoryTasks = allTasks.filter(task => task.category === category.name);
+          if (categoryTasks.length > 0) {
+            this.ratesCache.set(category.name, categoryTasks);
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error initializing rates:', error);
+      this.ratesCache = new Map();
+      this.taskGroupsCache = [];
+    }
+  }
+
+  public getRatesByCategory(category: string): ProductivityRate[] {
+    return this.ratesCache.get(category) || [];
+  }
+
+  public getRateById(id: string): ProductivityRate | undefined {
+    for (const rates of this.ratesCache.values()) {
+      const rate = rates.find(r => r.id === id);
+      if (rate) return rate;
+    }
+    return undefined;
+  }
+
+  public getAllRates(): ProductivityRate[] {
+    return this.ratesCache.get('all') || [];
+  }
+
+  public getTaskGroups(): TaskGroup[] {
+    return this.taskGroupsCache;
+  }
+
+  public searchRates(query: string): ProductivityRate[] {
+    const searchTerm = query.toLowerCase();
+    return this.getAllRates().filter(rate => 
+      rate.task.toLowerCase().includes(searchTerm) ||
+      rate.tool.toLowerCase().includes(searchTerm) ||
+      rate.category.toLowerCase().includes(searchTerm) ||
+      rate.subcategory.toLowerCase().includes(searchTerm)
+    );
+  }
+}
+
+export const ratesManager = RatesManager.getInstance();
+
+export const getRatesByCategory = (category: string) => ratesManager.getRatesByCategory(category);
+export const getRateById = (id: string) => ratesManager.getRateById(id);
+export const getAllRates = () => ratesManager.getAllRates();
+export const getTaskGroups = () => ratesManager.getTaskGroups();
+export const searchRates = (query: string) => ratesManager.searchRates(query);
+```
+
+## Types
+
+### types.ts
+```typescript
+import { CleaningTask } from '@/data/types/taskManagement';
+
+export interface SelectedTask extends CleaningTask {
+  quantity: number;
+  frequency: {
+    timesPerWeek: number;
+    timesPerMonth: number;
+  };
+  timeRequired: number;
+  selectedTool?: string;
+  taskId?: string;
+}
+
+export interface TaskProductivity {
+  timeRequired: number;
+  adjustedRate: number;
+}
+```
