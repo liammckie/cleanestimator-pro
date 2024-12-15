@@ -4,7 +4,7 @@ import { MenuOption } from "@/components/ui/dynamic-menu";
 export const getMenuOptions = (setActiveTab: (tab: string) => void): MenuOption[] => [
   {
     id: 'scope',
-    label: 'Scope & Tasks',
+    label: 'Sites',
     icon: "list",
     onClick: () => setActiveTab('scope')
   },

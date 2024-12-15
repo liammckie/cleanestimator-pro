@@ -4,7 +4,7 @@ import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 export const MainNavigation = () => {
   return (
     <TabsList className="w-full justify-start border-b">
-      <TabsTrigger value="scope">Scope & Tasks</TabsTrigger>
+      <TabsTrigger value="scope">Sites</TabsTrigger>
       <TabsTrigger value="labor">Labor Costs</TabsTrigger>
       <TabsTrigger value="equipment">Equipment</TabsTrigger>
       <TabsTrigger value="roster">Roster</TabsTrigger>
