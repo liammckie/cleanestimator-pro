@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
-import { DynamicMenu } from '@/components/ui/dynamic-menu';
 import { Tabs } from "@/components/ui/tabs";
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { calculateCosts } from '@/utils/costCalculations';
-import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { menuOptions } from '@/components/navigation/MenuOptions';
 import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskProvider } from '@/components/area/task/TaskContext';
-import { AreaContainer } from '@/components/area/AreaContainer';
-import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
-import { AreaData } from '@/components/area/task/types';
+import { AppLayout } from '@/components/layout/AppLayout';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -33,15 +29,6 @@ const Index = () => {
     },
   });
 
-  const handleAreaChange = (area: AreaData) => {
-    console.log('Area changed:', area);
-    setLaborCosts(prev => ({
-      ...prev,
-      totalMonthlyHours: area.totalTime,
-      taskCosts: area.selectedTasks
-    }));
-  };
-
   const costBreakdown = calculateCosts(sites, laborCosts.hourlyRate);
   const monthlyRevenue = costBreakdown.totalMonthlyCost * 1.5;
   const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
@@ -59,56 +46,37 @@ const Index = () => {
     })) || []
   );
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'scope':
-        return <AreaContainer onAreaChange={handleAreaChange} />;
-      default:
-        return (
-          <MainContent
-            sites={sites}
-            onSitesChange={setSites}
-            laborCosts={laborCosts}
-            setLaborCosts={setLaborCosts}
-            equipmentCosts={equipmentCosts}
-            setEquipmentCosts={setEquipmentCosts}
-            contractDetails={contractDetails}
-            setContractDetails={setContractDetails}
-            costBreakdown={costBreakdown}
-            monthlyRevenue={monthlyRevenue}
-            overhead={overhead}
-          />
-        );
-    }
-  };
-
   return (
     <SettingsProvider>
       <SidebarProvider>
-        <TaskProvider onTasksChange={handleAreaChange}>
-          <div className="min-h-screen flex w-full bg-background">
-            <div className="flex-1">
-              <div className="container mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold text-primary mb-8">
-                  Commercial Cleaning Estimation Tool
-                </h1>
-                
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                  <div className="flex gap-6">
-                    <DynamicMenu 
-                      options={formattedMenuOptions} 
-                      className="w-[250px] bg-card rounded-lg border border-border"
-                    />
-                    <div className="flex-1 space-y-6">
-                      <MainNavigation />
-                      {renderContent()}
-                    </div>
-                    <div className="w-[250px]">
-                      <ScopeOfWorkSidebar selectedTasks={selectedTasks} sites={sites} />
-                    </div>
-                  </div>
-                </Tabs>
-              </div>
+        <TaskProvider>
+          <div className="min-h-screen bg-background">
+            <div className="container mx-auto">
+              <h1 className="text-3xl font-bold text-primary py-8">
+                Commercial Cleaning Estimation Tool
+              </h1>
+              
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <AppLayout
+                  menuOptions={formattedMenuOptions}
+                  selectedTasks={selectedTasks}
+                  sites={sites}
+                >
+                  <MainContent
+                    sites={sites}
+                    onSitesChange={setSites}
+                    laborCosts={laborCosts}
+                    setLaborCosts={setLaborCosts}
+                    equipmentCosts={equipmentCosts}
+                    setEquipmentCosts={setEquipmentCosts}
+                    contractDetails={contractDetails}
+                    setContractDetails={setContractDetails}
+                    costBreakdown={costBreakdown}
+                    monthlyRevenue={monthlyRevenue}
+                    overhead={overhead}
+                  />
+                </AppLayout>
+              </Tabs>
             </div>
           </div>
         </TaskProvider>
