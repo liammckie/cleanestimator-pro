@@ -3,7 +3,14 @@ import { Check } from "lucide-react";
 import { CommandGroup, CommandItem } from "@/components/ui/command";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
-import { CategoryGroup } from '@/utils/categoryGroups';
+
+interface CategoryGroup {
+  name: string;
+  categories: {
+    name: string;
+    subcategories: string[];
+  }[];
+}
 
 interface CategoryListProps {
   groups: CategoryGroup[];
@@ -77,7 +84,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({
   if (!hasResults && searchQuery) {
     return (
       <div className="p-4 text-sm text-muted-foreground text-center">
-        No matching categories found.
+        No matching tasks found.
       </div>
     );
   }

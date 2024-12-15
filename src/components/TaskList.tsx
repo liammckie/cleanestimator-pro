@@ -4,6 +4,7 @@ import { getRatesByCategory } from '@/data/rates/ratesManager';
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { ProductivityRate } from '@/data/types/productivity';
 
 interface TaskListProps {
   category: string;
@@ -72,7 +73,7 @@ export const TaskList: React.FC<TaskListProps> = ({
       />
       <div className="grid gap-2">
         {filteredRates.length > 0 ? (
-          filteredRates.map((rate) => (
+          filteredRates.map((rate: ProductivityRate) => (
             <TaskItem
               key={rate.id}
               rate={rate}

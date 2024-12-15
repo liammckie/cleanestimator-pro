@@ -27,7 +27,10 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
     name: group.name,
     categories: group.categories.map(category => ({
       name: category.name,
-      subcategories: category.subcategories.map(sub => sub.name)
+      subcategories: category.subcategories.map(sub => ({
+        name: sub.name,
+        tasks: sub.tasks.map(task => task.task)
+      })).flat()
     }))
   }));
 
@@ -40,14 +43,14 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {value || "Select category..."}
+          {value || "Select task..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
         <Command>
           <CommandInput
-            placeholder="Search categories..."
+            placeholder="Search tasks..."
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
