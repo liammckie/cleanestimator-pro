@@ -11,6 +11,7 @@ import { TaskProvider } from '@/components/area/task/TaskContext';
 import { AreaContainer } from '@/components/area/AreaContainer';
 import { TaskSelector } from '@/components/task/TaskSelector';
 import { TaskStack } from '@/components/task/TaskStack';
+import { ScopeOfWork } from '@/components/scope/ScopeOfWork';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -63,7 +64,7 @@ const Index = () => {
           <div className="flex">
             <div className="flex-1 pr-4">
               <TaskSelector
-                onTaskSelect={(taskId) => handleTaskSelection(taskId, !selectedTasks.includes(taskId))}
+                onTaskSelect={(taskId) => console.log('Task selected:', taskId)}
                 selectedTasks={selectedTasks.map(task => task.taskId)}
               />
               <AreaContainer onAreaChange={handleAreaChange} />
