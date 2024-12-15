@@ -11,7 +11,7 @@ import { ProfitLoss } from '@/components/ProfitLoss';
 import { AwardSettings } from '@/components/settings/AwardSettings';
 import { useSettings } from '@/contexts/SettingsContext';
 import { SiteOverview } from '@/components/overview/SiteOverview';
-import { ScopeAndTaskPage } from '@/components/scope/ScopeAndTaskPage';
+import { TaskManagementPage } from '@/components/task-management/TaskManagementPage';
 
 interface MainContentProps {
   sites: any[];
@@ -52,21 +52,14 @@ export const MainContent: React.FC<MainContentProps> = ({
     }
   };
 
-  const selectedTasks = sites.flatMap(site => 
-    site.area?.selectedTasks?.map(task => ({
-      ...task,
-      siteName: site.name
-    })) || []
-  );
-
   return (
     <>
       <TabsContent value="sites" className="space-y-6">
         <SiteManager onSitesChange={onSitesChange} />
       </TabsContent>
 
-      <TabsContent value="scope" className="space-y-6">
-        <ScopeAndTaskPage sites={sites} />
+      <TabsContent value="task-management" className="space-y-6">
+        <TaskManagementPage />
       </TabsContent>
 
       <TabsContent value="labor" className="space-y-6">

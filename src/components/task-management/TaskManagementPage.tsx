@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TaskForm } from './TaskForm';
@@ -6,13 +6,14 @@ import { TaskList } from './TaskList';
 import { CleaningTask } from '@/data/types/taskManagement';
 import { loadTasks, saveTasks } from '@/utils/taskStorage';
 import { useToast } from '@/components/ui/use-toast';
+import { ScopeOfWorkSidebar } from '../ScopeOfWorkSidebar';
 
 export const TaskManagementPage = () => {
   const [tasks, setTasks] = useState<CleaningTask[]>([]);
   const [editingTask, setEditingTask] = useState<CleaningTask | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
+  React.useEffect(() => {
     const savedTasks = loadTasks();
     setTasks(savedTasks);
   }, []);
@@ -25,6 +26,10 @@ export const TaskManagementPage = () => {
     const updatedTasks = [...tasks, newTask];
     setTasks(updatedTasks);
     saveTasks(updatedTasks);
+    toast({
+      title: "Task Added",
+      description: "New task has been added to the database.",
+    });
   };
 
   const handleEditTask = (task: CleaningTask) => {
@@ -32,12 +37,18 @@ export const TaskManagementPage = () => {
   };
 
   const handleUpdateTask = (taskData: Omit<CleaningTask, 'id'>) => {
+    if (!editingTask) return;
+    
     const updatedTasks = tasks.map(task => 
-      task.id === editingTask?.id ? { ...taskData, id: task.id } : task
+      task.id === editingTask.id ? { ...taskData, id: task.id } : task
     );
     setTasks(updatedTasks);
     saveTasks(updatedTasks);
     setEditingTask(null);
+    toast({
+      title: "Task Updated",
+      description: "The task has been updated successfully.",
+    });
   };
 
   const handleDeleteTask = (taskId: string) => {
@@ -51,38 +62,61 @@ export const TaskManagementPage = () => {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Task Management</h1>
+    <div className="grid grid-cols-[1fr,auto] gap-6">
+      <div className="space-y-6">
+        <Tabs defaultValue="database" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="database">Task Database</TabsTrigger>
+            <TabsTrigger value="scope">Scope of Work</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="database">
+            <Card>
+              <CardHeader>
+                <CardTitle>{editingTask ? 'Edit Task' : 'Add New Task'}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TaskForm
+                  onSubmit={editingTask ? handleUpdateTask : handleAddTask}
+                  initialData={editingTask || undefined}
+                  mode={editingTask ? 'edit' : 'create'}
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Task Database</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TaskList
+                  tasks={tasks}
+                  onEditTask={handleEditTask}
+                  onDeleteTask={handleDeleteTask}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="scope">
+            <Card>
+              <CardHeader>
+                <CardTitle>Available Tasks</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TaskList
+                  tasks={tasks}
+                  onEditTask={handleEditTask}
+                  onDeleteTask={handleDeleteTask}
+                  mode="selection"
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
       
-      <Tabs defaultValue="input" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="input">Add Tasks</TabsTrigger>
-          <TabsTrigger value="view">View Tasks</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="input">
-          <Card>
-            <CardHeader>
-              <CardTitle>{editingTask ? 'Edit Task' : 'Add New Task'}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <TaskForm
-                onSubmit={editingTask ? handleUpdateTask : handleAddTask}
-                initialData={editingTask || undefined}
-                mode={editingTask ? 'edit' : 'create'}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="view">
-          <TaskList
-            tasks={tasks}
-            onEditTask={handleEditTask}
-            onDeleteTask={handleDeleteTask}
-          />
-        </TabsContent>
-      </Tabs>
+      <ScopeOfWorkSidebar selectedTasks={[]} sites={[]} />
     </div>
   );
 };
