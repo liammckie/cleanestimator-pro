@@ -55,16 +55,6 @@ export const industrySpecific: TaskGroup = {
               notes: 'Transportation hubs or fleets'
             },
             {
-              id: 'hotel-room-cleaning',
-              category: 'Industry-Specific',
-              subcategory: 'Industry-Specific',
-              task: 'Hotel Room Cleaning',
-              tool: 'Hospitality Cleaning Kit',
-              unit: 'SQM/hour',
-              ratePerHour: 180,
-              notes: 'Accommodation turnover service'
-            },
-            {
               id: 'warehouse-cleaning',
               category: 'Industry-Specific',
               subcategory: 'Industry-Specific',
@@ -82,17 +72,7 @@ export const industrySpecific: TaskGroup = {
               tool: 'Commercial Kitchen Cleaning Kit',
               unit: 'SQM/hour',
               ratePerHour: 100,
-              notes: 'For commercial kitchens and food prep areas'
-            },
-            {
-              id: 'patient-room-disinfection',
-              category: 'Industry-Specific',
-              subcategory: 'Industry-Specific',
-              task: 'Patient Room Disinfection',
-              tool: 'Medical Grade Disinfection Kit',
-              unit: 'SQM/hour',
-              ratePerHour: 70,
-              notes: 'Hospitals and healthcare rooms'
+              notes: 'For commercial kitchens and prep areas'
             },
             {
               id: 'office-deep-cleaning',
@@ -112,7 +92,7 @@ export const industrySpecific: TaskGroup = {
               tool: 'Outdoor Cleaning Equipment',
               unit: 'SQM/hour',
               ratePerHour: 200,
-              notes: 'Sweeping and debris removal in parking spaces'
+              notes: 'Sweeping and debris removal'
             }
           ]
         }
