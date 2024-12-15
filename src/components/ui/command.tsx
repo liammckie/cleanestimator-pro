@@ -84,8 +84,12 @@ const CommandGroup = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Group>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
 >(({ className, children, ...props }, ref) => {
-  // Return null if children is undefined or empty
-  if (!children || (Array.isArray(children) && children.length === 0)) {
+  // Enhanced validation for children
+  const hasValidChildren = React.Children.toArray(children).some(child => 
+    React.isValidElement(child) || (typeof child === 'string' && child.trim() !== '')
+  );
+
+  if (!hasValidChildren) {
     return null;
   }
 
