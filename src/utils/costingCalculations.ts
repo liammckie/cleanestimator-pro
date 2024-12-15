@@ -20,7 +20,10 @@ export const calculateTaskCosts = (
     if (!site.area?.selectedTasks) return;
     
     site.area.selectedTasks.forEach(task => {
+      // Calculate monthly hours based on frequency
       const monthlyHours = task.timeRequired * task.frequency.timesPerMonth;
+      
+      // Calculate base labor cost
       const baseCost = monthlyHours * laborRate;
       
       // Calculate additional costs if onCosts are provided
@@ -41,6 +44,14 @@ export const calculateTaskCosts = (
         timeRequired: monthlyHours,
         monthlyCost: totalCost
       });
+
+      console.log('Task cost calculated:', {
+        taskId: task.taskId,
+        monthlyHours,
+        baseCost,
+        totalCost,
+        laborRate
+      });
     });
   });
 
@@ -52,7 +63,14 @@ export const calculateTotalMonthlyHours = (sites: Site[]): number => {
     if (!site.area?.selectedTasks) return total;
     
     return total + site.area.selectedTasks.reduce((siteTotal, task) => {
-      return siteTotal + (task.timeRequired * task.frequency.timesPerMonth);
+      const monthlyHours = task.timeRequired * task.frequency.timesPerMonth;
+      console.log('Monthly hours for task:', {
+        taskId: task.taskId,
+        monthlyHours,
+        timeRequired: task.timeRequired,
+        frequency: task.frequency
+      });
+      return siteTotal + monthlyHours;
     }, 0);
   }, 0);
 };

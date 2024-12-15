@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { getProductivityRate } from '@/data/productivityRates';
 import { TaskCostBreakdown } from '@/utils/costingCalculations';
@@ -25,23 +23,10 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
   selectedTasks = [],
   onMarginChange
 }) => {
-  const [targetMargin, setTargetMargin] = useState(15);
   const totalCosts = laborCost + equipmentCost + overhead;
   const profit = revenue - totalCosts;
   const actualMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
   const effectiveHourlyRate = totalLaborHours > 0 ? laborCost / totalLaborHours : 0;
-  
-  const suggestedRevenue = totalCosts / (1 - (targetMargin / 100));
-  const suggestedMonthlyRate = suggestedRevenue;
-  const suggestedHourlyRate = totalLaborHours > 0 ? suggestedRevenue / totalLaborHours : 0;
-
-  const handleMarginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newMargin = parseFloat(e.target.value) || 0;
-    setTargetMargin(newMargin);
-    if (onMarginChange) {
-      onMarginChange(newMargin);
-    }
-  };
 
   const getTaskName = (taskId: string) => {
     const rate = getProductivityRate(taskId);
@@ -55,92 +40,98 @@ export const ProfitLoss: React.FC<ProfitLossProps> = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Target Margin (%)</Label>
-              <Input
-                type="number"
-                value={targetMargin}
-                onChange={handleMarginChange}
-                className="mt-1"
-              />
+          {/* Key Metrics */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">Monthly Revenue</p>
+              <p className="text-2xl font-bold">${revenue.toFixed(2)}</p>
             </div>
-            <div>
-              <Label>Actual Margin</Label>
-              <p className="text-2xl font-bold mt-1">{actualMargin.toFixed(1)}%</p>
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">Total Costs</p>
+              <p className="text-2xl font-bold">${totalCosts.toFixed(2)}</p>
+            </div>
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">Net Profit</p>
+              <p className="text-2xl font-bold">${profit.toFixed(2)}</p>
+            </div>
+            <div className="bg-accent/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">Profit Margin</p>
+              <p className="text-2xl font-bold">{actualMargin.toFixed(1)}%</p>
             </div>
           </div>
 
           <Separator />
 
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Monthly Revenue</span>
-              <span className="text-green-600 font-bold">${revenue.toFixed(2)}</span>
-            </div>
-            
+          {/* Labor Details */}
+          <div>
+            <h3 className="font-medium mb-2">Labor Breakdown</h3>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Total Labor Hours</span>
                 <span>{totalLaborHours.toFixed(1)} hours</span>
               </div>
-              
-              {/* Task Breakdown */}
-              <div className="pl-4 space-y-1">
-                {selectedTasks.length > 0 ? (
-                  selectedTasks.map((task, index) => (
-                    <div key={index} className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">
-                        {getTaskName(task.taskId)} ({task.timeRequired.toFixed(1)} hrs)
-                        <span className="text-xs ml-1">- {task.siteName}</span>
-                      </span>
-                      <span className="text-muted-foreground">
-                        ${task.monthlyCost.toFixed(2)}
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-sm text-muted-foreground">No tasks selected</div>
-                )}
-              </div>
-
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Labor Cost (${effectiveHourlyRate.toFixed(2)}/hr)</span>
-                <span className="text-red-600">-${laborCost.toFixed(2)}</span>
+                <span className="text-sm text-muted-foreground">Effective Hourly Rate</span>
+                <span>${effectiveHourlyRate.toFixed(2)}/hr</span>
               </div>
+              <div className="flex justify-between items-center font-medium">
+                <span>Total Labor Cost</span>
+                <span>${laborCost.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Task Breakdown */}
+          {selectedTasks.length > 0 && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-medium mb-2">Task Breakdown</h3>
+                <div className="space-y-2">
+                  {selectedTasks.map((task, index) => (
+                    <div key={index} className="flex justify-between items-center text-sm">
+                      <div>
+                        <span>{getTaskName(task.taskId)}</span>
+                        <span className="text-xs text-muted-foreground ml-2">
+                          ({task.timeRequired.toFixed(1)} hrs - {task.siteName})
+                        </span>
+                      </div>
+                      <span>${task.monthlyCost.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          <Separator />
+
+          {/* Other Costs */}
+          <div>
+            <h3 className="font-medium mb-2">Additional Costs</h3>
+            <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Equipment & Supplies</span>
-                <span className="text-red-600">-${equipmentCost.toFixed(2)}</span>
+                <span>${equipmentCost.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Overhead</span>
-                <span className="text-red-600">-${overhead.toFixed(2)}</span>
+                <span>${overhead.toFixed(2)}</span>
               </div>
-            </div>
-
-            <Separator />
-
-            <div className="flex justify-between items-center font-bold">
-              <span>Net Profit</span>
-              <span className={profit >= 0 ? "text-green-600" : "text-red-600"}>
-                ${profit.toFixed(2)}
-              </span>
             </div>
           </div>
 
           <Separator />
 
-          <div className="space-y-4">
-            <h3 className="font-medium">Suggested Rates (Based on Target Margin)</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm text-muted-foreground">Monthly Rate</Label>
-                <p className="text-xl font-bold">${suggestedMonthlyRate.toFixed(2)}</p>
-              </div>
-              <div>
-                <Label className="text-sm text-muted-foreground">Hourly Rate</Label>
-                <p className="text-xl font-bold">${suggestedHourlyRate.toFixed(2)}</p>
-              </div>
+          {/* Total Summary */}
+          <div className="pt-2">
+            <div className="flex justify-between items-center font-bold text-lg">
+              <span>Total Monthly Revenue</span>
+              <span>${revenue.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm text-muted-foreground mt-1">
+              <span>Profit Margin</span>
+              <span>{actualMargin.toFixed(1)}%</span>
             </div>
           </div>
         </div>
