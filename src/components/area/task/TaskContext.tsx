@@ -36,20 +36,30 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
   const calculateTotalHours = () => {
+    console.log('Calculating total hours for tasks:', selectedTasks);
+    
     const totalMonthlyHours = selectedTasks.reduce((total, task) => {
-      const taskMonthlyHours = task.timeRequired || 0;
-      console.log('Individual task calculation:', {
+      // Log individual task calculation
+      console.log('Processing task:', {
         taskId: task.taskId,
         timeRequired: task.timeRequired,
-        frequency: task.frequency,
-        monthlyHours: taskMonthlyHours
+        frequency: task.frequency
       });
+      
+      if (!task.timeRequired) {
+        console.log('Task has no timeRequired:', task.taskId);
+        return total;
+      }
+
+      const taskMonthlyHours = task.timeRequired;
+      console.log('Task monthly hours:', taskMonthlyHours);
+      
       return total + taskMonthlyHours;
     }, 0);
     
     const totalWeeklyHours = totalMonthlyHours / TIME_CONSTANTS.WEEKS_PER_MONTH;
     
-    console.log('Total hours calculation:', {
+    console.log('Final hours calculation:', {
       totalWeeklyHours,
       totalMonthlyHours,
       selectedTasksCount: selectedTasks.length,
@@ -66,9 +76,15 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   const [totalHours, setTotalHours] = useState({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
 
   useEffect(() => {
-    const newTotalHours = calculateTotalHours();
-    console.log('Updating total hours:', newTotalHours);
-    setTotalHours(newTotalHours);
+    if (selectedTasks.length > 0) {
+      console.log('Selected tasks changed, recalculating hours:', selectedTasks);
+      const newTotalHours = calculateTotalHours();
+      console.log('New total hours:', newTotalHours);
+      setTotalHours(newTotalHours);
+    } else {
+      console.log('No tasks selected, resetting hours to 0');
+      setTotalHours({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
+    }
   }, [selectedTasks]);
 
   const value = {
