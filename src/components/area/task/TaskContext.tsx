@@ -18,7 +18,6 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   onTasksChange,
   defaultLaborRate = 38 
 }) => {
-  // Initialize with an explicitly empty array
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
   
   const { calculateTaskTime } = useTaskManagement(
@@ -39,16 +38,16 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
   const calculateTotalHours = () => {
-    console.log('[HOURS_CALC] Starting hours calculation');
-    console.log('[HOURS_CALC] Number of selected tasks:', selectedTasks.length);
+    console.log('HOURS_CALC Starting hours calculation');
+    console.log('HOURS_CALC Selected tasks:', selectedTasks);
     
     if (!selectedTasks || selectedTasks.length === 0) {
-      console.log('[HOURS_CALC] No tasks selected, returning 0');
+      console.log('HOURS_CALC No tasks selected, returning 0');
       return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
     }
 
     const totalMonthlyHours = selectedTasks.reduce((total, task, index) => {
-      console.log(`[HOURS_CALC] Processing task ${index + 1}:`, {
+      console.log(`HOURS_CALC Processing task ${index + 1}:`, {
         taskId: task.taskId,
         timeRequired: task.timeRequired,
         frequency: task.frequency,
@@ -56,19 +55,19 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
       });
       
       if (!task.timeRequired) {
-        console.log(`[HOURS_CALC] Task ${task.taskId} has no timeRequired`);
+        console.log(`HOURS_CALC Task ${task.taskId} has no timeRequired`);
         return total;
       }
 
       const taskMonthlyHours = task.timeRequired;
-      console.log(`[HOURS_CALC] Task ${task.taskId} monthly hours:`, taskMonthlyHours);
+      console.log(`HOURS_CALC Task ${task.taskId} monthly hours:`, taskMonthlyHours);
       
       return total + taskMonthlyHours;
     }, 0);
     
     const totalWeeklyHours = totalMonthlyHours / TIME_CONSTANTS.WEEKS_PER_MONTH;
     
-    console.log('[HOURS_CALC] Final calculation:', {
+    console.log('HOURS_CALC Final calculation:', {
       totalWeeklyHours,
       totalMonthlyHours,
       selectedTasksCount: selectedTasks.length,
@@ -85,15 +84,16 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   const [totalHours, setTotalHours] = useState({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
 
   useEffect(() => {
-    console.log('[HOURS_CALC] Tasks changed, current tasks:', selectedTasks.length);
+    console.log('HOURS_CALC Tasks changed, current tasks:', selectedTasks.length);
+    console.log('HOURS_CALC Task details:', selectedTasks);
     
     if (selectedTasks.length > 0) {
-      console.log('[HOURS_CALC] Recalculating hours due to tasks change');
+      console.log('HOURS_CALC Recalculating hours due to tasks change');
       const newTotalHours = calculateTotalHours();
-      console.log('[HOURS_CALC] New total hours:', newTotalHours);
+      console.log('HOURS_CALC New total hours:', newTotalHours);
       setTotalHours(newTotalHours);
     } else {
-      console.log('[HOURS_CALC] No tasks selected, resetting hours to 0');
+      console.log('HOURS_CALC No tasks selected, resetting hours to 0');
       setTotalHours({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
     }
   }, [selectedTasks]);
