@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { AreaData, SelectedTask, TaskContextType } from './types';
 import { useTaskManagement } from '@/hooks/useTaskManagement';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
@@ -13,7 +13,7 @@ interface TaskProviderProps {
   defaultLaborRate?: number;
 }
 
-export const TaskProvider: React.FC<TaskProviderProps> = ({ 
+export const TaskProvider: React.FC<TaskProviderProps> = React.memo(({ 
   children, 
   onTasksChange,
   defaultLaborRate = 38 
@@ -101,7 +101,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     setTotalHours(newTotalHours);
   }, [selectedTasks]);
 
-  const value = {
+  const contextValue = useMemo(() => ({
     selectedTasks,
     handleTaskSelection,
     handleQuantityChange,
@@ -111,16 +111,25 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     handleProductivityOverride,
     totalWeeklyHours: totalHours.totalWeeklyHours,
     totalMonthlyHours: totalHours.totalMonthlyHours
-  };
+  }), [
+    selectedTasks,
+    handleToolChange,
+    handleLaborRateChange,
+    handleProductivityOverride,
+    totalHours.totalWeeklyHours,
+    totalHours.totalMonthlyHours
+  ]);
 
-  console.log('TASK_FLOW: TaskProvider rendering with value:', value);
+  console.log('TASK_FLOW: TaskProvider rendering with value:', contextValue);
 
   return (
-    <TaskContext.Provider value={value}>
+    <TaskContext.Provider value={contextValue}>
       {children}
     </TaskContext.Provider>
   );
-};
+});
+
+TaskProvider.displayName = 'TaskProvider';
 
 export const useTaskContext = () => {
   const context = useContext(TaskContext);
