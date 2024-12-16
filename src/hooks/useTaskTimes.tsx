@@ -8,7 +8,7 @@ export const calculateTaskTime = (
   selectedTool: string | undefined,
   frequency: TaskFrequency
 ): number => {
-  console.log('TASK_TIME: Calculating time for task:', {
+  console.log('TASK_TIME_CALC: Starting calculation for task:', {
     taskId,
     quantity,
     selectedTool,
@@ -25,17 +25,21 @@ export const calculateTaskTime = (
       quantity
     );
     
-    console.log('TASK_TIME: Calculation result:', {
+    const timeRequired = productivity?.timeRequired || 0;
+    const weeklyHours = timeRequired * frequency.timesPerWeek;
+    const monthlyHours = timeRequired * frequency.timesPerMonth;
+
+    console.log('TASK_TIME_CALC: Calculation completed:', {
       taskId,
-      productivity,
-      timeRequired: productivity?.timeRequired || 0,
-      weeklyHours: (productivity?.timeRequired || 0) * frequency.timesPerWeek,
-      monthlyHours: (productivity?.timeRequired || 0) * frequency.timesPerMonth
+      timeRequired,
+      weeklyHours,
+      monthlyHours,
+      productivity
     });
 
-    return productivity?.timeRequired || 0;
+    return timeRequired;
   } catch (error) {
-    console.error('TASK_TIME: Error calculating task time:', error);
+    console.error('TASK_TIME_CALC: Error calculating task time:', error);
     return 0;
   }
 };
