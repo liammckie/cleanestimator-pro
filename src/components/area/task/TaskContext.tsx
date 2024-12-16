@@ -18,7 +18,10 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   onTasksChange,
   defaultLaborRate = 38 
 }) => {
-  const { selectedTasks, setSelectedTasks, calculateTaskTime } = useTaskManagement(
+  // Initialize with an empty array explicitly
+  const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
+  
+  const { calculateTaskTime } = useTaskManagement(
     onTasksChange,
     defaultLaborRate
   );
@@ -39,7 +42,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     console.log('[HOURS_CALC] Starting hours calculation');
     console.log('[HOURS_CALC] Number of selected tasks:', selectedTasks.length);
     
-    if (selectedTasks.length === 0) {
+    if (!selectedTasks || selectedTasks.length === 0) {
       console.log('[HOURS_CALC] No tasks selected, returning 0');
       return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
     }
@@ -96,7 +99,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   }, [selectedTasks]);
 
   const value = {
-    selectedTasks: selectedTasks || [], // Ensure we always have an array, even if empty
+    selectedTasks,
     handleTaskSelection,
     handleQuantityChange,
     handleFrequencyChange,
