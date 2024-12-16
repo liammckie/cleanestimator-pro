@@ -18,18 +18,33 @@ export const IndustryList: React.FC<IndustryListProps> = ({
   searchQuery,
   onSelect,
 }) => {
+  console.log('INDUSTRY_SELECT Rendering IndustryList with:', {
+    groupsCount: groups?.length,
+    selectedValue,
+    searchQuery
+  });
+
   // Ensure groups is an array and handle undefined/null case
   const safeGroups = Array.isArray(groups) ? groups : [];
 
-  // Filter valid groups
-  const filteredGroups = safeGroups.filter(group => 
-    group && 
-    typeof group === 'object' &&
-    group.name &&
-    Array.isArray(group.categories)
-  );
+  // Filter valid groups and log the process
+  const filteredGroups = safeGroups.filter(group => {
+    const isValid = group && 
+      typeof group === 'object' &&
+      group.name &&
+      Array.isArray(group.categories);
+    
+    console.log('INDUSTRY_SELECT Validating group:', {
+      groupName: group?.name,
+      isValid,
+      categoriesCount: group?.categories?.length
+    });
+    
+    return isValid;
+  });
 
   if (filteredGroups.length === 0) {
+    console.log('INDUSTRY_SELECT No valid industries found');
     return (
       <div className="p-4 text-sm text-muted-foreground text-center">
         No industries available.
@@ -42,13 +57,29 @@ export const IndustryList: React.FC<IndustryListProps> = ({
       {filteredGroups.map(group => {
         // Ensure categories is an array and filter by search query
         const categories = Array.isArray(group.categories) ? group.categories : [];
-        const filteredCategories = categories.filter(category =>
-          category && 
-          typeof category === 'string' &&
-          category.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        const filteredCategories = categories.filter(category => {
+          const isValid = category && 
+            typeof category === 'string' &&
+            category.toLowerCase().includes(searchQuery.toLowerCase());
+          
+          console.log('INDUSTRY_SELECT Filtering category:', {
+            category,
+            matches: isValid,
+            searchQuery
+          });
+          
+          return isValid;
+        });
 
-        if (filteredCategories.length === 0) return null;
+        if (filteredCategories.length === 0) {
+          console.log('INDUSTRY_SELECT No matching categories for group:', group.name);
+          return null;
+        }
+
+        console.log('INDUSTRY_SELECT Rendering group:', {
+          groupName: group.name,
+          matchingCategories: filteredCategories.length
+        });
 
         return (
           <AccordionItem key={group.name} value={group.name}>
@@ -60,22 +91,33 @@ export const IndustryList: React.FC<IndustryListProps> = ({
             </AccordionTrigger>
             <AccordionContent>
               <CommandGroup>
-                {filteredCategories.map((category) => (
-                  <CommandItem
-                    key={category}
-                    value={category}
-                    onSelect={() => onSelect(category)}
-                    className="cursor-pointer"
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedValue === category ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {category}
-                  </CommandItem>
-                ))}
+                {filteredCategories.map((category) => {
+                  const isSelected = selectedValue === category;
+                  console.log('INDUSTRY_SELECT Rendering category:', {
+                    category,
+                    isSelected
+                  });
+
+                  return (
+                    <CommandItem
+                      key={category}
+                      value={category}
+                      onSelect={() => {
+                        console.log('INDUSTRY_SELECT Category selected:', category);
+                        onSelect(category);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          isSelected ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {category}
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             </AccordionContent>
           </AccordionItem>
