@@ -38,21 +38,23 @@ function App() {
     <ErrorBoundary>
       <SettingsProvider>
         <TaskProvider>
-          <Tabs defaultValue="sites" className="w-full">
-            <MainContent
-              sites={sites}
-              onSitesChange={setSites}
-              laborCosts={laborCosts}
-              setLaborCosts={setLaborCosts}
-              equipmentCosts={equipmentCosts}
-              setEquipmentCosts={setEquipmentCosts}
-              contractDetails={contractDetails}
-              setContractDetails={setContractDetails}
-              costBreakdown={costBreakdown}
-              monthlyRevenue={monthlyRevenue}
-              overhead={overhead}
-            />
-          </Tabs>
+          <div className="min-h-screen flex w-full bg-background">
+            <Tabs defaultValue="sites" className="w-full">
+              <MainContent
+                sites={sites}
+                onSitesChange={setSites}
+                laborCosts={laborCosts}
+                setLaborCosts={setLaborCosts}
+                equipmentCosts={equipmentCosts}
+                setEquipmentCosts={setEquipmentCosts}
+                contractDetails={contractDetails}
+                setContractDetails={setContractDetails}
+                costBreakdown={costBreakdown}
+                monthlyRevenue={monthlyRevenue}
+                overhead={overhead}
+              />
+            </Tabs>
+          </div>
         </TaskProvider>
       </SettingsProvider>
     </ErrorBoundary>
