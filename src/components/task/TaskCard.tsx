@@ -73,7 +73,7 @@ export const TaskCard = React.memo(({
             <Label>Quantity ({rate.unit})</Label>
             <Input
               type="number"
-              value={selectedTask.quantity || ''}
+              value={selectedTask.quantity.toString()}
               onChange={(e) => handleQuantityChange(Number(e.target.value))}
               min={0}
               className="bg-background"
@@ -88,7 +88,7 @@ export const TaskCard = React.memo(({
 
         <TaskTimeRequirements
           timeRequired={selectedTask.timeRequired}
-          weeklyHours={weeklyHours}
+          weeklyHours={parseFloat(weeklyHours)}
           ratePerHour={rate.ratePerHour}
           unit={rate.unit}
         />
