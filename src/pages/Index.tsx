@@ -74,12 +74,10 @@ const AppContent = React.memo(({
                 monthlyRevenue={monthlyRevenue}
                 overhead={overhead}
               />
-              {activeTab === 'scope' && (
-                <TaskManagementContent 
-                  activeTab={activeTab} 
-                  onAreaChange={onAreaChange}
-                />
-              )}
+              <TaskManagementContent 
+                activeTab={activeTab} 
+                onAreaChange={onAreaChange}
+              />
             </div>
             <ScopeOfWorkSidebar 
               selectedTasks={selectedTasks} 
@@ -155,7 +153,7 @@ const Index = () => {
 
   return (
     <SettingsProvider>
-      <TaskProvider>
+      <TaskProvider onTasksChange={handleAreaChange}>
         <CostProvider>
           <div className="min-h-screen flex w-full bg-background">
             <div className="flex-1">
