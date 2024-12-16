@@ -137,7 +137,7 @@ const Index = () => {
   return (
     <SettingsProvider>
       <CostProvider>
-        <TaskProvider onTasksChange={handleAreaChange}>
+        <TaskProvider onTasksChange={handleAreaChange} defaultLaborRate={laborCosts.hourlyRate}>
           <div className="min-h-screen flex w-full bg-background">
             <div className="flex-1">
               <AppContent
