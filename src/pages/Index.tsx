@@ -83,20 +83,20 @@ const Index = () => {
 
   return (
     <SettingsProvider>
-      <TaskProvider onTasksChange={handleAreaChange}>
-        <div className="min-h-screen flex w-full bg-background">
-          <div className="flex-1">
-            <div className="container mx-auto px-4 py-8">
-              <h1 className="text-3xl font-bold text-primary mb-8">
-                Commercial Cleaning Estimation Tool
-              </h1>
-              
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <div className="flex">
-                  <DynamicMenu 
-                    options={formattedMenuOptions} 
-                    className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
-                  />
+      <div className="min-h-screen flex w-full bg-background">
+        <div className="flex-1">
+          <div className="container mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold text-primary mb-8">
+              Commercial Cleaning Estimation Tool
+            </h1>
+            
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <div className="flex">
+                <DynamicMenu 
+                  options={formattedMenuOptions} 
+                  className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
+                />
+                <TaskProvider onTasksChange={handleAreaChange}>
                   <div className="flex-1 px-6">
                     <MainNavigation />
                     {renderContent()}
@@ -105,12 +105,12 @@ const Index = () => {
                     selectedTasks={selectedTasks} 
                     sites={sites} 
                   />
-                </div>
-              </Tabs>
-            </div>
+                </TaskProvider>
+              </div>
+            </Tabs>
           </div>
         </div>
-      </TaskProvider>
+      </div>
     </SettingsProvider>
   );
 };
