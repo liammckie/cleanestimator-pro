@@ -2,11 +2,10 @@ import { useCallback } from 'react';
 import { SelectedTask } from '@/components/area/task/types';
 import { toast } from '@/components/ui/use-toast';
 import { getRateById } from '@/data/rates/ratesManager';
-import { validateTaskData } from '@/utils/taskValidation';
 
 export const useTaskOperations = (
   selectedTasks: SelectedTask[],
-  setSelectedTasks: (tasks: SelectedTask[]) => void,
+  setSelectedTasks: React.Dispatch<React.SetStateAction<SelectedTask[]>>,
   calculateTaskTime: any,
   defaultLaborRate: number = 38
 ) => {
@@ -16,11 +15,12 @@ export const useTaskOperations = (
     siteId?: string,
     siteName?: string
   ) => {
-    console.log('DEBUG: useTaskOperations - handleTaskSelection:', {
+    console.log('DEBUG: Task selection triggered:', {
       taskId,
       isSelected,
       siteId,
-      siteName
+      siteName,
+      currentTaskCount: selectedTasks.length
     });
 
     if (isSelected) {
@@ -34,8 +34,6 @@ export const useTaskOperations = (
         });
         return;
       }
-
-      console.log('DEBUG: Found rate for task:', rate);
 
       const newTask: SelectedTask = {
         taskId,
@@ -51,9 +49,9 @@ export const useTaskOperations = (
         laborRate: defaultLaborRate
       };
 
-      setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => {
-        console.log('DEBUG: Adding new task to selected tasks:', newTask);
-        return [...prev, newTask];
+      setSelectedTasks(prevTasks => {
+        console.log('DEBUG: Adding new task:', newTask);
+        return [...prevTasks, newTask];
       });
       
       toast({
@@ -61,84 +59,91 @@ export const useTaskOperations = (
         description: `${rate.task} has been added to your scope.`
       });
     } else {
-      setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => {
-        console.log('DEBUG: Removing task from selected tasks:', taskId);
-        return prev.filter(task => task.taskId !== taskId);
+      setSelectedTasks(prevTasks => {
+        console.log('DEBUG: Removing task:', taskId);
+        return prevTasks.filter(task => task.taskId !== taskId);
       });
     }
-  }, [setSelectedTasks, defaultLaborRate]);
+  }, [selectedTasks, setSelectedTasks, defaultLaborRate]);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
-    console.log('DEBUG: useTaskOperations - handleQuantityChange:', {
+    console.log('DEBUG: Quantity change triggered:', {
       taskId,
-      quantity
+      quantity,
+      currentTasks: selectedTasks
     });
 
-    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
-      if (task.taskId === taskId) {
-        if (!validateTaskData(task, quantity)) {
-          console.log('DEBUG: Task data validation failed');
-          return task;
-        }
-        
-        const timeRequired = calculateTaskTime(
-          taskId,
-          quantity,
-          task.selectedTool,
-          task.frequency
-        );
-        
-        console.log('DEBUG: Updating task with new quantity:', {
-          taskId,
-          quantity,
-          timeRequired
-        });
+    setSelectedTasks(prevTasks => {
+      const updatedTasks = prevTasks.map(task => {
+        if (task.taskId === taskId) {
+          const timeRequired = calculateTaskTime(
+            taskId,
+            quantity,
+            task.selectedTool,
+            task.frequency
+          );
+          
+          console.log('DEBUG: Updated task time:', {
+            taskId,
+            quantity,
+            timeRequired
+          });
 
-        return {
-          ...task,
-          quantity,
-          timeRequired
-        };
-      }
-      return task;
-    }));
-  }, [calculateTaskTime, setSelectedTasks]);
+          return {
+            ...task,
+            quantity,
+            timeRequired
+          };
+        }
+        return task;
+      });
+
+      console.log('DEBUG: Tasks after quantity update:', updatedTasks);
+      return updatedTasks;
+    });
+  }, [calculateTaskTime, selectedTasks]);
 
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
-    console.log('DEBUG: useTaskOperations - handleFrequencyChange:', {
+    console.log('DEBUG: Frequency change triggered:', {
       taskId,
-      timesPerWeek
+      timesPerWeek,
+      currentTasks: selectedTasks
     });
 
-    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
-      if (task.taskId === taskId) {
-        const frequency = {
-          timesPerWeek,
-          timesPerMonth: timesPerWeek * 4.33
-        };
-        
-        const timeRequired = calculateTaskTime(
-          taskId,
-          task.quantity,
-          task.selectedTool,
-          frequency
-        );
-        
-        console.log('DEBUG: Updating task with new frequency:', {
-          taskId,
-          frequency,
-          timeRequired
-        });
+    setSelectedTasks(prevTasks => {
+      const updatedTasks = prevTasks.map(task => {
+        if (task.taskId === taskId) {
+          const frequency = {
+            timesPerWeek,
+            timesPerMonth: timesPerWeek * 4.33
+          };
+          
+          const timeRequired = calculateTaskTime(
+            taskId,
+            task.quantity,
+            task.selectedTool,
+            frequency
+          );
+          
+          console.log('DEBUG: Updated task frequency:', {
+            taskId,
+            frequency,
+            timeRequired
+          });
 
-        return {
-          ...task,
-          frequency,
-          timeRequired
-        };
-      }
-      return task;
-    }));
-  }, [calculateTaskTime, setSelectedTasks]);
+          return {
+            ...task,
+            frequency,
+            timeRequired
+          };
+        }
+        return task;
+      });
+
+      console.log('DEBUG: Tasks after frequency update:', updatedTasks);
+      return updatedTasks;
+    });
+  }, [calculateTaskTime, selectedTasks]);
 
   return {
     handleTaskSelection,

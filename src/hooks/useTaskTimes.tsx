@@ -12,26 +12,36 @@ export const calculateTaskTime = (
     taskId,
     quantity,
     selectedTool,
-    frequency
-  });
-
-  const productivity = calculateTaskProductivity(
-    taskId,
-    quantity,
-    selectedTool,
     frequency,
-    quantity
-  );
-  
-  console.log('DEBUG: Task time calculation result:', {
-    taskId,
-    productivity
+    timestamp: new Date().toISOString()
   });
 
-  return productivity?.timeRequired || 0;
+  try {
+    const productivity = calculateTaskProductivity(
+      taskId,
+      quantity,
+      selectedTool,
+      frequency,
+      quantity
+    );
+    
+    console.log('DEBUG: Task time calculation result:', {
+      taskId,
+      productivity,
+      timeRequired: productivity?.timeRequired || 0
+    });
+
+    return productivity?.timeRequired || 0;
+  } catch (error) {
+    console.error('DEBUG: Error calculating task time:', error);
+    return 0;
+  }
 };
 
 export const useTaskTimes = () => {
   const calculateTaskTimeCallback = useCallback(calculateTaskTime, []);
+  
+  console.log('DEBUG: useTaskTimes hook initialized');
+  
   return { calculateTaskTime: calculateTaskTimeCallback };
 };
