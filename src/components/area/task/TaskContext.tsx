@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { TaskContextType, SelectedTask } from './types';
 import { useTaskTimes } from '@/hooks/useTaskTimes';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
@@ -23,8 +23,13 @@ export const TaskProvider = React.memo(({
   });
 
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>(() => {
-    const savedTasks = localStorage.getItem('selectedTasks');
-    return savedTasks ? JSON.parse(savedTasks) : [];
+    try {
+      const savedTasks = localStorage.getItem('selectedTasks');
+      return savedTasks ? JSON.parse(savedTasks) : [];
+    } catch (error) {
+      console.error('Error loading tasks from localStorage:', error);
+      return [];
+    }
   });
 
   const { calculateTaskTime } = useTaskTimes();
@@ -41,7 +46,7 @@ export const TaskProvider = React.memo(({
     handleProductivityOverride
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
-  const calculateTotalHours = () => {
+  const calculateTotalHours = useCallback(() => {
     if (!selectedTasks || selectedTasks.length === 0) {
       console.log('HOURS_CALC: No tasks selected, returning 0');
       return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
@@ -53,20 +58,30 @@ export const TaskProvider = React.memo(({
 
     const totalWeeklyHours = totalMonthlyHours / 4.33;
 
-    console.log('TASK_FLOW: Hours calculation complete:', {
+    console.log('TASK_FLOW: Hours calculation:', {
       totalWeeklyHours,
       totalMonthlyHours,
       selectedTasksCount: selectedTasks.length
     });
 
     return { totalWeeklyHours, totalMonthlyHours };
-  };
+  }, [selectedTasks]);
 
-  const { totalWeeklyHours, totalMonthlyHours } = calculateTotalHours();
+  const { totalWeeklyHours, totalMonthlyHours } = useMemo(() => 
+    calculateTotalHours(),
+    [calculateTotalHours]
+  );
 
   // Save tasks to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('selectedTasks', JSON.stringify(selectedTasks));
+    try {
+      localStorage.setItem('selectedTasks', JSON.stringify(selectedTasks));
+      console.log('TASK_FLOW: Tasks saved to localStorage:', {
+        taskCount: selectedTasks.length
+      });
+    } catch (error) {
+      console.error('Error saving tasks to localStorage:', error);
+    }
   }, [selectedTasks]);
 
   // Update area data when tasks change
