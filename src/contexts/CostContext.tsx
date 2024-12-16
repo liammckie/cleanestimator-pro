@@ -14,11 +14,20 @@ interface CostContextType {
 const CostContext = createContext<CostContextType | undefined>(undefined);
 
 export const CostProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { selectedTasks } = useTaskContext();
+  // Initialize state with default values
   const [totalLaborCost, setTotalLaborCost] = useState(0);
   const [totalEquipmentCost, setTotalEquipmentCost] = useState(0);
   const [totalWeeklyHours, setTotalWeeklyHours] = useState(0);
   const [laborRate, setLaborRate] = useState(38); // Default labor rate
+
+  // Try to get task context, but provide fallback if not available
+  let selectedTasks: any[] = [];
+  try {
+    const taskContext = useTaskContext();
+    selectedTasks = taskContext?.selectedTasks || [];
+  } catch (error) {
+    console.log('Task context not available yet, using default values');
+  }
 
   useEffect(() => {
     // Calculate total weekly hours and costs from selected tasks
