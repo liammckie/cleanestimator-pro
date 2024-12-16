@@ -15,7 +15,7 @@ export const useTaskOperations = (
     siteId?: string,
     siteName?: string
   ) => {
-    console.log('DEBUG: Task selection triggered:', {
+    console.log('TASK_FLOW: Task selection operation started:', {
       taskId,
       isSelected,
       siteId,
@@ -26,7 +26,7 @@ export const useTaskOperations = (
     if (isSelected) {
       const rate = getRateById(taskId);
       if (!rate) {
-        console.error('DEBUG: Could not find rate for task:', taskId);
+        console.error('TASK_FLOW: Could not find rate for task:', taskId);
         toast({
           title: "Error",
           description: `Could not find rate for task ${taskId}`,
@@ -50,7 +50,8 @@ export const useTaskOperations = (
       };
 
       setSelectedTasks(prevTasks => {
-        console.log('DEBUG: Adding new task:', newTask);
+        console.log('TASK_FLOW: Adding new task:', newTask);
+        console.log('TASK_FLOW: Previous tasks:', prevTasks);
         return [...prevTasks, newTask];
       });
       
@@ -60,14 +61,15 @@ export const useTaskOperations = (
       });
     } else {
       setSelectedTasks(prevTasks => {
-        console.log('DEBUG: Removing task:', taskId);
+        console.log('TASK_FLOW: Removing task:', taskId);
+        console.log('TASK_FLOW: Previous tasks:', prevTasks);
         return prevTasks.filter(task => task.taskId !== taskId);
       });
     }
   }, [selectedTasks, setSelectedTasks, defaultLaborRate]);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
-    console.log('DEBUG: Quantity change triggered:', {
+    console.log('TASK_FLOW: Quantity change operation started:', {
       taskId,
       quantity,
       currentTasks: selectedTasks
@@ -83,7 +85,7 @@ export const useTaskOperations = (
             task.frequency
           );
           
-          console.log('DEBUG: Updated task time:', {
+          console.log('TASK_FLOW: Updated task time:', {
             taskId,
             quantity,
             timeRequired
@@ -98,13 +100,13 @@ export const useTaskOperations = (
         return task;
       });
 
-      console.log('DEBUG: Tasks after quantity update:', updatedTasks);
+      console.log('TASK_FLOW: Tasks after quantity update:', updatedTasks);
       return updatedTasks;
     });
   }, [calculateTaskTime, selectedTasks]);
 
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
-    console.log('DEBUG: Frequency change triggered:', {
+    console.log('TASK_FLOW: Frequency change operation started:', {
       taskId,
       timesPerWeek,
       currentTasks: selectedTasks
@@ -125,7 +127,7 @@ export const useTaskOperations = (
             frequency
           );
           
-          console.log('DEBUG: Updated task frequency:', {
+          console.log('TASK_FLOW: Updated task frequency:', {
             taskId,
             frequency,
             timeRequired
@@ -140,7 +142,7 @@ export const useTaskOperations = (
         return task;
       });
 
-      console.log('DEBUG: Tasks after frequency update:', updatedTasks);
+      console.log('TASK_FLOW: Tasks after frequency update:', updatedTasks);
       return updatedTasks;
     });
   }, [calculateTaskTime, selectedTasks]);

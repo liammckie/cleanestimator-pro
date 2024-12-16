@@ -18,7 +18,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   onTasksChange,
   defaultLaborRate = 38 
 }) => {
-  console.log('DEBUG: TaskProvider rendering');
+  console.log('TASK_FLOW: TaskProvider initializing');
   
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
   
@@ -40,22 +40,22 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
   const calculateTotalHours = () => {
-    console.log('DEBUG: Starting hours calculation');
-    console.log('DEBUG: Selected tasks:', selectedTasks);
+    console.log('TASK_FLOW: Calculating total hours');
+    console.log('TASK_FLOW: Current selected tasks:', selectedTasks);
     
     if (!selectedTasks || selectedTasks.length === 0) {
-      console.log('DEBUG: No tasks selected, returning 0');
+      console.log('TASK_FLOW: No tasks selected');
       return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
     }
 
     const totalMonthlyHours = selectedTasks.reduce((total, task) => {
-      console.log('DEBUG: Processing task:', task);
+      console.log('TASK_FLOW: Processing task for hours calculation:', task);
       return total + (task.timeRequired || 0);
     }, 0);
     
     const totalWeeklyHours = totalMonthlyHours / TIME_CONSTANTS.WEEKS_PER_MONTH;
     
-    console.log('DEBUG: Final calculation:', {
+    console.log('TASK_FLOW: Hours calculation complete:', {
       totalWeeklyHours,
       totalMonthlyHours,
       selectedTasksCount: selectedTasks.length
@@ -65,27 +65,30 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   };
 
   const handleTaskSelection = (taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
-    console.log('DEBUG: Task selection triggered:', {
+    console.log('TASK_FLOW: Task selection triggered:', {
       taskId,
       isSelected,
       siteId,
-      siteName
+      siteName,
+      currentSelectedTasks: selectedTasks
     });
     baseHandleTaskSelection(taskId, isSelected, siteId, siteName);
   };
 
   const handleQuantityChange = (taskId: string, quantity: number) => {
-    console.log('DEBUG: Quantity change triggered:', {
+    console.log('TASK_FLOW: Quantity change triggered:', {
       taskId,
-      quantity
+      quantity,
+      currentSelectedTasks: selectedTasks
     });
     baseHandleQuantityChange(taskId, quantity);
   };
 
   const handleFrequencyChange = (taskId: string, timesPerWeek: number) => {
-    console.log('DEBUG: Frequency change triggered:', {
+    console.log('TASK_FLOW: Frequency change triggered:', {
       taskId,
-      timesPerWeek
+      timesPerWeek,
+      currentSelectedTasks: selectedTasks
     });
     baseHandleFrequencyChange(taskId, timesPerWeek);
   };
@@ -93,7 +96,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   const [totalHours, setTotalHours] = useState({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
 
   useEffect(() => {
-    console.log('DEBUG: Tasks state changed:', selectedTasks);
+    console.log('TASK_FLOW: Tasks state changed:', selectedTasks);
     const newTotalHours = calculateTotalHours();
     setTotalHours(newTotalHours);
   }, [selectedTasks]);

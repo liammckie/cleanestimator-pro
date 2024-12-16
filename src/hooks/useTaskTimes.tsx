@@ -8,7 +8,7 @@ export const calculateTaskTime = (
   selectedTool: string | undefined,
   frequency: TaskFrequency
 ): number => {
-  console.log('DEBUG: calculateTaskTime called with:', {
+  console.log('TASK_FLOW: calculateTaskTime called with:', {
     taskId,
     quantity,
     selectedTool,
@@ -25,7 +25,7 @@ export const calculateTaskTime = (
       quantity
     );
     
-    console.log('DEBUG: Task time calculation result:', {
+    console.log('TASK_FLOW: Task time calculation result:', {
       taskId,
       productivity,
       timeRequired: productivity?.timeRequired || 0
@@ -33,15 +33,15 @@ export const calculateTaskTime = (
 
     return productivity?.timeRequired || 0;
   } catch (error) {
-    console.error('DEBUG: Error calculating task time:', error);
+    console.error('TASK_FLOW: Error calculating task time:', error);
     return 0;
   }
 };
 
 export const useTaskTimes = () => {
-  const calculateTaskTimeCallback = useCallback(calculateTaskTime, []);
+  console.log('TASK_FLOW: useTaskTimes hook initialized');
   
-  console.log('DEBUG: useTaskTimes hook initialized');
+  const calculateTaskTimeCallback = useCallback(calculateTaskTime, []);
   
   return { calculateTaskTime: calculateTaskTimeCallback };
 };
