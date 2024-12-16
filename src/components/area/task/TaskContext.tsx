@@ -3,6 +3,7 @@ import { AreaData, SelectedTask, TaskContextType } from './types';
 import { useTaskManagement } from '@/hooks/useTaskManagement';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
 import { useTaskModifiers } from '@/hooks/useTaskModifiers';
+import { TIME_CONSTANTS } from '@/utils/constants';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
@@ -40,17 +41,24 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
       console.log('Task hours calculation:', {
         taskId: task.taskId,
         timeRequired: task.timeRequired,
-        monthlyHours: taskMonthlyHours
+        frequency: task.frequency,
+        monthlyHours: taskMonthlyHours,
+        quantity: task.quantity
       });
       return total + taskMonthlyHours;
     }, 0);
     
-    const totalWeeklyHours = totalMonthlyHours / 4.33;
+    const totalWeeklyHours = totalMonthlyHours / TIME_CONSTANTS.WEEKS_PER_MONTH;
     
     console.log('Total hours calculation:', {
       totalWeeklyHours,
       totalMonthlyHours,
-      selectedTasksCount: selectedTasks.length
+      selectedTasksCount: selectedTasks.length,
+      taskDetails: selectedTasks.map(task => ({
+        taskId: task.taskId,
+        timeRequired: task.timeRequired,
+        frequency: task.frequency
+      }))
     });
     
     return { totalWeeklyHours, totalMonthlyHours };

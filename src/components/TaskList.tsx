@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { TIME_CONSTANTS } from '@/utils/constants';
 
 interface TaskListProps {
   category: string;
@@ -46,6 +47,20 @@ export const TaskList: React.FC<TaskListProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
   const productivityRates = getRatesByCategory(category) || [];
+
+  const handleQuantityUpdate = (taskId: string, quantity: number) => {
+    console.log('Updating quantity:', { taskId, quantity });
+    onQuantityChange(taskId, quantity);
+  };
+
+  const handleFrequencyUpdate = (taskId: string, timesPerWeek: number) => {
+    console.log('Updating frequency:', { 
+      taskId, 
+      timesPerWeek,
+      monthlyTimes: timesPerWeek * TIME_CONSTANTS.WEEKS_PER_MONTH 
+    });
+    onFrequencyChange(taskId, timesPerWeek);
+  };
 
   const filteredRates = productivityRates
     .filter(rate => rate && rate.category === category)
@@ -104,7 +119,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleRemove(rate.id)}
+                      onClick={() => onRemoveTask(rate.id)}
                       className="text-destructive hover:text-destructive/90"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -117,7 +132,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                       <Input
                         type="number"
                         value={selectedTask.quantity || ''}
-                        onChange={(e) => onQuantityChange(rate.id, Number(e.target.value))}
+                        onChange={(e) => handleQuantityUpdate(rate.id, Number(e.target.value))}
                         min={0}
                       />
                     </div>
@@ -126,7 +141,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                       <Label>Frequency (times per week)</Label>
                       <Select
                         value={selectedTask.frequency.timesPerWeek.toString()}
-                        onValueChange={(value) => onFrequencyChange(rate.id, Number(value))}
+                        onValueChange={(value) => handleFrequencyUpdate(rate.id, Number(value))}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select frequency" />
@@ -145,7 +160,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                   <div className="bg-accent/50 p-4 rounded-lg space-y-2">
                     <h4 className="font-medium">Time Requirements</h4>
                     <div className="text-sm space-y-1">
-                      <p>Time per service: {((selectedTask.timeRequired * 60) / selectedTask.frequency.timesPerWeek / 4.33).toFixed(1)} minutes</p>
+                      <p>Time per service: {((selectedTask.timeRequired * TIME_CONSTANTS.MINUTES_PER_HOUR) / selectedTask.frequency.timesPerWeek / TIME_CONSTANTS.WEEKS_PER_MONTH).toFixed(1)} minutes</p>
                       <p>Monthly hours: {selectedTask.timeRequired.toFixed(1)} hours</p>
                       <p>Productivity rate: {rate.ratePerHour.toFixed(2)} {rate.unit}/hour</p>
                     </div>
