@@ -1,12 +1,12 @@
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card } from "@/components/ui/card";
-import { Building, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { Site } from '@/data/types/site';
 import { useTaskContext } from './area/task/TaskContext';
 import { toast } from './ui/use-toast';
 import { TaskList } from './scope/TaskList';
 import { SiteSummaryCard } from './scope/SiteSummaryCard';
+import { TimeSummaryCards } from './scope/TimeSummaryCards';
 
 interface ScopeOfWorkSidebarProps {
   selectedTasks: Array<{
@@ -25,7 +25,18 @@ interface ScopeOfWorkSidebarProps {
 export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
   sites = []
 }) => {
-  const { selectedTasks, handleTaskSelection, totalWeeklyHours, totalMonthlyHours } = useTaskContext();
+  const { 
+    selectedTasks, 
+    handleTaskSelection, 
+    totalWeeklyHours, 
+    totalMonthlyHours 
+  } = useTaskContext();
+
+  console.log('ScopeOfWorkSidebar rendering with:', {
+    totalWeeklyHours,
+    totalMonthlyHours,
+    selectedTasksCount: selectedTasks.length
+  });
 
   const handleRemoveTask = (taskId: string, siteId?: string) => {
     handleTaskSelection(taskId, false, siteId);
@@ -42,31 +53,11 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
       </div>
       <ScrollArea className="h-[calc(100vh-10rem)] px-6">
         <div className="space-y-6 py-6">
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="p-4 bg-accent/50">
-              <div className="flex items-center space-x-2">
-                <Building className="w-4 h-4 text-primary" />
-                <p className="text-sm font-medium">Sites</p>
-              </div>
-              <p className="text-2xl font-bold mt-2">{sites.length}</p>
-            </Card>
-            
-            <Card className="p-4 bg-accent/50">
-              <div className="flex items-center space-x-2">
-                <Clock className="w-4 h-4 text-primary" />
-                <p className="text-sm font-medium">Weekly Hours</p>
-              </div>
-              <p className="text-2xl font-bold mt-2">{totalWeeklyHours.toFixed(1)}</p>
-            </Card>
-          </div>
-
-          <Card className="p-4 bg-accent/50">
-            <div className="flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-primary" />
-              <p className="text-sm font-medium">Monthly Hours</p>
-            </div>
-            <p className="text-2xl font-bold mt-2">{totalMonthlyHours.toFixed(1)}</p>
-          </Card>
+          <TimeSummaryCards
+            siteCount={sites.length}
+            weeklyHours={totalWeeklyHours}
+            monthlyHours={totalMonthlyHours}
+          />
 
           {Object.entries(selectedTasks.reduce((acc, task) => {
             const siteName = task.siteName || 'Default Site';

@@ -34,15 +34,25 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     handleProductivityOverride
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
-  // Calculate total weekly and monthly hours whenever tasks change
   const calculateTotalHours = () => {
     const totalMonthlyHours = selectedTasks.reduce((total, task) => {
-      return total + (task.timeRequired || 0);
+      const taskMonthlyHours = task.timeRequired || 0;
+      console.log('Task hours calculation:', {
+        taskId: task.taskId,
+        timeRequired: task.timeRequired,
+        monthlyHours: taskMonthlyHours
+      });
+      return total + taskMonthlyHours;
     }, 0);
     
     const totalWeeklyHours = totalMonthlyHours / 4.33;
     
-    console.log('Calculated hours:', { totalWeeklyHours, totalMonthlyHours });
+    console.log('Total hours calculation:', {
+      totalWeeklyHours,
+      totalMonthlyHours,
+      selectedTasksCount: selectedTasks.length
+    });
+    
     return { totalWeeklyHours, totalMonthlyHours };
   };
 
@@ -51,7 +61,6 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   useEffect(() => {
     const newTotalHours = calculateTotalHours();
     setTotalHours(newTotalHours);
-    console.log('Updated total hours:', newTotalHours);
   }, [selectedTasks]);
 
   const value = {
