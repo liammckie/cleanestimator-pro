@@ -40,16 +40,16 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
   const calculateTotalHours = () => {
-    console.log('TASK_FLOW: Calculating total hours');
-    console.log('TASK_FLOW: Current selected tasks:', selectedTasks);
+    console.log('TASK_FLOW: Starting hours calculation');
+    console.log('TASK_FLOW: Selected tasks:', selectedTasks);
     
     if (!selectedTasks || selectedTasks.length === 0) {
-      console.log('TASK_FLOW: No tasks selected');
+      console.log('TASK_FLOW: No tasks selected, returning 0');
       return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
     }
 
     const totalMonthlyHours = selectedTasks.reduce((total, task) => {
-      console.log('TASK_FLOW: Processing task for hours calculation:', task);
+      console.log('TASK_FLOW: Processing task for hours:', task);
       return total + (task.timeRequired || 0);
     }, 0);
     
