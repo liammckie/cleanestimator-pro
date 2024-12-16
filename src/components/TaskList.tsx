@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ProductivityRate } from '@/data/types/productivity';
 import { TaskSearchInput } from './task/TaskSearchInput';
@@ -26,7 +26,7 @@ interface TaskListProps {
   onToolChange: (taskId: string, tool: string) => void;
 }
 
-export const TaskList: React.FC<TaskListProps> = ({
+export const TaskList = React.memo(({
   category,
   selectedTasks = [],
   onTaskSelection,
@@ -35,20 +35,30 @@ export const TaskList: React.FC<TaskListProps> = ({
   onProductivityOverride,
   onRemoveTask,
   onToolChange,
-}) => {
+}: TaskListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const productivityRates = getRatesByCategory(category) || [];
+  
+  const productivityRates = useMemo(() => 
+    getRatesByCategory(category) || [], 
+    [category]
+  );
 
-  const filteredRates = productivityRates
-    .filter(rate => rate && rate.category === category)
-    .filter(rate => {
-      if (!rate) return false;
-      const query = searchQuery.toLowerCase();
-      return (
-        rate.task.toLowerCase().includes(query) ||
-        rate.tool.toLowerCase().includes(query)
-      );
-    });
+  const filteredRates = useMemo(() => {
+    return productivityRates
+      .filter(rate => rate && rate.category === category)
+      .filter(rate => {
+        if (!rate) return false;
+        const query = searchQuery.toLowerCase();
+        return (
+          rate.task.toLowerCase().includes(query) ||
+          rate.tool.toLowerCase().includes(query)
+        );
+      });
+  }, [productivityRates, category, searchQuery]);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+  }, []);
 
   if (selectedTasks.length === 0) {
     return (
@@ -64,7 +74,7 @@ export const TaskList: React.FC<TaskListProps> = ({
     <div className="space-y-4">
       <TaskSearchInput 
         value={searchQuery}
-        onChange={setSearchQuery}
+        onChange={handleSearchChange}
       />
 
       <div className="grid gap-4">
@@ -86,4 +96,6 @@ export const TaskList: React.FC<TaskListProps> = ({
       </div>
     </div>
   );
-};
+});
+
+TaskList.displayName = 'TaskList';

@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ProductivityRate } from '@/data/types/productivity';
 import { TaskFrequencySelect } from './TaskFrequencySelect';
 import { TaskTimeRequirements } from './TaskTimeRequirements';
+import { TIME_CONSTANTS } from '@/utils/constants';
 
 interface TaskCardProps {
   rate: ProductivityRate;
@@ -18,63 +18,83 @@ interface TaskCardProps {
       timesPerWeek: number;
       timesPerMonth: number;
     };
+    productivityOverride?: number;
+    selectedTool?: string;
   };
   onQuantityChange: (taskId: string, quantity: number) => void;
   onFrequencyChange: (taskId: string, timesPerWeek: number) => void;
   onRemoveTask: (taskId: string) => void;
 }
 
-export const TaskCard: React.FC<TaskCardProps> = ({
+export const TaskCard = React.memo(({
   rate,
   selectedTask,
   onQuantityChange,
   onFrequencyChange,
   onRemoveTask,
-}) => {
+}: TaskCardProps) => {
+  const handleQuantityChange = useCallback((value: number) => {
+    onQuantityChange(rate.id, value);
+  }, [rate.id, onQuantityChange]);
+
+  const handleFrequencyChange = useCallback((value: number) => {
+    onFrequencyChange(rate.id, value);
+  }, [rate.id, onFrequencyChange]);
+
+  const handleRemove = useCallback(() => {
+    onRemoveTask(rate.id);
+  }, [rate.id, onRemoveTask]);
+
+  const weeklyHours = useMemo(() => {
+    return (selectedTask.timeRequired / TIME_CONSTANTS.WEEKS_PER_MONTH).toFixed(1);
+  }, [selectedTask.timeRequired]);
+
   return (
     <Card className="p-4">
       <CardContent className="space-y-4">
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-medium">{rate.task}</h3>
-            <p className="text-sm text-muted-foreground">
-              {selectedTask.frequency.timesPerWeek}x per week
-            </p>
+            <p className="text-sm text-muted-foreground">{rate.tool}</p>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onRemoveTask(rate.id)}
+            onClick={handleRemove}
             className="text-destructive hover:text-destructive/90"
           >
-            <Trash2 className="h-4 w-4" />
+            <span className="sr-only">Remove task</span>
+            ×
           </Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
+        <div className="grid gap-4">
+          <div>
             <Label>Quantity ({rate.unit})</Label>
             <Input
               type="number"
               value={selectedTask.quantity || ''}
-              onChange={(e) => onQuantityChange(rate.id, Number(e.target.value))}
+              onChange={(e) => handleQuantityChange(Number(e.target.value))}
               min={0}
+              className="bg-background"
             />
           </div>
 
           <TaskFrequencySelect
-            value={selectedTask.frequency.timesPerWeek.toString()}
-            onValueChange={(value) => onFrequencyChange(rate.id, Number(value))}
+            value={selectedTask.frequency.timesPerWeek}
+            onChange={handleFrequencyChange}
           />
         </div>
 
         <TaskTimeRequirements
           timeRequired={selectedTask.timeRequired}
-          weeklyHours={(selectedTask.timeRequired / 4.33).toFixed(1)}
+          weeklyHours={weeklyHours}
           ratePerHour={rate.ratePerHour}
           unit={rate.unit}
         />
       </CardContent>
     </Card>
   );
-};
+});
+
+TaskCard.displayName = 'TaskCard';
