@@ -76,10 +76,7 @@ const AppContent = React.memo(({
               onAreaChange={onAreaChange}
             />
           </div>
-          <ScopeOfWorkSidebar 
-            sites={sites}
-            selectedTasks={[]} // Initialize with empty array since tasks are managed by TaskContext
-          />
+          <ScopeOfWorkSidebar sites={sites} />
         </div>
       </div>
     </Tabs>

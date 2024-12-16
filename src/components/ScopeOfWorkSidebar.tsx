@@ -9,16 +9,6 @@ import { SiteSummaryCard } from './scope/SiteSummaryCard';
 import { TimeSummaryCards } from './scope/TimeSummaryCards';
 
 interface ScopeOfWorkSidebarProps {
-  selectedTasks: Array<{
-    taskId: string;
-    quantity: number;
-    timeRequired: number;
-    frequency: {
-      timesPerWeek: number;
-      timesPerMonth: number;
-    };
-    siteName?: string;
-  }>;
   sites?: Site[];
 }
 
@@ -29,13 +19,16 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
     selectedTasks, 
     handleTaskSelection, 
     totalWeeklyHours, 
-    totalMonthlyHours 
+    totalMonthlyHours,
+    handleQuantityChange,
+    handleFrequencyChange,
+    handleToolChange 
   } = useTaskContext();
 
-  console.log('ScopeOfWorkSidebar rendering with:', {
+  console.log('ScopeOfWorkSidebar rendering with tasks:', {
+    selectedTasks,
     totalWeeklyHours,
-    totalMonthlyHours,
-    selectedTasksCount: selectedTasks.length
+    totalMonthlyHours
   });
 
   const handleRemoveTask = (taskId: string, siteId?: string) => {
@@ -45,6 +38,16 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
       description: "Task has been removed from the scope.",
     });
   };
+
+  // Group tasks by site
+  const tasksBySite = selectedTasks.reduce((acc, task) => {
+    const siteName = task.siteName || 'Default Site';
+    if (!acc[siteName]) {
+      acc[siteName] = [];
+    }
+    acc[siteName].push(task);
+    return acc;
+  }, {} as Record<string, typeof selectedTasks>);
 
   return (
     <div className="w-[300px] shrink-0 border-l bg-background">
@@ -59,37 +62,24 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
             monthlyHours={totalMonthlyHours}
           />
 
-          {Object.entries(selectedTasks.reduce((acc, task) => {
-            const siteName = task.siteName || 'Default Site';
-            if (!acc[siteName]) {
-              acc[siteName] = [];
-            }
-            acc[siteName].push(task);
-            return acc;
-          }, {} as Record<string, typeof selectedTasks>)).map(([siteName, siteTasks]) => {
+          {Object.entries(tasksBySite).map(([siteName, siteTasks]) => {
             const siteMonthlyTime = siteTasks.reduce((sum, task) => 
-              sum + (task.timeRequired || 0), 0) * 60;
+              sum + (task.timeRequired || 0), 0);
             const siteWeeklyTime = siteMonthlyTime / 4.33;
             
             return (
               <div key={siteName} className="space-y-4">
                 <SiteSummaryCard
                   siteName={siteName}
-                  weeklyHours={siteWeeklyTime / 60}
-                  monthlyHours={siteMonthlyTime / 60}
+                  weeklyHours={siteWeeklyTime}
+                  monthlyHours={siteMonthlyTime}
                 />
                 
                 <TaskList
                   selectedTasks={siteTasks}
-                  onQuantityChange={(taskId, quantity) => {
-                    console.log('Updating quantity:', taskId, quantity);
-                  }}
-                  onFrequencyChange={(taskId, freq) => {
-                    console.log('Updating frequency:', taskId, freq);
-                  }}
-                  onToolChange={(taskId, tool) => {
-                    console.log('Updating tool:', taskId, tool);
-                  }}
+                  onQuantityChange={handleQuantityChange}
+                  onFrequencyChange={handleFrequencyChange}
+                  onToolChange={handleToolChange}
                   onRemoveTask={handleRemoveTask}
                 />
               </div>
