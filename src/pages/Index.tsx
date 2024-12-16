@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { DynamicMenu } from '@/components/ui/dynamic-menu';
 import { Tabs } from "@/components/ui/tabs";
 import { calculateCosts } from '@/utils/costCalculations';
@@ -54,7 +54,7 @@ const Index = () => {
     }));
   }, []);
 
-  const costBreakdown = React.useMemo(() => 
+  const costBreakdown = useMemo(() => 
     calculateCosts(sites, laborCosts.hourlyRate),
     [sites, laborCosts.hourlyRate]
   );
@@ -62,7 +62,7 @@ const Index = () => {
   const monthlyRevenue = costBreakdown.totalMonthlyCost * 1.5;
   const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
 
-  const formattedMenuOptions = React.useMemo(() => 
+  const formattedMenuOptions = useMemo(() => 
     menuOptions.map(option => ({
       name: option.label,
       icon: option.icon as "layout" | "file-text" | "list" | "user" | "wrench" | "calendar" | "check-square" | "globe" | "settings",
@@ -71,7 +71,7 @@ const Index = () => {
     []
   );
 
-  const selectedTasks = React.useMemo(() => 
+  const selectedTasks = useMemo(() => 
     sites.flatMap(site => 
       site.area?.selectedTasks?.map(task => ({
         ...task,
@@ -81,9 +81,32 @@ const Index = () => {
     [sites]
   );
 
+  const taskManagementContent = useMemo(() => (
+    <TaskManagementContent 
+      activeTab={activeTab} 
+      onAreaChange={handleAreaChange}
+    />
+  ), [activeTab, handleAreaChange]);
+
+  const mainContent = useMemo(() => (
+    <MainContent
+      sites={sites}
+      onSitesChange={setSites}
+      laborCosts={laborCosts}
+      setLaborCosts={setLaborCosts}
+      equipmentCosts={equipmentCosts}
+      setEquipmentCosts={setEquipmentCosts}
+      contractDetails={contractDetails}
+      setContractDetails={setContractDetails}
+      costBreakdown={costBreakdown}
+      monthlyRevenue={monthlyRevenue}
+      overhead={overhead}
+    />
+  ), [sites, laborCosts, equipmentCosts, contractDetails, costBreakdown, monthlyRevenue, overhead]);
+
   return (
     <SettingsProvider>
-      <TaskProvider onTasksChange={handleAreaChange}>
+      <TaskProvider>
         <div className="min-h-screen flex w-full bg-background">
           <div className="flex-1">
             <div className="container mx-auto px-4 py-8">
@@ -100,26 +123,7 @@ const Index = () => {
                   <div className="flex flex-1">
                     <div className="flex-1 px-6">
                       <MainNavigation />
-                      {activeTab === 'scope' ? (
-                        <TaskManagementContent 
-                          activeTab={activeTab} 
-                          onAreaChange={handleAreaChange}
-                        />
-                      ) : (
-                        <MainContent
-                          sites={sites}
-                          onSitesChange={setSites}
-                          laborCosts={laborCosts}
-                          setLaborCosts={setLaborCosts}
-                          equipmentCosts={equipmentCosts}
-                          setEquipmentCosts={setEquipmentCosts}
-                          contractDetails={contractDetails}
-                          setContractDetails={setContractDetails}
-                          costBreakdown={costBreakdown}
-                          monthlyRevenue={monthlyRevenue}
-                          overhead={overhead}
-                        />
-                      )}
+                      {activeTab === 'scope' ? taskManagementContent : mainContent}
                     </div>
                     <ScopeOfWorkSidebar 
                       selectedTasks={selectedTasks} 

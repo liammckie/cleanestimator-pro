@@ -17,17 +17,10 @@ export const useTaskOperations = (
     siteId?: string,
     siteName?: string
   ) => {
-    console.log('TASK_FLOW: handleTaskSelection called:', {
-      taskId,
-      isSelected,
-      siteId,
-      siteName
-    });
-
     if (isSelected) {
       const rate = getRateById(taskId);
       if (!rate) {
-        console.error('TASK_FLOW: Could not find rate for task:', taskId);
+        console.error('Could not find rate for task:', taskId);
         toast({
           title: "Error",
           description: `Could not find rate for task ${taskId}`,
@@ -50,104 +43,59 @@ export const useTaskOperations = (
         laborRate: defaultLaborRate
       };
 
-      setSelectedTasks(prevTasks => {
-        console.log('TASK_FLOW: Adding new task:', {
-          newTask,
-          previousTasks: prevTasks
-        });
-        return [...prevTasks, newTask];
-      });
+      setSelectedTasks(prev => [...prev, newTask]);
       
       toast({
         title: "Task Added",
         description: `${rate.task} has been added to your scope.`
       });
     } else {
-      setSelectedTasks(prevTasks => {
-        console.log('TASK_FLOW: Removing task:', {
-          taskId,
-          previousTasks: prevTasks
-        });
-        return prevTasks.filter(task => task.taskId !== taskId);
-      });
+      setSelectedTasks(prev => prev.filter(task => task.taskId !== taskId));
     }
-  }, [selectedTasks, setSelectedTasks, defaultLaborRate]);
+  }, [setSelectedTasks, defaultLaborRate]);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
-    console.log('TASK_FLOW: handleQuantityChange called:', {
-      taskId,
-      quantity
-    });
-
-    setSelectedTasks(prevTasks => {
-      const updatedTasks = prevTasks.map(task => {
-        if (task.taskId === taskId) {
-          const timeRequired = calculateTaskTime(
-            taskId,
-            quantity,
-            task.selectedTool,
-            task.frequency
-          );
-          
-          console.log('TASK_FLOW: Updated task time:', {
-            taskId,
-            quantity,
-            timeRequired
-          });
-
-          return {
-            ...task,
-            quantity,
-            timeRequired
-          };
-        }
-        return task;
-      });
-
-      console.log('TASK_FLOW: Tasks after quantity update:', updatedTasks);
-      return updatedTasks;
-    });
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        const timeRequired = calculateTaskTime(
+          taskId,
+          quantity,
+          task.selectedTool,
+          task.frequency
+        );
+        return {
+          ...task,
+          quantity,
+          timeRequired
+        };
+      }
+      return task;
+    }));
   }, [calculateTaskTime]);
 
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
-    console.log('TASK_FLOW: handleFrequencyChange called:', {
-      taskId,
-      timesPerWeek
-    });
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        const frequency = {
+          timesPerWeek,
+          timesPerMonth: timesPerWeek * 4.33
+        };
+        
+        const timeRequired = calculateTaskTime(
+          taskId,
+          task.quantity,
+          task.selectedTool,
+          frequency
+        );
 
-    setSelectedTasks(prevTasks => {
-      const updatedTasks = prevTasks.map(task => {
-        if (task.taskId === taskId) {
-          const frequency = {
-            timesPerWeek,
-            timesPerMonth: timesPerWeek * 4.33
-          };
-          
-          const timeRequired = calculateTaskTime(
-            taskId,
-            task.quantity,
-            task.selectedTool,
-            frequency
-          );
-          
-          console.log('TASK_FLOW: Updated task frequency:', {
-            taskId,
-            frequency,
-            timeRequired
-          });
-
-          return {
-            ...task,
-            frequency,
-            timeRequired
-          };
-        }
-        return task;
-      });
-
-      console.log('TASK_FLOW: Tasks after frequency update:', updatedTasks);
-      return updatedTasks;
-    });
+        return {
+          ...task,
+          frequency,
+          timeRequired
+        };
+      }
+      return task;
+    }));
   }, [calculateTaskTime]);
 
   return {

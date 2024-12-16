@@ -17,6 +17,8 @@ export const TaskProvider = React.memo(({
   onTasksChange,
   defaultLaborRate = 38 
 }: TaskProviderProps) => {
+  console.log('TASK_FLOW: TaskProvider initializing');
+
   const {
     selectedTasks,
     setSelectedTasks,
