@@ -96,7 +96,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   }, [selectedTasks]);
 
   const value = {
-    selectedTasks,
+    selectedTasks: selectedTasks || [], // Ensure we always have an array, even if empty
     handleTaskSelection,
     handleQuantityChange,
     handleFrequencyChange,
