@@ -7,7 +7,6 @@ import { Trash2 } from "lucide-react";
 import { ProductivityRate } from '@/data/types/productivity';
 import { TaskFrequencySelect } from './TaskFrequencySelect';
 import { TaskTimeRequirements } from './TaskTimeRequirements';
-import { TIME_CONSTANTS } from '@/utils/constants';
 
 interface TaskCardProps {
   rate: ProductivityRate;
@@ -19,8 +18,6 @@ interface TaskCardProps {
       timesPerWeek: number;
       timesPerMonth: number;
     };
-    productivityOverride?: number;
-    selectedTool?: string;
   };
   onQuantityChange: (taskId: string, quantity: number) => void;
   onFrequencyChange: (taskId: string, timesPerWeek: number) => void;
@@ -34,15 +31,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onFrequencyChange,
   onRemoveTask,
 }) => {
-  const weeklyHours = (selectedTask.timeRequired / TIME_CONSTANTS.WEEKS_PER_MONTH).toFixed(1);
-
   return (
     <Card className="p-4">
       <CardContent className="space-y-4">
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-medium">{rate.task}</h3>
-            <p className="text-sm text-muted-foreground">{rate.tool}</p>
+            <p className="text-sm text-muted-foreground">
+              {selectedTask.frequency.timesPerWeek}x per week
+            </p>
           </div>
           <Button
             variant="ghost"
@@ -62,7 +59,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               value={selectedTask.quantity || ''}
               onChange={(e) => onQuantityChange(rate.id, Number(e.target.value))}
               min={0}
-              className="bg-background"
             />
           </div>
 
@@ -74,7 +70,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
         <TaskTimeRequirements
           timeRequired={selectedTask.timeRequired}
-          weeklyHours={weeklyHours}
+          weeklyHours={(selectedTask.timeRequired / 4.33).toFixed(1)}
           ratePerHour={rate.ratePerHour}
           unit={rate.unit}
         />
