@@ -58,32 +58,34 @@ const AppContent = React.memo(({
             options={formattedMenuOptions} 
             className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
           />
-          <div className="flex flex-1">
-            <div className="flex-1 px-6">
-              <MainNavigation />
-              <MainContent
-                sites={sites}
-                onSitesChange={setSites}
-                laborCosts={laborCosts}
-                setLaborCosts={setLaborCosts}
-                equipmentCosts={equipmentCosts}
-                setEquipmentCosts={setEquipmentCosts}
-                contractDetails={contractDetails}
-                setContractDetails={setContractDetails}
-                costBreakdown={costBreakdown}
-                monthlyRevenue={monthlyRevenue}
-                overhead={overhead}
-              />
-              <TaskManagementContent 
-                activeTab={activeTab} 
-                onAreaChange={onAreaChange}
+          <TaskProvider onTasksChange={onAreaChange}>
+            <div className="flex flex-1">
+              <div className="flex-1 px-6">
+                <MainNavigation />
+                <MainContent
+                  sites={sites}
+                  onSitesChange={setSites}
+                  laborCosts={laborCosts}
+                  setLaborCosts={setLaborCosts}
+                  equipmentCosts={equipmentCosts}
+                  setEquipmentCosts={setEquipmentCosts}
+                  contractDetails={contractDetails}
+                  setContractDetails={setContractDetails}
+                  costBreakdown={costBreakdown}
+                  monthlyRevenue={monthlyRevenue}
+                  overhead={overhead}
+                />
+                <TaskManagementContent 
+                  activeTab={activeTab} 
+                  onAreaChange={onAreaChange}
+                />
+              </div>
+              <ScopeOfWorkSidebar 
+                selectedTasks={selectedTasks} 
+                sites={sites} 
               />
             </div>
-            <ScopeOfWorkSidebar 
-              selectedTasks={selectedTasks} 
-              sites={sites} 
-            />
-          </div>
+          </TaskProvider>
         </div>
       </Tabs>
     </div>
@@ -153,32 +155,30 @@ const Index = () => {
 
   return (
     <SettingsProvider>
-      <TaskProvider onTasksChange={handleAreaChange}>
-        <CostProvider>
-          <div className="min-h-screen flex w-full bg-background">
-            <div className="flex-1">
-              <AppContent
-                activeTab={activeTab}
-                onAreaChange={handleAreaChange}
-                sites={sites}
-                laborCosts={laborCosts}
-                equipmentCosts={equipmentCosts}
-                contractDetails={contractDetails}
-                costBreakdown={costBreakdown}
-                monthlyRevenue={monthlyRevenue}
-                overhead={overhead}
-                setLaborCosts={setLaborCosts}
-                setEquipmentCosts={setEquipmentCosts}
-                setContractDetails={setContractDetails}
-                setSites={setSites}
-                selectedTasks={selectedTasks}
-                formattedMenuOptions={formattedMenuOptions}
-                onTabChange={handleTabChange}
-              />
-            </div>
+      <CostProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <div className="flex-1">
+            <AppContent
+              activeTab={activeTab}
+              onAreaChange={handleAreaChange}
+              sites={sites}
+              laborCosts={laborCosts}
+              equipmentCosts={equipmentCosts}
+              contractDetails={contractDetails}
+              costBreakdown={costBreakdown}
+              monthlyRevenue={monthlyRevenue}
+              overhead={overhead}
+              setLaborCosts={setLaborCosts}
+              setEquipmentCosts={setEquipmentCosts}
+              setContractDetails={setContractDetails}
+              setSites={setSites}
+              selectedTasks={selectedTasks}
+              formattedMenuOptions={formattedMenuOptions}
+              onTabChange={handleTabChange}
+            />
           </div>
-        </CostProvider>
-      </TaskProvider>
+        </div>
+      </CostProvider>
     </SettingsProvider>
   );
 };
