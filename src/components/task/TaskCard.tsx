@@ -46,7 +46,7 @@ export const TaskCard = React.memo(({
   }, [rate.id, onRemoveTask]);
 
   const weeklyHours = useMemo(() => {
-    return (selectedTask.timeRequired / TIME_CONSTANTS.WEEKS_PER_MONTH).toFixed(1);
+    return selectedTask.timeRequired / TIME_CONSTANTS.WEEKS_PER_MONTH;
   }, [selectedTask.timeRequired]);
 
   return (
@@ -81,14 +81,14 @@ export const TaskCard = React.memo(({
           </div>
 
           <TaskFrequencySelect
-            value={selectedTask.frequency.timesPerWeek}
-            onChange={handleFrequencyChange}
+            value={selectedTask.frequency.timesPerWeek.toString()}
+            onValueChange={(value) => handleFrequencyChange(Number(value))}
           />
         </div>
 
         <TaskTimeRequirements
           timeRequired={selectedTask.timeRequired}
-          weeklyHours={parseFloat(weeklyHours)}
+          weeklyHours={weeklyHours}
           ratePerHour={rate.ratePerHour}
           unit={rate.unit}
         />
