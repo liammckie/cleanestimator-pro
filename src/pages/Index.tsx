@@ -22,13 +22,12 @@ const TaskManagementContent = React.memo(({
   onAreaChange: (area: AreaData) => void;
 }) => {
   if (activeTab !== 'scope') return null;
-  
   return <AreaContainer onAreaChange={onAreaChange} />;
 });
 
 TaskManagementContent.displayName = 'TaskManagementContent';
 
-const AppContent = React.memo(({ 
+const MainContentWrapper = React.memo(({
   activeTab,
   onAreaChange,
   sites,
@@ -58,41 +57,39 @@ const AppContent = React.memo(({
             options={formattedMenuOptions} 
             className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
           />
-          <TaskProvider onTasksChange={onAreaChange}>
-            <div className="flex flex-1">
-              <div className="flex-1 px-6">
-                <MainNavigation />
-                <MainContent
-                  sites={sites}
-                  onSitesChange={setSites}
-                  laborCosts={laborCosts}
-                  setLaborCosts={setLaborCosts}
-                  equipmentCosts={equipmentCosts}
-                  setEquipmentCosts={setEquipmentCosts}
-                  contractDetails={contractDetails}
-                  setContractDetails={setContractDetails}
-                  costBreakdown={costBreakdown}
-                  monthlyRevenue={monthlyRevenue}
-                  overhead={overhead}
-                />
-                <TaskManagementContent 
-                  activeTab={activeTab} 
-                  onAreaChange={onAreaChange}
-                />
-              </div>
-              <ScopeOfWorkSidebar 
-                selectedTasks={selectedTasks} 
-                sites={sites} 
+          <div className="flex flex-1">
+            <div className="flex-1 px-6">
+              <MainNavigation />
+              <MainContent
+                sites={sites}
+                onSitesChange={setSites}
+                laborCosts={laborCosts}
+                setLaborCosts={setLaborCosts}
+                equipmentCosts={equipmentCosts}
+                setEquipmentCosts={setEquipmentCosts}
+                contractDetails={contractDetails}
+                setContractDetails={setContractDetails}
+                costBreakdown={costBreakdown}
+                monthlyRevenue={monthlyRevenue}
+                overhead={overhead}
+              />
+              <TaskManagementContent 
+                activeTab={activeTab} 
+                onAreaChange={onAreaChange}
               />
             </div>
-          </TaskProvider>
+            <ScopeOfWorkSidebar 
+              selectedTasks={selectedTasks} 
+              sites={sites} 
+            />
+          </div>
         </div>
       </Tabs>
     </div>
   );
 });
 
-AppContent.displayName = 'AppContent';
+MainContentWrapper.displayName = 'MainContentWrapper';
 
 const Index = () => {
   const [sites, setSites] = useState([]);
@@ -156,28 +153,30 @@ const Index = () => {
   return (
     <SettingsProvider>
       <CostProvider>
-        <div className="min-h-screen flex w-full bg-background">
-          <div className="flex-1">
-            <AppContent
-              activeTab={activeTab}
-              onAreaChange={handleAreaChange}
-              sites={sites}
-              laborCosts={laborCosts}
-              equipmentCosts={equipmentCosts}
-              contractDetails={contractDetails}
-              costBreakdown={costBreakdown}
-              monthlyRevenue={monthlyRevenue}
-              overhead={overhead}
-              setLaborCosts={setLaborCosts}
-              setEquipmentCosts={setEquipmentCosts}
-              setContractDetails={setContractDetails}
-              setSites={setSites}
-              selectedTasks={selectedTasks}
-              formattedMenuOptions={formattedMenuOptions}
-              onTabChange={handleTabChange}
-            />
+        <TaskProvider onTasksChange={handleAreaChange}>
+          <div className="min-h-screen flex w-full bg-background">
+            <div className="flex-1">
+              <MainContentWrapper
+                activeTab={activeTab}
+                onAreaChange={handleAreaChange}
+                sites={sites}
+                laborCosts={laborCosts}
+                equipmentCosts={equipmentCosts}
+                contractDetails={contractDetails}
+                costBreakdown={costBreakdown}
+                monthlyRevenue={monthlyRevenue}
+                overhead={overhead}
+                setLaborCosts={setLaborCosts}
+                setEquipmentCosts={setEquipmentCosts}
+                setContractDetails={setContractDetails}
+                setSites={setSites}
+                selectedTasks={selectedTasks}
+                formattedMenuOptions={formattedMenuOptions}
+                onTabChange={handleTabChange}
+              />
+            </div>
           </div>
-        </div>
+        </TaskProvider>
       </CostProvider>
     </SettingsProvider>
   );
