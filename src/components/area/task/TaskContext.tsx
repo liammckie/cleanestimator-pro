@@ -36,35 +36,34 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
   const calculateTotalHours = () => {
-    console.log('=== HOURS CALCULATION START ===');
-    console.log('Number of selected tasks:', selectedTasks.length);
+    console.log('[HOURS_CALC] Starting hours calculation');
+    console.log('[HOURS_CALC] Number of selected tasks:', selectedTasks.length);
     
     const totalMonthlyHours = selectedTasks.reduce((total, task, index) => {
-      console.log(`Task ${index + 1}:`, {
+      console.log(`[HOURS_CALC] Processing task ${index + 1}:`, {
         taskId: task.taskId,
         timeRequired: task.timeRequired,
         frequency: task.frequency
       });
       
       if (!task.timeRequired) {
-        console.log(`Task ${task.taskId} has no timeRequired`);
+        console.log(`[HOURS_CALC] Task ${task.taskId} has no timeRequired`);
         return total;
       }
 
       const taskMonthlyHours = task.timeRequired;
-      console.log(`Task ${task.taskId} monthly hours:`, taskMonthlyHours);
+      console.log(`[HOURS_CALC] Task ${task.taskId} monthly hours:`, taskMonthlyHours);
       
       return total + taskMonthlyHours;
     }, 0);
     
     const totalWeeklyHours = totalMonthlyHours / TIME_CONSTANTS.WEEKS_PER_MONTH;
     
-    console.log('Final calculation:', {
+    console.log('[HOURS_CALC] Final calculation:', {
       totalWeeklyHours,
       totalMonthlyHours,
       selectedTasksCount: selectedTasks.length
     });
-    console.log('=== HOURS CALCULATION END ===');
     
     return { totalWeeklyHours, totalMonthlyHours };
   };
@@ -73,9 +72,11 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
 
   useEffect(() => {
     if (selectedTasks.length > 0) {
+      console.log('[HOURS_CALC] Recalculating hours due to tasks change');
       const newTotalHours = calculateTotalHours();
       setTotalHours(newTotalHours);
     } else {
+      console.log('[HOURS_CALC] No tasks selected, resetting hours to 0');
       setTotalHours({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
     }
   }, [selectedTasks]);
