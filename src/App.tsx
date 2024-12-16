@@ -12,8 +12,8 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <CostProvider>
-        <TaskProvider onTasksChange={(area) => console.log('Area changed:', area)}>
+      <TaskProvider onTasksChange={(area) => console.log('Area changed:', area)}>
+        <CostProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -21,8 +21,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
             </Routes>
           </BrowserRouter>
-        </TaskProvider>
-      </CostProvider>
+        </CostProvider>
+      </TaskProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
