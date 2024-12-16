@@ -34,6 +34,18 @@ interface TaskListProps {
   onToolChange: (taskId: string, tool: string) => void;
 }
 
+const frequencyOptions = [
+  { label: 'Weekly', value: '1', timesPerMonth: 4.33 },
+  { label: 'Fortnightly', value: '0.5', timesPerMonth: 2.17 },
+  { label: 'Monthly', value: '0.25', timesPerMonth: 1 },
+  { label: '2x Weekly', value: '2', timesPerMonth: 8.66 },
+  { label: '3x Weekly', value: '3', timesPerMonth: 13 },
+  { label: '4x Weekly', value: '4', timesPerMonth: 17.33 },
+  { label: '5x Weekly', value: '5', timesPerMonth: 21.66 },
+  { label: '6x Weekly', value: '6', timesPerMonth: 26 },
+  { label: '7x Weekly', value: '7', timesPerMonth: 30.33 },
+];
+
 export const TaskList: React.FC<TaskListProps> = ({
   category,
   selectedTasks = [],
@@ -53,7 +65,8 @@ export const TaskList: React.FC<TaskListProps> = ({
     onQuantityChange(taskId, quantity);
   };
 
-  const handleFrequencyUpdate = (taskId: string, timesPerWeek: number) => {
+  const handleFrequencyUpdate = (taskId: string, frequencyValue: string) => {
+    const timesPerWeek = parseFloat(frequencyValue);
     console.log('Updating frequency:', { 
       taskId, 
       timesPerWeek,
@@ -73,24 +86,9 @@ export const TaskList: React.FC<TaskListProps> = ({
       );
     });
 
-  const handleRemove = (taskId: string) => {
-    onRemoveTask(taskId);
-    toast({
-      title: "Task Removed",
-      description: "Task has been removed from the scope of work.",
-    });
+  const calculateWeeklyHours = (timeRequired: number, frequency: { timesPerWeek: number }) => {
+    return (timeRequired / TIME_CONSTANTS.WEEKS_PER_MONTH).toFixed(1);
   };
-
-  if (!category) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Please select a category to view available tasks.
-        </AlertDescription>
-      </Alert>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -107,6 +105,8 @@ export const TaskList: React.FC<TaskListProps> = ({
             const selectedTask = selectedTasks.find(task => task.taskId === rate.id);
             
             if (!selectedTask) return null;
+
+            const weeklyHours = calculateWeeklyHours(selectedTask.timeRequired, selectedTask.frequency);
 
             return (
               <Card key={rate.id} className="p-4">
@@ -138,18 +138,18 @@ export const TaskList: React.FC<TaskListProps> = ({
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Frequency (times per week)</Label>
+                      <Label>Frequency</Label>
                       <Select
                         value={selectedTask.frequency.timesPerWeek.toString()}
-                        onValueChange={(value) => handleFrequencyUpdate(rate.id, Number(value))}
+                        onValueChange={(value) => handleFrequencyUpdate(rate.id, value)}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select frequency" />
                         </SelectTrigger>
                         <SelectContent>
-                          {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
-                            <SelectItem key={freq} value={freq.toString()}>
-                              {freq}x per week
+                          {frequencyOptions.map((freq) => (
+                            <SelectItem key={freq.value} value={freq.value}>
+                              {freq.label}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -161,6 +161,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                     <h4 className="font-medium">Time Requirements</h4>
                     <div className="text-sm space-y-1">
                       <p>Time per service: {((selectedTask.timeRequired * TIME_CONSTANTS.MINUTES_PER_HOUR) / selectedTask.frequency.timesPerWeek / TIME_CONSTANTS.WEEKS_PER_MONTH).toFixed(1)} minutes</p>
+                      <p>Weekly hours: {weeklyHours} hours</p>
                       <p>Monthly hours: {selectedTask.timeRequired.toFixed(1)} hours</p>
                       <p>Productivity rate: {rate.ratePerHour.toFixed(2)} {rate.unit}/hour</p>
                     </div>
