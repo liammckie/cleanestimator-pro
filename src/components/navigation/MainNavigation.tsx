@@ -4,7 +4,7 @@ import { menuOptions } from './MenuOptions';
 
 export const MainNavigation = () => {
   return (
-    <TabsList className="w-full justify-start border-b bg-background">
+    <TabsList className="w-full justify-start border-b">
       {menuOptions.map((option) => (
         <TabsTrigger key={option.id} value={option.id}>
           {option.label}
