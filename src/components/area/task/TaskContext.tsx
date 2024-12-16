@@ -17,7 +17,7 @@ export const TaskProvider = React.memo(({
   onTasksChange,
   defaultLaborRate = 38 
 }: TaskProviderProps) => {
-  console.log('TASK_FLOW: TaskProvider initializing');
+  console.log('TASK_CONTEXT: TaskProvider rendering');
 
   const {
     selectedTasks,
@@ -25,6 +25,16 @@ export const TaskProvider = React.memo(({
     calculateTaskTime,
     calculateTotalHours
   } = useTaskInitialization(onTasksChange, defaultLaborRate);
+
+  console.log('TASK_CONTEXT: Current selected tasks:', {
+    count: selectedTasks.length,
+    tasks: selectedTasks.map(task => ({
+      taskId: task.taskId,
+      quantity: task.quantity,
+      timeRequired: task.timeRequired,
+      frequency: task.frequency
+    }))
+  });
 
   const {
     handleTaskSelection,
@@ -39,6 +49,12 @@ export const TaskProvider = React.memo(({
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
   const { totalWeeklyHours, totalMonthlyHours } = calculateTotalHours();
+
+  console.log('TASK_CONTEXT: Hours calculation:', {
+    totalWeeklyHours,
+    totalMonthlyHours,
+    taskCount: selectedTasks.length
+  });
 
   const contextValue = useMemo(() => ({
     selectedTasks,

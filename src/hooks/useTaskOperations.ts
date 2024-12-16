@@ -9,14 +9,13 @@ export const useTaskOperations = (
   calculateTaskTime: any,
   defaultLaborRate: number = 38
 ) => {
-  console.log('TASK_OPERATIONS: Current selected tasks:', {
+  console.log('TASK_OPERATIONS: Current tasks state:', {
     count: selectedTasks.length,
     tasks: selectedTasks.map(task => ({
       taskId: task.taskId,
       quantity: task.quantity,
       timeRequired: task.timeRequired,
-      weeklyHours: task.timeRequired * task.frequency.timesPerWeek,
-      monthlyHours: task.timeRequired * task.frequency.timesPerMonth
+      frequency: task.frequency
     }))
   });
 
@@ -26,17 +25,18 @@ export const useTaskOperations = (
     siteId?: string,
     siteName?: string
   ) => {
-    console.log('TASK_OPERATIONS: Task selection changed:', {
+    console.log('TASK_SELECTION: Handling task selection:', {
       taskId,
       isSelected,
       siteId,
-      siteName
+      siteName,
+      currentTaskCount: selectedTasks.length
     });
 
     if (isSelected) {
       const rate = getRateById(taskId);
       if (!rate) {
-        console.error('Could not find rate for task:', taskId);
+        console.error('TASK_SELECTION: Could not find rate for task:', taskId);
         toast({
           title: "Error",
           description: `Could not find rate for task ${taskId}`,
@@ -61,9 +61,14 @@ export const useTaskOperations = (
 
       setSelectedTasks(prev => {
         const updated = [...prev, newTask];
-        console.log('TASK_OPERATIONS: Added new task:', {
-          task: newTask,
-          totalTasks: updated.length
+        console.log('TASK_SELECTION: Added new task:', {
+          newTask,
+          totalTasksAfterAdd: updated.length,
+          allTasks: updated.map(t => ({
+            taskId: t.taskId,
+            quantity: t.quantity,
+            timeRequired: t.timeRequired
+          }))
         });
         return updated;
       });
@@ -75,17 +80,29 @@ export const useTaskOperations = (
     } else {
       setSelectedTasks(prev => {
         const updated = prev.filter(task => task.taskId !== taskId);
-        console.log('TASK_OPERATIONS: Removed task:', {
+        console.log('TASK_SELECTION: Removed task:', {
           taskId,
-          remainingTasks: updated.length
+          remainingTasks: updated.length,
+          allTasks: updated.map(t => ({
+            taskId: t.taskId,
+            quantity: t.quantity,
+            timeRequired: t.timeRequired
+          }))
         });
         return updated;
       });
     }
-  }, [setSelectedTasks, defaultLaborRate]);
+  }, [selectedTasks, setSelectedTasks, defaultLaborRate]);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
-    console.log('TASK_OPERATIONS: Quantity changed:', { taskId, quantity });
+    console.log('TASK_QUANTITY: Updating quantity:', {
+      taskId,
+      newQuantity: quantity,
+      currentTasks: selectedTasks.map(t => ({
+        taskId: t.taskId,
+        currentQuantity: t.quantity
+      }))
+    });
     
     setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
@@ -96,7 +113,7 @@ export const useTaskOperations = (
           task.frequency
         );
         
-        console.log('TASK_OPERATIONS: Updated task time:', {
+        console.log('TASK_QUANTITY: Updated task time:', {
           taskId,
           quantity,
           timeRequired,
@@ -112,10 +129,14 @@ export const useTaskOperations = (
       }
       return task;
     }));
-  }, [calculateTaskTime]);
+  }, [calculateTaskTime, selectedTasks]);
 
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
-    console.log('TASK_OPERATIONS: Frequency changed:', { taskId, timesPerWeek });
+    console.log('TASK_FREQUENCY: Updating frequency:', {
+      taskId,
+      newTimesPerWeek: timesPerWeek,
+      currentTask: selectedTasks.find(t => t.taskId === taskId)
+    });
     
     setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
@@ -131,7 +152,7 @@ export const useTaskOperations = (
           frequency
         );
 
-        console.log('TASK_OPERATIONS: Updated task frequency:', {
+        console.log('TASK_FREQUENCY: Updated task frequency:', {
           taskId,
           frequency,
           timeRequired,
@@ -147,7 +168,7 @@ export const useTaskOperations = (
       }
       return task;
     }));
-  }, [calculateTaskTime]);
+  }, [calculateTaskTime, selectedTasks]);
 
   return {
     handleTaskSelection,
