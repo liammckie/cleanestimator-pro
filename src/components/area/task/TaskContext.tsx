@@ -18,7 +18,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   onTasksChange,
   defaultLaborRate = 38 
 }) => {
-  console.log('TASK_FLOW: TaskProvider initializing');
+  console.log('TASK_FLOW: TaskProvider initializing with props:', { defaultLaborRate });
   
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
   
@@ -112,6 +112,8 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     totalWeeklyHours: totalHours.totalWeeklyHours,
     totalMonthlyHours: totalHours.totalMonthlyHours
   };
+
+  console.log('TASK_FLOW: TaskProvider rendering with value:', value);
 
   return (
     <TaskContext.Provider value={value}>

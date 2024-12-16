@@ -9,18 +9,19 @@ export const useTaskOperations = (
   calculateTaskTime: any,
   defaultLaborRate: number = 38
 ) => {
+  console.log('TASK_FLOW: useTaskOperations initialized');
+
   const handleTaskSelection = useCallback((
     taskId: string,
     isSelected: boolean,
     siteId?: string,
     siteName?: string
   ) => {
-    console.log('TASK_FLOW: Task selection operation started:', {
+    console.log('TASK_FLOW: handleTaskSelection called:', {
       taskId,
       isSelected,
       siteId,
-      siteName,
-      currentTaskCount: selectedTasks.length
+      siteName
     });
 
     if (isSelected) {
@@ -50,8 +51,10 @@ export const useTaskOperations = (
       };
 
       setSelectedTasks(prevTasks => {
-        console.log('TASK_FLOW: Adding new task:', newTask);
-        console.log('TASK_FLOW: Previous tasks:', prevTasks);
+        console.log('TASK_FLOW: Adding new task:', {
+          newTask,
+          previousTasks: prevTasks
+        });
         return [...prevTasks, newTask];
       });
       
@@ -61,18 +64,19 @@ export const useTaskOperations = (
       });
     } else {
       setSelectedTasks(prevTasks => {
-        console.log('TASK_FLOW: Removing task:', taskId);
-        console.log('TASK_FLOW: Previous tasks:', prevTasks);
+        console.log('TASK_FLOW: Removing task:', {
+          taskId,
+          previousTasks: prevTasks
+        });
         return prevTasks.filter(task => task.taskId !== taskId);
       });
     }
   }, [selectedTasks, setSelectedTasks, defaultLaborRate]);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
-    console.log('TASK_FLOW: Quantity change operation started:', {
+    console.log('TASK_FLOW: handleQuantityChange called:', {
       taskId,
-      quantity,
-      currentTasks: selectedTasks
+      quantity
     });
 
     setSelectedTasks(prevTasks => {
@@ -103,13 +107,12 @@ export const useTaskOperations = (
       console.log('TASK_FLOW: Tasks after quantity update:', updatedTasks);
       return updatedTasks;
     });
-  }, [calculateTaskTime, selectedTasks]);
+  }, [calculateTaskTime]);
 
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
-    console.log('TASK_FLOW: Frequency change operation started:', {
+    console.log('TASK_FLOW: handleFrequencyChange called:', {
       taskId,
-      timesPerWeek,
-      currentTasks: selectedTasks
+      timesPerWeek
     });
 
     setSelectedTasks(prevTasks => {
@@ -145,7 +148,7 @@ export const useTaskOperations = (
       console.log('TASK_FLOW: Tasks after frequency update:', updatedTasks);
       return updatedTasks;
     });
-  }, [calculateTaskTime, selectedTasks]);
+  }, [calculateTaskTime]);
 
   return {
     handleTaskSelection,
