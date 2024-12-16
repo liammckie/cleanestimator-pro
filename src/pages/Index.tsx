@@ -28,6 +28,72 @@ const TaskManagementContent = React.memo(({
 
 TaskManagementContent.displayName = 'TaskManagementContent';
 
+const AppContent = React.memo(({ 
+  activeTab,
+  onAreaChange,
+  sites,
+  laborCosts,
+  equipmentCosts,
+  contractDetails,
+  costBreakdown,
+  monthlyRevenue,
+  overhead,
+  setLaborCosts,
+  setEquipmentCosts,
+  setContractDetails,
+  setSites,
+  selectedTasks,
+  formattedMenuOptions
+}: any) => {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-primary mb-8">
+        Commercial Cleaning Estimation Tool
+      </h1>
+      
+      <Tabs value={activeTab}>
+        <div className="flex">
+          <DynamicMenu 
+            options={formattedMenuOptions} 
+            className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
+          />
+          <div className="flex flex-1">
+            <div className="flex-1 px-6">
+              <MainNavigation />
+              {activeTab === 'scope' ? (
+                <TaskManagementContent 
+                  activeTab={activeTab} 
+                  onAreaChange={onAreaChange}
+                />
+              ) : (
+                <MainContent
+                  sites={sites}
+                  onSitesChange={setSites}
+                  laborCosts={laborCosts}
+                  setLaborCosts={setLaborCosts}
+                  equipmentCosts={equipmentCosts}
+                  setEquipmentCosts={setEquipmentCosts}
+                  contractDetails={contractDetails}
+                  setContractDetails={setContractDetails}
+                  costBreakdown={costBreakdown}
+                  monthlyRevenue={monthlyRevenue}
+                  overhead={overhead}
+                />
+              )}
+            </div>
+            <ScopeOfWorkSidebar 
+              selectedTasks={selectedTasks} 
+              sites={sites} 
+            />
+          </div>
+        </div>
+      </Tabs>
+    </div>
+  );
+});
+
+AppContent.displayName = 'AppContent';
+
 const Index = () => {
   const [sites, setSites] = useState([]);
   const [activeTab, setActiveTab] = useState('sites');
@@ -48,6 +114,7 @@ const Index = () => {
   });
 
   const handleAreaChange = useCallback((area: AreaData) => {
+    console.log('Area changed:', area);
     setLaborCosts(prev => ({
       ...prev,
       totalMonthlyHours: area.totalTime,
@@ -82,59 +149,29 @@ const Index = () => {
     [sites]
   );
 
-  const taskManagementContent = useMemo(() => (
-    <TaskManagementContent 
-      activeTab={activeTab} 
-      onAreaChange={handleAreaChange}
-    />
-  ), [activeTab, handleAreaChange]);
-
-  const mainContent = useMemo(() => (
-    <MainContent
-      sites={sites}
-      onSitesChange={setSites}
-      laborCosts={laborCosts}
-      setLaborCosts={setLaborCosts}
-      equipmentCosts={equipmentCosts}
-      setEquipmentCosts={setEquipmentCosts}
-      contractDetails={contractDetails}
-      setContractDetails={setContractDetails}
-      costBreakdown={costBreakdown}
-      monthlyRevenue={monthlyRevenue}
-      overhead={overhead}
-    />
-  ), [sites, laborCosts, equipmentCosts, contractDetails, costBreakdown, monthlyRevenue, overhead]);
-
   return (
     <SettingsProvider>
       <TaskProvider>
         <CostProvider>
           <div className="min-h-screen flex w-full bg-background">
             <div className="flex-1">
-              <div className="container mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold text-primary mb-8">
-                  Commercial Cleaning Estimation Tool
-                </h1>
-                
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <div className="flex">
-                    <DynamicMenu 
-                      options={formattedMenuOptions} 
-                      className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
-                    />
-                    <div className="flex flex-1">
-                      <div className="flex-1 px-6">
-                        <MainNavigation />
-                        {activeTab === 'scope' ? taskManagementContent : mainContent}
-                      </div>
-                      <ScopeOfWorkSidebar 
-                        selectedTasks={selectedTasks} 
-                        sites={sites} 
-                      />
-                    </div>
-                  </div>
-                </Tabs>
-              </div>
+              <AppContent
+                activeTab={activeTab}
+                onAreaChange={handleAreaChange}
+                sites={sites}
+                laborCosts={laborCosts}
+                equipmentCosts={equipmentCosts}
+                contractDetails={contractDetails}
+                costBreakdown={costBreakdown}
+                monthlyRevenue={monthlyRevenue}
+                overhead={overhead}
+                setLaborCosts={setLaborCosts}
+                setEquipmentCosts={setEquipmentCosts}
+                setContractDetails={setContractDetails}
+                setSites={setSites}
+                selectedTasks={selectedTasks}
+                formattedMenuOptions={formattedMenuOptions}
+              />
             </div>
           </div>
         </CostProvider>
