@@ -8,6 +8,13 @@ export const calculateTaskTime = (
   selectedTool: string | undefined,
   frequency: TaskFrequency
 ): number => {
+  console.log('DEBUG: calculateTaskTime called with:', {
+    taskId,
+    quantity,
+    selectedTool,
+    frequency
+  });
+
   const productivity = calculateTaskProductivity(
     taskId,
     quantity,
@@ -16,11 +23,8 @@ export const calculateTaskTime = (
     quantity
   );
   
-  console.log('Task time calculation:', {
+  console.log('DEBUG: Task time calculation result:', {
     taskId,
-    quantity,
-    selectedTool,
-    frequency,
     productivity
   });
 
@@ -29,6 +33,5 @@ export const calculateTaskTime = (
 
 export const useTaskTimes = () => {
   const calculateTaskTimeCallback = useCallback(calculateTaskTime, []);
-
   return { calculateTaskTime: calculateTaskTimeCallback };
 };

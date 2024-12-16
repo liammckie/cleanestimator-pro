@@ -18,6 +18,8 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   onTasksChange,
   defaultLaborRate = 38 
 }) => {
+  console.log('DEBUG: TaskProvider rendering');
+  
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
   
   const { calculateTaskTime } = useTaskManagement(
@@ -38,110 +40,62 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
   const calculateTotalHours = () => {
-    console.log('HOURS_CALC Starting hours calculation');
-    console.log('HOURS_CALC Selected tasks:', selectedTasks);
+    console.log('DEBUG: Starting hours calculation');
+    console.log('DEBUG: Selected tasks:', selectedTasks);
     
     if (!selectedTasks || selectedTasks.length === 0) {
-      console.log('HOURS_CALC No tasks selected, returning 0');
+      console.log('DEBUG: No tasks selected, returning 0');
       return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
     }
 
-    const totalMonthlyHours = selectedTasks.reduce((total, task, index) => {
-      console.log('HOURS_CALC Processing task:', {
-        index: index + 1,
-        taskId: task.taskId,
-        timeRequired: task.timeRequired,
-        frequency: task.frequency,
-        quantity: task.quantity
-      });
-      
-      if (!task.timeRequired) {
-        console.log('HOURS_CALC Task has no timeRequired:', task.taskId);
-        return total;
-      }
-
-      const taskMonthlyHours = task.timeRequired;
-      console.log('HOURS_CALC Monthly hours for task:', {
-        taskId: task.taskId,
-        hours: taskMonthlyHours
-      });
-      
-      return total + taskMonthlyHours;
+    const totalMonthlyHours = selectedTasks.reduce((total, task) => {
+      console.log('DEBUG: Processing task:', task);
+      return total + (task.timeRequired || 0);
     }, 0);
     
     const totalWeeklyHours = totalMonthlyHours / TIME_CONSTANTS.WEEKS_PER_MONTH;
     
-    console.log('HOURS_CALC Final calculation:', {
+    console.log('DEBUG: Final calculation:', {
       totalWeeklyHours,
       totalMonthlyHours,
-      selectedTasksCount: selectedTasks.length,
-      taskDetails: selectedTasks.map(task => ({
-        taskId: task.taskId,
-        timeRequired: task.timeRequired,
-        frequency: task.frequency
-      }))
+      selectedTasksCount: selectedTasks.length
     });
     
     return { totalWeeklyHours, totalMonthlyHours };
   };
 
-  const [totalHours, setTotalHours] = useState({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
-
-  // Wrap the task selection handler to add logging
   const handleTaskSelection = (taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
-    console.log('HOURS_CALC Task selection triggered:', {
+    console.log('DEBUG: Task selection triggered:', {
       taskId,
       isSelected,
       siteId,
-      siteName,
-      currentTaskCount: selectedTasks.length
+      siteName
     });
-    
     baseHandleTaskSelection(taskId, isSelected, siteId, siteName);
   };
 
-  // Wrap quantity change handler to add logging
   const handleQuantityChange = (taskId: string, quantity: number) => {
-    console.log('HOURS_CALC Quantity change triggered:', {
+    console.log('DEBUG: Quantity change triggered:', {
       taskId,
-      quantity,
-      currentTask: selectedTasks.find(t => t.taskId === taskId)
+      quantity
     });
-    
     baseHandleQuantityChange(taskId, quantity);
   };
 
-  // Wrap frequency change handler to add logging
   const handleFrequencyChange = (taskId: string, timesPerWeek: number) => {
-    console.log('HOURS_CALC Frequency change triggered:', {
+    console.log('DEBUG: Frequency change triggered:', {
       taskId,
-      timesPerWeek,
-      currentTask: selectedTasks.find(t => t.taskId === taskId)
+      timesPerWeek
     });
-    
     baseHandleFrequencyChange(taskId, timesPerWeek);
   };
 
+  const [totalHours, setTotalHours] = useState({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
+
   useEffect(() => {
-    console.log('HOURS_CALC Tasks state changed:', {
-      taskCount: selectedTasks.length,
-      tasks: selectedTasks.map(task => ({
-        taskId: task.taskId,
-        quantity: task.quantity,
-        timeRequired: task.timeRequired,
-        frequency: task.frequency
-      }))
-    });
-    
-    if (selectedTasks.length > 0) {
-      console.log('HOURS_CALC Recalculating hours for tasks');
-      const newTotalHours = calculateTotalHours();
-      console.log('HOURS_CALC New total hours calculated:', newTotalHours);
-      setTotalHours(newTotalHours);
-    } else {
-      console.log('HOURS_CALC No tasks selected, resetting hours to 0');
-      setTotalHours({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
-    }
+    console.log('DEBUG: Tasks state changed:', selectedTasks);
+    const newTotalHours = calculateTotalHours();
+    setTotalHours(newTotalHours);
   }, [selectedTasks]);
 
   const value = {
