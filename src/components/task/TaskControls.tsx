@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToolSelect } from '../ToolSelect';
+import { FREQUENCY_OPTIONS } from '@/constants/frequencyOptions';
 import {
   Tooltip,
   TooltipContent,
@@ -113,7 +114,7 @@ export const TaskControls = memo(({
       <div>
         <div className="flex items-center gap-2">
           <Label htmlFor={`frequency-${taskId}`}>
-            Times per Week
+            Service Frequency
           </Label>
           <TooltipProvider>
             <Tooltip>
@@ -121,22 +122,34 @@ export const TaskControls = memo(({
                 <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>Select how many times per week this task needs to be performed</p>
+                <p>Select how often this task needs to be performed</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
         <Select
           value={frequency?.timesPerWeek?.toString() || "1"}
-          onValueChange={(value) => onFrequencyChange(taskId, parseInt(value))}
+          onValueChange={(value) => onFrequencyChange(taskId, parseFloat(value))}
         >
-          <SelectTrigger>
+          <SelectTrigger id={`frequency-${taskId}`} className="w-full">
             <SelectValue placeholder="Select frequency" />
           </SelectTrigger>
-          <SelectContent>
-            {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
-              <SelectItem key={freq} value={freq.toString()}>
-                {freq} {freq === 1 ? 'time' : 'times'} per week
+          <SelectContent
+            position="popper"
+            className="bg-popover border border-border shadow-md z-[1000]"
+            style={{ 
+              minWidth: "200px",
+              maxHeight: "300px",
+              overflowY: "auto"
+            }}
+          >
+            {FREQUENCY_OPTIONS.map((option) => (
+              <SelectItem 
+                key={option.value} 
+                value={option.value}
+                className="cursor-pointer hover:bg-accent focus:bg-accent"
+              >
+                {option.label}
               </SelectItem>
             ))}
           </SelectContent>

@@ -4,6 +4,7 @@ import { toast } from '@/components/ui/use-toast';
 import { getRateById } from '@/data/rates/ratesManager';
 import { validateTaskData } from '@/utils/taskValidation';
 import { TIME_CONSTANTS } from '@/utils/constants';
+import { FREQUENCY_OPTIONS } from '@/constants/frequencyOptions';
 
 export const useTaskOperations = (
   selectedTasks: SelectedTask[],
@@ -42,16 +43,14 @@ export const useTaskOperations = (
         laborRate: defaultLaborRate
       };
 
-      setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => [...prev, newTask]);
+      setSelectedTasks(prev => [...prev, newTask]);
       
       toast({
         title: "Task Added",
         description: `${rate.task} has been added to your scope.`
       });
     } else {
-      setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => 
-        prev.filter(task => task.taskId !== taskId)
-      );
+      setSelectedTasks(prev => prev.filter(task => task.taskId !== taskId));
       
       toast({
         title: "Task Removed",
@@ -61,7 +60,7 @@ export const useTaskOperations = (
   }, [setSelectedTasks, defaultLaborRate]);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
-    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
+    setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
         if (!validateTaskData(task, quantity)) return task;
         
@@ -72,7 +71,7 @@ export const useTaskOperations = (
           task.frequency
         );
         
-        console.log('Updated task time:', {
+        console.log('Task time calculation:', {
           taskId,
           quantity,
           timeRequired,
@@ -90,11 +89,18 @@ export const useTaskOperations = (
   }, [calculateTaskTime, setSelectedTasks]);
 
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
-    setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
+    setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
+        const frequencyOption = FREQUENCY_OPTIONS.find(opt => parseFloat(opt.value) === timesPerWeek);
+        
+        if (!frequencyOption) {
+          console.error('Invalid frequency value:', timesPerWeek);
+          return task;
+        }
+
         const frequency = {
           timesPerWeek,
-          timesPerMonth: timesPerWeek * TIME_CONSTANTS.WEEKS_PER_MONTH
+          timesPerMonth: frequencyOption.timesPerMonth
         };
         
         const timeRequired = calculateTaskTime(
@@ -104,10 +110,12 @@ export const useTaskOperations = (
           frequency
         );
         
-        console.log('Updated task frequency:', {
+        console.log('Frequency update:', {
           taskId,
           frequency,
-          timeRequired
+          timeRequired,
+          timesPerWeek,
+          timesPerMonth: frequencyOption.timesPerMonth
         });
         
         return {
