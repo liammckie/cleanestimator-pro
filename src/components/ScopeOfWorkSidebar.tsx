@@ -25,7 +25,7 @@ interface ScopeOfWorkSidebarProps {
 export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
   sites = []
 }) => {
-  const { selectedTasks, handleTaskSelection, totalWeeklyHours } = useTaskContext();
+  const { selectedTasks, handleTaskSelection, totalWeeklyHours, totalMonthlyHours } = useTaskContext();
 
   const handleRemoveTask = (taskId: string, siteId?: string) => {
     handleTaskSelection(taskId, false, siteId);
@@ -59,6 +59,14 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
               <p className="text-2xl font-bold mt-2">{totalWeeklyHours.toFixed(1)}</p>
             </Card>
           </div>
+
+          <Card className="p-4 bg-accent/50">
+            <div className="flex items-center space-x-2">
+              <Clock className="w-4 h-4 text-primary" />
+              <p className="text-sm font-medium">Monthly Hours</p>
+            </div>
+            <p className="text-2xl font-bold mt-2">{totalMonthlyHours.toFixed(1)}</p>
+          </Card>
 
           {Object.entries(selectedTasks.reduce((acc, task) => {
             const siteName = task.siteName || 'Default Site';
