@@ -1,35 +1,34 @@
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import { AreaData, SelectedTask, TaskContextType } from './types';
-import { useTaskManagement } from '@/hooks/useTaskManagement';
+import React, { createContext, useContext, useMemo } from 'react';
+import { TaskContextType } from './types';
+import { useTaskInitialization } from '@/hooks/useTaskInitialization';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
 import { useTaskModifiers } from '@/hooks/useTaskModifiers';
-import { TIME_CONSTANTS } from '@/utils/constants';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 interface TaskProviderProps {
   children: React.ReactNode;
-  onTasksChange?: (area: AreaData) => void;
+  onTasksChange?: (area: any) => void;
   defaultLaborRate?: number;
 }
 
-export const TaskProvider: React.FC<TaskProviderProps> = React.memo(({ 
+export const TaskProvider = React.memo(({ 
   children, 
   onTasksChange,
   defaultLaborRate = 38 
-}) => {
-  const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
-  
-  const { calculateTaskTime } = useTaskManagement(
-    onTasksChange,
-    defaultLaborRate
-  );
+}: TaskProviderProps) => {
+  const {
+    selectedTasks,
+    setSelectedTasks,
+    calculateTaskTime,
+    calculateTotalHours
+  } = useTaskInitialization(onTasksChange, defaultLaborRate);
 
   const {
-    handleTaskSelection: baseHandleTaskSelection,
-    handleQuantityChange: baseHandleQuantityChange,
-    handleFrequencyChange: baseHandleFrequencyChange
-  } = useTaskOperations(selectedTasks, setSelectedTasks, calculateTaskTime, defaultLaborRate);
+    handleTaskSelection,
+    handleQuantityChange,
+    handleFrequencyChange
+  } = useTaskOperations(selectedTasks, setSelectedTasks, calculateTaskTime);
 
   const {
     handleToolChange,
@@ -37,51 +36,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = React.memo(({
     handleProductivityOverride
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
-  const calculateTotalHours = useCallback(() => {
-    if (!selectedTasks || selectedTasks.length === 0) {
-      return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
-    }
-
-    const totalMonthlyHours = selectedTasks.reduce((total, task) => 
-      total + (task.timeRequired || 0), 0);
-    
-    const totalWeeklyHours = totalMonthlyHours / TIME_CONSTANTS.WEEKS_PER_MONTH;
-    
-    return { totalWeeklyHours, totalMonthlyHours };
-  }, [selectedTasks]);
-
-  const handleTaskSelection = useCallback((
-    taskId: string, 
-    isSelected: boolean, 
-    siteId?: string, 
-    siteName?: string
-  ) => {
-    baseHandleTaskSelection(taskId, isSelected, siteId, siteName);
-  }, [baseHandleTaskSelection]);
-
-  const handleQuantityChange = useCallback((
-    taskId: string, 
-    quantity: number
-  ) => {
-    baseHandleQuantityChange(taskId, quantity);
-  }, [baseHandleQuantityChange]);
-
-  const handleFrequencyChange = useCallback((
-    taskId: string, 
-    timesPerWeek: number
-  ) => {
-    baseHandleFrequencyChange(taskId, timesPerWeek);
-  }, [baseHandleFrequencyChange]);
-
-  const [totalHours, setTotalHours] = useState({ 
-    totalWeeklyHours: 0, 
-    totalMonthlyHours: 0 
-  });
-
-  React.useEffect(() => {
-    const newTotalHours = calculateTotalHours();
-    setTotalHours(newTotalHours);
-  }, [selectedTasks, calculateTotalHours]);
+  const { totalWeeklyHours, totalMonthlyHours } = calculateTotalHours();
 
   const contextValue = useMemo(() => ({
     selectedTasks,
@@ -91,8 +46,8 @@ export const TaskProvider: React.FC<TaskProviderProps> = React.memo(({
     handleToolChange,
     handleLaborRateChange,
     handleProductivityOverride,
-    totalWeeklyHours: totalHours.totalWeeklyHours,
-    totalMonthlyHours: totalHours.totalMonthlyHours
+    totalWeeklyHours,
+    totalMonthlyHours
   }), [
     selectedTasks,
     handleTaskSelection,
@@ -101,8 +56,8 @@ export const TaskProvider: React.FC<TaskProviderProps> = React.memo(({
     handleToolChange,
     handleLaborRateChange,
     handleProductivityOverride,
-    totalHours.totalWeeklyHours,
-    totalHours.totalMonthlyHours
+    totalWeeklyHours,
+    totalMonthlyHours
   ]);
 
   return (
