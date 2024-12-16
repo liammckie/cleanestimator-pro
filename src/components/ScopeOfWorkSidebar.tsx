@@ -17,7 +17,7 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
 }) => {
   const { 
     selectedTasks, 
-    handleTaskSelection, 
+    handleTaskSelection,
     totalWeeklyHours, 
     totalMonthlyHours,
     handleQuantityChange,
@@ -25,10 +25,11 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
     handleToolChange 
   } = useTaskContext();
 
-  console.log('ScopeOfWorkSidebar rendering with tasks:', {
-    selectedTasks,
+  console.log('ScopeOfWorkSidebar rendering with:', {
     totalWeeklyHours,
-    totalMonthlyHours
+    totalMonthlyHours,
+    selectedTasksCount: selectedTasks.length,
+    tasks: selectedTasks
   });
 
   const handleRemoveTask = (taskId: string, siteId?: string) => {

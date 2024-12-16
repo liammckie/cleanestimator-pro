@@ -3,6 +3,7 @@ import { TaskContextType, SelectedTask } from './types';
 import { useTaskTimes } from '@/hooks/useTaskTimes';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
 import { useTaskModifiers } from '@/hooks/useTaskModifiers';
+import { toast } from '@/components/ui/use-toast';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
@@ -17,15 +18,12 @@ export const TaskProvider = React.memo(({
   onTasksChange,
   defaultLaborRate = 38 
 }: TaskProviderProps) => {
-  console.log('TASK_FLOW: TaskProvider mounting with props:', {
-    hasOnTasksChange: !!onTasksChange,
-    defaultLaborRate
-  });
-
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>(() => {
     try {
       const savedTasks = localStorage.getItem('selectedTasks');
-      return savedTasks ? JSON.parse(savedTasks) : [];
+      const parsedTasks = savedTasks ? JSON.parse(savedTasks) : [];
+      console.log('TASK_FLOW: Loaded tasks from storage:', parsedTasks);
+      return parsedTasks;
     } catch (error) {
       console.error('Error loading tasks from localStorage:', error);
       return [];
@@ -48,7 +46,6 @@ export const TaskProvider = React.memo(({
 
   const calculateTotalHours = useCallback(() => {
     if (!selectedTasks || selectedTasks.length === 0) {
-      console.log('HOURS_CALC: No tasks selected, returning 0');
       return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
     }
 
@@ -61,7 +58,8 @@ export const TaskProvider = React.memo(({
     console.log('TASK_FLOW: Hours calculation:', {
       totalWeeklyHours,
       totalMonthlyHours,
-      selectedTasksCount: selectedTasks.length
+      selectedTasksCount: selectedTasks.length,
+      tasks: selectedTasks
     });
 
     return { totalWeeklyHours, totalMonthlyHours };
@@ -77,10 +75,16 @@ export const TaskProvider = React.memo(({
     try {
       localStorage.setItem('selectedTasks', JSON.stringify(selectedTasks));
       console.log('TASK_FLOW: Tasks saved to localStorage:', {
-        taskCount: selectedTasks.length
+        taskCount: selectedTasks.length,
+        tasks: selectedTasks
       });
     } catch (error) {
       console.error('Error saving tasks to localStorage:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save tasks to local storage",
+        variant: "destructive",
+      });
     }
   }, [selectedTasks]);
 
@@ -88,7 +92,7 @@ export const TaskProvider = React.memo(({
   useEffect(() => {
     if (onTasksChange) {
       const areaData = {
-        squareMeters: 0,
+        squareMeters: selectedTasks.reduce((sum, task) => sum + (task.quantity || 0), 0),
         spaceType: '',
         industryType: '',
         selectedTasks: selectedTasks.map(task => ({
@@ -107,10 +111,11 @@ export const TaskProvider = React.memo(({
         }, 0)
       };
 
-      console.log('AREA_UPDATE: Updating area data:', {
+      console.log('TASK_FLOW: Updating area data:', {
         totalMonthlyHours,
         totalLaborCost: areaData.totalLaborCost,
-        taskCount: selectedTasks.length
+        taskCount: selectedTasks.length,
+        tasks: selectedTasks
       });
 
       onTasksChange(areaData);
@@ -139,12 +144,6 @@ export const TaskProvider = React.memo(({
     totalMonthlyHours
   ]);
 
-  console.log('TASK_FLOW: Context value updated:', {
-    selectedTasksCount: selectedTasks.length,
-    totalWeeklyHours,
-    totalMonthlyHours
-  });
-
   return (
     <TaskContext.Provider value={contextValue}>
       {children}
@@ -157,7 +156,6 @@ TaskProvider.displayName = 'TaskProvider';
 export const useTaskContext = () => {
   const context = useContext(TaskContext);
   if (context === undefined) {
-    console.error('TASK_FLOW: useTaskContext called outside of TaskProvider');
     throw new Error('useTaskContext must be used within a TaskProvider');
   }
   return context;
