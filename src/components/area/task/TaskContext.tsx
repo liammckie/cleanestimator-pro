@@ -26,9 +26,9 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   );
 
   const {
-    handleTaskSelection,
-    handleQuantityChange,
-    handleFrequencyChange
+    handleTaskSelection: baseHandleTaskSelection,
+    handleQuantityChange: baseHandleQuantityChange,
+    handleFrequencyChange: baseHandleFrequencyChange
   } = useTaskOperations(selectedTasks, setSelectedTasks, calculateTaskTime, defaultLaborRate);
 
   const {
@@ -87,7 +87,41 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
 
   const [totalHours, setTotalHours] = useState({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
 
-  // Add immediate logging when selectedTasks changes
+  // Wrap the task selection handler to add logging
+  const handleTaskSelection = (taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
+    console.log('HOURS_CALC Task selection triggered:', {
+      taskId,
+      isSelected,
+      siteId,
+      siteName,
+      currentTaskCount: selectedTasks.length
+    });
+    
+    baseHandleTaskSelection(taskId, isSelected, siteId, siteName);
+  };
+
+  // Wrap quantity change handler to add logging
+  const handleQuantityChange = (taskId: string, quantity: number) => {
+    console.log('HOURS_CALC Quantity change triggered:', {
+      taskId,
+      quantity,
+      currentTask: selectedTasks.find(t => t.taskId === taskId)
+    });
+    
+    baseHandleQuantityChange(taskId, quantity);
+  };
+
+  // Wrap frequency change handler to add logging
+  const handleFrequencyChange = (taskId: string, timesPerWeek: number) => {
+    console.log('HOURS_CALC Frequency change triggered:', {
+      taskId,
+      timesPerWeek,
+      currentTask: selectedTasks.find(t => t.taskId === taskId)
+    });
+    
+    baseHandleFrequencyChange(taskId, timesPerWeek);
+  };
+
   useEffect(() => {
     console.log('HOURS_CALC Tasks state changed:', {
       taskCount: selectedTasks.length,
