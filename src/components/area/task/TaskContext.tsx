@@ -38,12 +38,11 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   const calculateTotalHours = () => {
     const totalMonthlyHours = selectedTasks.reduce((total, task) => {
       const taskMonthlyHours = task.timeRequired || 0;
-      console.log('Task hours calculation:', {
+      console.log('Individual task calculation:', {
         taskId: task.taskId,
         timeRequired: task.timeRequired,
         frequency: task.frequency,
-        monthlyHours: taskMonthlyHours,
-        quantity: task.quantity
+        monthlyHours: taskMonthlyHours
       });
       return total + taskMonthlyHours;
     }, 0);
@@ -68,6 +67,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
 
   useEffect(() => {
     const newTotalHours = calculateTotalHours();
+    console.log('Updating total hours:', newTotalHours);
     setTotalHours(newTotalHours);
   }, [selectedTasks]);
 
