@@ -134,6 +134,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                         value={selectedTask.quantity || ''}
                         onChange={(e) => handleQuantityUpdate(rate.id, Number(e.target.value))}
                         min={0}
+                        className="bg-background"
                       />
                     </div>
 
@@ -143,12 +144,24 @@ export const TaskList: React.FC<TaskListProps> = ({
                         value={selectedTask.frequency.timesPerWeek.toString()}
                         onValueChange={(value) => handleFrequencyUpdate(rate.id, value)}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-background">
                           <SelectValue placeholder="Select frequency" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent
+                          position="popper"
+                          className="bg-popover border border-border shadow-md z-[1000]"
+                          style={{ 
+                            minWidth: "200px",
+                            maxHeight: "300px",
+                            overflowY: "auto"
+                          }}
+                        >
                           {frequencyOptions.map((freq) => (
-                            <SelectItem key={freq.value} value={freq.value}>
+                            <SelectItem 
+                              key={freq.value} 
+                              value={freq.value}
+                              className="cursor-pointer hover:bg-accent focus:bg-accent"
+                            >
                               {freq.label}
                             </SelectItem>
                           ))}
