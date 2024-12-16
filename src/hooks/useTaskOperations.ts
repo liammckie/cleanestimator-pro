@@ -9,7 +9,16 @@ export const useTaskOperations = (
   calculateTaskTime: any,
   defaultLaborRate: number = 38
 ) => {
-  console.log('TASK_FLOW: useTaskOperations initialized');
+  console.log('TASK_OPERATIONS: Current selected tasks:', {
+    count: selectedTasks.length,
+    tasks: selectedTasks.map(task => ({
+      taskId: task.taskId,
+      quantity: task.quantity,
+      timeRequired: task.timeRequired,
+      weeklyHours: task.timeRequired * task.frequency.timesPerWeek,
+      monthlyHours: task.timeRequired * task.frequency.timesPerMonth
+    }))
+  });
 
   const handleTaskSelection = useCallback((
     taskId: string,
@@ -17,6 +26,13 @@ export const useTaskOperations = (
     siteId?: string,
     siteName?: string
   ) => {
+    console.log('TASK_OPERATIONS: Task selection changed:', {
+      taskId,
+      isSelected,
+      siteId,
+      siteName
+    });
+
     if (isSelected) {
       const rate = getRateById(taskId);
       if (!rate) {
@@ -43,18 +59,34 @@ export const useTaskOperations = (
         laborRate: defaultLaborRate
       };
 
-      setSelectedTasks(prev => [...prev, newTask]);
+      setSelectedTasks(prev => {
+        const updated = [...prev, newTask];
+        console.log('TASK_OPERATIONS: Added new task:', {
+          task: newTask,
+          totalTasks: updated.length
+        });
+        return updated;
+      });
       
       toast({
         title: "Task Added",
         description: `${rate.task} has been added to your scope.`
       });
     } else {
-      setSelectedTasks(prev => prev.filter(task => task.taskId !== taskId));
+      setSelectedTasks(prev => {
+        const updated = prev.filter(task => task.taskId !== taskId);
+        console.log('TASK_OPERATIONS: Removed task:', {
+          taskId,
+          remainingTasks: updated.length
+        });
+        return updated;
+      });
     }
   }, [setSelectedTasks, defaultLaborRate]);
 
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
+    console.log('TASK_OPERATIONS: Quantity changed:', { taskId, quantity });
+    
     setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
         const timeRequired = calculateTaskTime(
@@ -63,6 +95,15 @@ export const useTaskOperations = (
           task.selectedTool,
           task.frequency
         );
+        
+        console.log('TASK_OPERATIONS: Updated task time:', {
+          taskId,
+          quantity,
+          timeRequired,
+          weeklyHours: timeRequired * task.frequency.timesPerWeek,
+          monthlyHours: timeRequired * task.frequency.timesPerMonth
+        });
+        
         return {
           ...task,
           quantity,
@@ -74,6 +115,8 @@ export const useTaskOperations = (
   }, [calculateTaskTime]);
 
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
+    console.log('TASK_OPERATIONS: Frequency changed:', { taskId, timesPerWeek });
+    
     setSelectedTasks(prev => prev.map(task => {
       if (task.taskId === taskId) {
         const frequency = {
@@ -87,6 +130,14 @@ export const useTaskOperations = (
           task.selectedTool,
           frequency
         );
+
+        console.log('TASK_OPERATIONS: Updated task frequency:', {
+          taskId,
+          frequency,
+          timeRequired,
+          weeklyHours: timeRequired * frequency.timesPerWeek,
+          monthlyHours: timeRequired * frequency.timesPerMonth
+        });
 
         return {
           ...task,

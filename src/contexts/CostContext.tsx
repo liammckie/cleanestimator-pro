@@ -14,19 +14,27 @@ interface CostContextType {
 const CostContext = createContext<CostContextType | undefined>(undefined);
 
 export const CostProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Initialize state with default values
   const [totalLaborCost, setTotalLaborCost] = useState(0);
   const [totalEquipmentCost, setTotalEquipmentCost] = useState(0);
   const [totalWeeklyHours, setTotalWeeklyHours] = useState(0);
-  const [laborRate, setLaborRate] = useState(38); // Default labor rate
+  const [laborRate, setLaborRate] = useState(38);
 
   // Try to get task context, but provide fallback if not available
   let selectedTasks: any[] = [];
   try {
     const taskContext = useTaskContext();
     selectedTasks = taskContext?.selectedTasks || [];
+    console.log('COST_CONTEXT: Retrieved tasks from context:', {
+      taskCount: selectedTasks.length,
+      tasks: selectedTasks.map(task => ({
+        taskId: task.taskId,
+        timeRequired: task.timeRequired,
+        weeklyHours: task.timeRequired * task.frequency.timesPerWeek,
+        monthlyHours: task.timeRequired * task.frequency.timesPerMonth
+      }))
+    });
   } catch (error) {
-    console.log('Task context not available yet, using default values');
+    console.log('COST_CONTEXT: Task context not available yet, using default values');
   }
 
   useEffect(() => {
@@ -42,23 +50,27 @@ export const CostProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTotalWeeklyHours(weeklyHours);
     setTotalLaborCost(laborCost);
     
-    console.log('Updated calculations:', {
+    console.log('COST_CONTEXT: Updated calculations:', {
       weeklyHours,
       monthlyHours,
       laborRate,
-      laborCost
+      laborCost,
+      selectedTasks: selectedTasks.length
     });
   }, [selectedTasks, laborRate]);
 
   const updateLaborCost = (cost: number) => {
+    console.log('COST_CONTEXT: Updating labor cost:', cost);
     setTotalLaborCost(cost);
   };
 
   const updateEquipmentCost = (cost: number) => {
+    console.log('COST_CONTEXT: Updating equipment cost:', cost);
     setTotalEquipmentCost(cost);
   };
 
   const updateLaborRate = (rate: number) => {
+    console.log('COST_CONTEXT: Updating labor rate:', rate);
     setLaborRate(rate);
   };
 
