@@ -47,7 +47,7 @@ const defaultOnCosts: OnCostsState = {
 };
 
 export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => {
-  const { totalWeeklyHours, totalMonthlyHours } = useTaskContext();
+  const { totalWeeklyHours = 0, totalMonthlyHours = 0 } = useTaskContext();
   const { updateLaborRate } = useCostContext();
   const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
   const [contractedRate, setContractedRate] = useState<number>(38);
