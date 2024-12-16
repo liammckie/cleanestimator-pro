@@ -1,167 +1,123 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { toast } from '@/components/ui/use-toast';
-import { getTaskById } from '@/data/tasks/cleaningProductivityRates';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { TaskContextType, SelectedTask } from './types';
-import { calculateTaskTime } from '@/hooks/useTaskTimes';
+import { useTaskTimes } from '@/hooks/useTaskTimes';
+import { useTaskOperations } from '@/hooks/useTaskOperations';
+import { useTaskModifiers } from '@/hooks/useTaskModifiers';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 interface TaskProviderProps {
   children: React.ReactNode;
-  onTasksChange?: (data: any) => void;
+  onTasksChange?: (area: any) => void;
   defaultLaborRate?: number;
 }
 
-export const TaskProvider: React.FC<TaskProviderProps> = ({
-  children,
+export const TaskProvider = React.memo(({ 
+  children, 
   onTasksChange,
-  defaultLaborRate = 38
-}) => {
+  defaultLaborRate = 38 
+}: TaskProviderProps) => {
+  console.log('TASK_FLOW: TaskProvider mounting with props:', {
+    hasOnTasksChange: !!onTasksChange,
+    defaultLaborRate
+  });
+
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>(() => {
     try {
       const savedTasks = localStorage.getItem('selectedTasks');
       return savedTasks ? JSON.parse(savedTasks) : [];
     } catch (error) {
-      console.error('Error loading tasks:', error);
+      console.error('Error loading tasks from localStorage:', error);
       return [];
     }
   });
 
-  const handleTaskSelection = (taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
-    if (isSelected) {
-      const task = getTaskById(taskId);
-      if (!task) {
-        toast({
-          title: "Error",
-          description: "Task not found",
-          variant: "destructive",
-        });
-        return;
-      }
+  const { calculateTaskTime } = useTaskTimes();
 
-      const newTask: SelectedTask = {
-        taskId,
-        siteId,
-        siteName,
-        quantity: 0,
-        timeRequired: 0,
-        frequency: {
-          timesPerWeek: 1,
-          timesPerMonth: 4.33
-        },
-        selectedTool: task.defaultTool,
-        laborRate: defaultLaborRate
-      };
+  const {
+    handleTaskSelection,
+    handleQuantityChange,
+    handleFrequencyChange
+  } = useTaskOperations(selectedTasks, setSelectedTasks, calculateTaskTime, defaultLaborRate);
 
-      setSelectedTasks(prev => [...prev, newTask]);
-      
-      toast({
-        title: "Task Added",
-        description: `${task.name} has been added to your scope.`
-      });
-    } else {
-      setSelectedTasks(prev => 
-        prev.filter(task => !(task.taskId === taskId && task.siteId === siteId))
-      );
+  const {
+    handleToolChange,
+    handleLaborRateChange,
+    handleProductivityOverride
+  } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
+
+  const calculateTotalHours = useCallback(() => {
+    if (!selectedTasks || selectedTasks.length === 0) {
+      console.log('HOURS_CALC: No tasks selected, returning 0');
+      return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
     }
-  };
 
-  const handleQuantityChange = (taskId: string, quantity: number) => {
-    setSelectedTasks(prev => prev.map(task => {
-      if (task.taskId === taskId) {
-        const timeRequired = calculateTaskTime(
-          taskId,
-          quantity,
-          task.selectedTool,
-          task.frequency
-        );
-        return { ...task, quantity, timeRequired };
-      }
-      return task;
-    }));
-  };
+    const totalMonthlyHours = selectedTasks.reduce((total, task) => {
+      return total + (task.timeRequired * task.frequency.timesPerMonth);
+    }, 0);
 
-  const handleFrequencyChange = (taskId: string, timesPerWeek: number) => {
-    setSelectedTasks(prev => prev.map(task => {
-      if (task.taskId === taskId) {
-        const frequency = {
-          timesPerWeek,
-          timesPerMonth: timesPerWeek * 4.33
-        };
-        const timeRequired = calculateTaskTime(
-          taskId,
-          task.quantity,
-          task.selectedTool,
-          frequency
-        );
-        return { ...task, frequency, timeRequired };
-      }
-      return task;
-    }));
-  };
+    const totalWeeklyHours = totalMonthlyHours / 4.33;
 
-  const handleToolChange = (taskId: string, tool: string) => {
-    setSelectedTasks(prev => prev.map(task => {
-      if (task.taskId === taskId) {
-        const timeRequired = calculateTaskTime(
-          taskId,
-          task.quantity,
-          tool,
-          task.frequency
-        );
-        return { ...task, selectedTool: tool, timeRequired };
-      }
-      return task;
-    }));
-  };
+    console.log('TASK_FLOW: Hours calculation:', {
+      totalWeeklyHours,
+      totalMonthlyHours,
+      selectedTasksCount: selectedTasks.length
+    });
 
-  const handleLaborRateChange = (taskId: string, rate: number) => {
-    setSelectedTasks(prev => prev.map(task => {
-      if (task.taskId === taskId) {
-        return { ...task, laborRate: rate };
-      }
-      return task;
-    }));
-  };
-
-  const handleProductivityOverride = (taskId: string, override: number) => {
-    setSelectedTasks(prev => prev.map(task => {
-      if (task.taskId === taskId) {
-        const timeRequired = calculateTaskTime(
-          taskId,
-          task.quantity,
-          task.selectedTool,
-          task.frequency
-        );
-        return { ...task, productivityOverride: override, timeRequired };
-      }
-      return task;
-    }));
-  };
-
-  const { totalWeeklyHours, totalMonthlyHours } = useMemo(() => {
-    const monthlyHours = selectedTasks.reduce((total, task) => 
-      total + (task.timeRequired * task.frequency.timesPerMonth), 0);
-    
-    return {
-      totalMonthlyHours: monthlyHours,
-      totalWeeklyHours: monthlyHours / 4.33
-    };
+    return { totalWeeklyHours, totalMonthlyHours };
   }, [selectedTasks]);
 
+  const { totalWeeklyHours, totalMonthlyHours } = useMemo(() => 
+    calculateTotalHours(),
+    [calculateTotalHours]
+  );
+
+  // Save tasks to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('selectedTasks', JSON.stringify(selectedTasks));
-    
-    if (onTasksChange) {
-      onTasksChange({
-        selectedTasks,
-        totalMonthlyHours,
-        totalLaborCost: totalMonthlyHours * defaultLaborRate
+    try {
+      localStorage.setItem('selectedTasks', JSON.stringify(selectedTasks));
+      console.log('TASK_FLOW: Tasks saved to localStorage:', {
+        taskCount: selectedTasks.length
       });
+    } catch (error) {
+      console.error('Error saving tasks to localStorage:', error);
+    }
+  }, [selectedTasks]);
+
+  // Update area data when tasks change
+  useEffect(() => {
+    if (onTasksChange) {
+      const areaData = {
+        squareMeters: 0,
+        spaceType: '',
+        industryType: '',
+        selectedTasks: selectedTasks.map(task => ({
+          taskId: task.taskId,
+          quantity: task.quantity,
+          timeRequired: task.timeRequired,
+          frequency: task.frequency,
+          productivityOverride: task.productivityOverride,
+          selectedTool: task.selectedTool,
+          laborRate: task.laborRate || defaultLaborRate
+        })),
+        totalTime: totalMonthlyHours,
+        totalLaborCost: selectedTasks.reduce((sum, task) => {
+          const hourlyRate = task.laborRate || defaultLaborRate;
+          return sum + (task.timeRequired * hourlyRate * task.frequency.timesPerMonth);
+        }, 0)
+      };
+
+      console.log('AREA_UPDATE: Updating area data:', {
+        totalMonthlyHours,
+        totalLaborCost: areaData.totalLaborCost,
+        taskCount: selectedTasks.length
+      });
+
+      onTasksChange(areaData);
     }
   }, [selectedTasks, totalMonthlyHours, onTasksChange, defaultLaborRate]);
 
-  const contextValue = {
+  const contextValue = useMemo(() => ({
     selectedTasks,
     handleTaskSelection,
     handleQuantityChange,
@@ -171,18 +127,37 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     handleProductivityOverride,
     totalWeeklyHours,
     totalMonthlyHours
-  };
+  }), [
+    selectedTasks,
+    handleTaskSelection,
+    handleQuantityChange,
+    handleFrequencyChange,
+    handleToolChange,
+    handleLaborRateChange,
+    handleProductivityOverride,
+    totalWeeklyHours,
+    totalMonthlyHours
+  ]);
+
+  console.log('TASK_FLOW: Context value updated:', {
+    selectedTasksCount: selectedTasks.length,
+    totalWeeklyHours,
+    totalMonthlyHours
+  });
 
   return (
     <TaskContext.Provider value={contextValue}>
       {children}
     </TaskContext.Provider>
   );
-};
+});
+
+TaskProvider.displayName = 'TaskProvider';
 
 export const useTaskContext = () => {
   const context = useContext(TaskContext);
-  if (!context) {
+  if (context === undefined) {
+    console.error('TASK_FLOW: useTaskContext called outside of TaskProvider');
     throw new Error('useTaskContext must be used within a TaskProvider');
   }
   return context;

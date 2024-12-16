@@ -21,8 +21,6 @@ export const TaskList = ({
   onToolChange,
   onRemoveTask
 }: TaskListProps) => {
-  console.log('TaskList rendering with tasks:', selectedTasks);
-
   if (selectedTasks.length === 0) {
     return (
       <div className="text-center p-8 text-muted-foreground">

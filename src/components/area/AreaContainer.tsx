@@ -1,6 +1,7 @@
 import React from 'react';
 import { CategoryPanel } from './CategoryPanel';
 import { TaskManager } from './TaskManager';
+import { TaskProvider } from './task/TaskContext';
 import { TimeDisplay } from './TimeDisplay';
 import { AreaData } from './task/types';
 
@@ -14,8 +15,10 @@ export const AreaContainer: React.FC<AreaContainerProps> = ({ onAreaChange }) =>
   return (
     <div className="space-y-4">
       <CategoryPanel value={category} onValueChange={setCategory} />
-      <TaskManager category={category} />
-      <TimeDisplay selectedTasks={[]} />
+      <TaskProvider onTasksChange={onAreaChange}>
+        <TaskManager category={category} />
+        <TimeDisplay selectedTasks={[]} />
+      </TaskProvider>
     </div>
   );
 };
