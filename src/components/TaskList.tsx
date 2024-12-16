@@ -10,6 +10,7 @@ import { TaskSearchInput } from './task/TaskSearchInput';
 import { TaskFrequencySelect } from './task/TaskFrequencySelect';
 import { TaskTimeRequirements } from './task/TaskTimeRequirements';
 import { TIME_CONSTANTS } from '@/utils/constants';
+import { getRatesByCategory } from '@/data/rates/ratesManager';
 
 interface TaskListProps {
   category: string;
