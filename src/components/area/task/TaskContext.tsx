@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { AreaData, SelectedTask, TaskContextType } from './types';
 import { useTaskManagement } from '@/hooks/useTaskManagement';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
@@ -42,30 +42,43 @@ export const TaskProvider: React.FC<TaskProviderProps> = React.memo(({
       return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
     }
 
-    const totalMonthlyHours = selectedTasks.reduce((total, task) => {
-      return total + (task.timeRequired || 0);
-    }, 0);
+    const totalMonthlyHours = selectedTasks.reduce((total, task) => 
+      total + (task.timeRequired || 0), 0);
     
     const totalWeeklyHours = totalMonthlyHours / TIME_CONSTANTS.WEEKS_PER_MONTH;
     
     return { totalWeeklyHours, totalMonthlyHours };
   }, [selectedTasks]);
 
-  const handleTaskSelection = useCallback((taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
+  const handleTaskSelection = useCallback((
+    taskId: string, 
+    isSelected: boolean, 
+    siteId?: string, 
+    siteName?: string
+  ) => {
     baseHandleTaskSelection(taskId, isSelected, siteId, siteName);
   }, [baseHandleTaskSelection]);
 
-  const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
+  const handleQuantityChange = useCallback((
+    taskId: string, 
+    quantity: number
+  ) => {
     baseHandleQuantityChange(taskId, quantity);
   }, [baseHandleQuantityChange]);
 
-  const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
+  const handleFrequencyChange = useCallback((
+    taskId: string, 
+    timesPerWeek: number
+  ) => {
     baseHandleFrequencyChange(taskId, timesPerWeek);
   }, [baseHandleFrequencyChange]);
 
-  const [totalHours, setTotalHours] = useState({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
+  const [totalHours, setTotalHours] = useState({ 
+    totalWeeklyHours: 0, 
+    totalMonthlyHours: 0 
+  });
 
-  useEffect(() => {
+  React.useEffect(() => {
     const newTotalHours = calculateTotalHours();
     setTotalHours(newTotalHours);
   }, [selectedTasks, calculateTotalHours]);
