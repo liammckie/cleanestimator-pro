@@ -27,63 +27,23 @@ const TaskManagementContent = React.memo(({
 
 TaskManagementContent.displayName = 'TaskManagementContent';
 
-const AppContent = React.memo(({
-  activeTab,
-  onAreaChange,
+const AppLayout = React.memo(({
+  children,
   sites,
-  laborCosts,
-  equipmentCosts,
-  contractDetails,
-  costBreakdown,
-  monthlyRevenue,
-  overhead,
-  setLaborCosts,
-  setEquipmentCosts,
-  setContractDetails,
-  setSites,
-  formattedMenuOptions,
-  onTabChange
-}: any) => (
-  <div className="container mx-auto px-4 py-8">
-    <h1 className="text-3xl font-bold text-primary mb-8">
-      Commercial Cleaning Estimation Tool
-    </h1>
-    
-    <Tabs value={activeTab} onValueChange={onTabChange}>
-      <div className="flex">
-        <DynamicMenu 
-          options={formattedMenuOptions} 
-          className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
-        />
-        <div className="flex flex-1">
-          <div className="flex-1 px-6">
-            <MainNavigation />
-            <MainContent
-              sites={sites}
-              onSitesChange={setSites}
-              laborCosts={laborCosts}
-              setLaborCosts={setLaborCosts}
-              equipmentCosts={equipmentCosts}
-              setEquipmentCosts={setEquipmentCosts}
-              contractDetails={contractDetails}
-              setContractDetails={setContractDetails}
-              costBreakdown={costBreakdown}
-              monthlyRevenue={monthlyRevenue}
-              overhead={overhead}
-            />
-            <TaskManagementContent 
-              activeTab={activeTab} 
-              onAreaChange={onAreaChange}
-            />
-          </div>
-          <ScopeOfWorkSidebar sites={sites} />
-        </div>
-      </div>
-    </Tabs>
+}: {
+  children: React.ReactNode;
+  sites: any[];
+}) => (
+  <div className="flex flex-1">
+    <div className="flex-1 px-6">
+      <MainNavigation />
+      {children}
+    </div>
+    <ScopeOfWorkSidebar sites={sites} />
   </div>
 ));
 
-AppContent.displayName = 'AppContent';
+AppLayout.displayName = 'AppLayout';
 
 const Index = () => {
   const [sites, setSites] = useState([]);
@@ -142,24 +102,38 @@ const Index = () => {
           defaultLaborRate={laborCosts.hourlyRate}
         >
           <div className="min-h-screen flex w-full bg-background">
-            <div className="flex-1">
-              <AppContent
-                activeTab={activeTab}
-                onAreaChange={handleAreaChange}
-                sites={sites}
-                laborCosts={laborCosts}
-                equipmentCosts={equipmentCosts}
-                contractDetails={contractDetails}
-                costBreakdown={costBreakdown}
-                monthlyRevenue={monthlyRevenue}
-                overhead={overhead}
-                setLaborCosts={setLaborCosts}
-                setEquipmentCosts={setEquipmentCosts}
-                setContractDetails={setContractDetails}
-                setSites={setSites}
-                formattedMenuOptions={formattedMenuOptions}
-                onTabChange={handleTabChange}
-              />
+            <div className="container mx-auto px-4 py-8">
+              <h1 className="text-3xl font-bold text-primary mb-8">
+                Commercial Cleaning Estimation Tool
+              </h1>
+              
+              <Tabs value={activeTab} onValueChange={handleTabChange}>
+                <div className="flex">
+                  <DynamicMenu 
+                    options={formattedMenuOptions} 
+                    className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
+                  />
+                  <AppLayout sites={sites}>
+                    <MainContent
+                      sites={sites}
+                      onSitesChange={setSites}
+                      laborCosts={laborCosts}
+                      setLaborCosts={setLaborCosts}
+                      equipmentCosts={equipmentCosts}
+                      setEquipmentCosts={setEquipmentCosts}
+                      contractDetails={contractDetails}
+                      setContractDetails={setContractDetails}
+                      costBreakdown={costBreakdown}
+                      monthlyRevenue={monthlyRevenue}
+                      overhead={overhead}
+                    />
+                    <TaskManagementContent 
+                      activeTab={activeTab} 
+                      onAreaChange={handleAreaChange}
+                    />
+                  </AppLayout>
+                </div>
+              </Tabs>
             </div>
           </div>
         </TaskProvider>
