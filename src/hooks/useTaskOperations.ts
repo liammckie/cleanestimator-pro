@@ -9,15 +9,6 @@ export const useTaskOperations = (
   calculateTaskTime: any,
   defaultLaborRate: number = 38
 ) => {
-  console.log('TASK_OPERATIONS: Hook initialized with:', {
-    selectedTasksCount: selectedTasks.length,
-    tasks: selectedTasks.map(task => ({
-      taskId: task.taskId,
-      quantity: task.quantity,
-      timeRequired: task.timeRequired
-    }))
-  });
-
   const handleTaskSelection = useCallback((
     taskId: string,
     isSelected: boolean,
@@ -29,7 +20,7 @@ export const useTaskOperations = (
       isSelected,
       siteId,
       siteName,
-      currentTaskCount: selectedTasks.length
+      currentTasks: selectedTasks
     });
 
     if (isSelected) {
@@ -48,7 +39,7 @@ export const useTaskOperations = (
         taskId,
         siteId,
         siteName,
-        quantity: 0,
+        quantity: rate.defaultQuantity || 0,
         timeRequired: 0,
         frequency: {
           timesPerWeek: 1,
@@ -59,24 +50,32 @@ export const useTaskOperations = (
       };
 
       setSelectedTasks(prev => {
+        const taskExists = prev.some(task => task.taskId === taskId && task.siteId === siteId);
+        if (taskExists) {
+          console.log('TASK_OPERATIONS: Task already exists:', taskId);
+          return prev;
+        }
+        
         const updated = [...prev, newTask];
         console.log('TASK_OPERATIONS: Added new task:', {
           newTask,
-          totalTasksAfterAdd: updated.length
+          updatedTasks: updated
         });
         return updated;
       });
-      
+
       toast({
         title: "Task Added",
         description: `${rate.task} has been added to your scope.`
       });
     } else {
       setSelectedTasks(prev => {
-        const updated = prev.filter(task => task.taskId !== taskId);
+        const updated = prev.filter(task => 
+          !(task.taskId === taskId && task.siteId === siteId)
+        );
         console.log('TASK_OPERATIONS: Removed task:', {
           taskId,
-          remainingTasks: updated.length
+          remainingTasks: updated
         });
         return updated;
       });
@@ -86,8 +85,8 @@ export const useTaskOperations = (
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
     console.log('TASK_OPERATIONS: Updating quantity:', {
       taskId,
-      newQuantity: quantity,
-      currentTask: selectedTasks.find(t => t.taskId === taskId)
+      quantity,
+      currentTasks: selectedTasks
     });
     
     setSelectedTasks(prev => prev.map(task => {
@@ -98,14 +97,6 @@ export const useTaskOperations = (
           task.selectedTool,
           task.frequency
         );
-        
-        console.log('TASK_OPERATIONS: Updated task time:', {
-          taskId,
-          quantity,
-          timeRequired,
-          weeklyHours: timeRequired * task.frequency.timesPerWeek,
-          monthlyHours: timeRequired * task.frequency.timesPerMonth
-        });
         
         return {
           ...task,
@@ -120,8 +111,8 @@ export const useTaskOperations = (
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
     console.log('TASK_OPERATIONS: Updating frequency:', {
       taskId,
-      newTimesPerWeek: timesPerWeek,
-      currentTask: selectedTasks.find(t => t.taskId === taskId)
+      timesPerWeek,
+      currentTasks: selectedTasks
     });
     
     setSelectedTasks(prev => prev.map(task => {
@@ -137,14 +128,6 @@ export const useTaskOperations = (
           task.selectedTool,
           frequency
         );
-
-        console.log('TASK_OPERATIONS: Updated task frequency:', {
-          taskId,
-          frequency,
-          timeRequired,
-          weeklyHours: timeRequired * frequency.timesPerWeek,
-          monthlyHours: timeRequired * frequency.timesPerMonth
-        });
 
         return {
           ...task,

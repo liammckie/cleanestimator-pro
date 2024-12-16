@@ -22,7 +22,7 @@ export const TaskProvider = React.memo(({
     try {
       const savedTasks = localStorage.getItem('selectedTasks');
       const parsedTasks = savedTasks ? JSON.parse(savedTasks) : [];
-      console.log('TASK_FLOW: Loaded tasks from storage:', parsedTasks);
+      console.log('TASK_FLOW: Loading tasks from storage:', parsedTasks);
       return parsedTasks;
     } catch (error) {
       console.error('Error loading tasks from localStorage:', error);
@@ -55,7 +55,7 @@ export const TaskProvider = React.memo(({
 
     const totalWeeklyHours = totalMonthlyHours / 4.33;
 
-    console.log('TASK_FLOW: Hours calculation:', {
+    console.log('TASK_FLOW: Calculating hours:', {
       totalWeeklyHours,
       totalMonthlyHours,
       selectedTasksCount: selectedTasks.length,
@@ -74,7 +74,7 @@ export const TaskProvider = React.memo(({
   useEffect(() => {
     try {
       localStorage.setItem('selectedTasks', JSON.stringify(selectedTasks));
-      console.log('TASK_FLOW: Tasks saved to localStorage:', {
+      console.log('TASK_FLOW: Saving tasks to localStorage:', {
         taskCount: selectedTasks.length,
         tasks: selectedTasks
       });
@@ -111,13 +111,7 @@ export const TaskProvider = React.memo(({
         }, 0)
       };
 
-      console.log('TASK_FLOW: Updating area data:', {
-        totalMonthlyHours,
-        totalLaborCost: areaData.totalLaborCost,
-        taskCount: selectedTasks.length,
-        tasks: selectedTasks
-      });
-
+      console.log('TASK_FLOW: Updating area data:', areaData);
       onTasksChange(areaData);
     }
   }, [selectedTasks, totalMonthlyHours, onTasksChange, defaultLaborRate]);
