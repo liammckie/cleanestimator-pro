@@ -12,12 +12,18 @@ import { ScopeOfWork } from '@/components/scope/ScopeOfWork';
 import { FinancialTabs } from '@/components/financial/FinancialTabs';
 import { useCostCalculations } from '@/hooks/useCostCalculations';
 
-interface MainContentProps {
+export interface MainContentProps {
   sites: any[];
   onSitesChange: (sites: any[]) => void;
-  laborCosts: any;
+  laborCosts: {
+    weeklyHours: number;
+    monthlyHours: number;
+    annualHours: number;
+    laborCost: number;
+    totalMonthlyCost: number;
+  };
   setLaborCosts: (costs: any) => void;
-  equipmentCosts: any;
+  equipmentCosts: { monthly: number };
   setEquipmentCosts: (costs: any) => void;
   contractDetails: any;
   setContractDetails: (details: any) => void;
@@ -82,18 +88,20 @@ export const MainContent: React.FC<MainContentProps> = ({
         <CostSummary costs={costBreakdown} />
       </TabsContent>
 
-      <FinancialTabs
-        laborCosts={laborCosts}
-        setLaborCosts={setLaborCosts}
-        monthlyRevenue={monthlyRevenue}
-        overhead={overhead}
-        costBreakdown={costBreakdown}
-        equipmentCosts={equipmentCosts}
-        contractDetails={contractDetails}
-        setContractDetails={setContractDetails}
-        taskCosts={taskCosts}
-        onMarginChange={handleMarginChange}
-      />
+      <TabsContent value="financial" className="space-y-6">
+        <FinancialTabs
+          laborCosts={laborCosts}
+          setLaborCosts={setLaborCosts}
+          monthlyRevenue={monthlyRevenue}
+          overhead={overhead}
+          costBreakdown={costBreakdown}
+          equipmentCosts={equipmentCosts}
+          contractDetails={contractDetails}
+          setContractDetails={setContractDetails}
+          taskCosts={taskCosts}
+          onMarginChange={handleMarginChange}
+        />
+      </TabsContent>
 
       <TabsContent value="settings" className="space-y-6">
         <AwardSettings

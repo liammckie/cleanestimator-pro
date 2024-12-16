@@ -1,6 +1,12 @@
-export interface TaskFrequency {
-  timesPerWeek: number;
-  timesPerMonth: number;
+import { ProductivityRate } from '@/data/types/productivity';
+
+export interface AreaData {
+  squareMeters: number;
+  spaceType: string;
+  industryType: string;
+  selectedTasks: SelectedTask[];
+  totalTime: number;
+  totalLaborCost: number;
 }
 
 export interface SelectedTask {
@@ -9,9 +15,12 @@ export interface SelectedTask {
   siteName?: string;
   quantity: number;
   timeRequired: number;
-  frequency: TaskFrequency;
-  productivityOverride?: number;
+  frequency: {
+    timesPerWeek: number;
+    timesPerMonth: number;
+  };
   selectedTool?: string;
+  productivityOverride?: number;
   laborRate?: number;
 }
 
