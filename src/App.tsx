@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { MainContent } from './components/layout/MainContent';
 import { TaskProvider } from './components/area/task/TaskContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 import { Site } from './data/types/site';
 import './App.css';
 
@@ -34,21 +35,23 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <TaskProvider>
-        <MainContent
-          sites={sites}
-          onSitesChange={setSites}
-          laborCosts={laborCosts}
-          setLaborCosts={setLaborCosts}
-          equipmentCosts={equipmentCosts}
-          setEquipmentCosts={setEquipmentCosts}
-          contractDetails={contractDetails}
-          setContractDetails={setContractDetails}
-          costBreakdown={costBreakdown}
-          monthlyRevenue={monthlyRevenue}
-          overhead={overhead}
-        />
-      </TaskProvider>
+      <SettingsProvider>
+        <TaskProvider>
+          <MainContent
+            sites={sites}
+            onSitesChange={setSites}
+            laborCosts={laborCosts}
+            setLaborCosts={setLaborCosts}
+            equipmentCosts={equipmentCosts}
+            setEquipmentCosts={setEquipmentCosts}
+            contractDetails={contractDetails}
+            setContractDetails={setContractDetails}
+            costBreakdown={costBreakdown}
+            monthlyRevenue={monthlyRevenue}
+            overhead={overhead}
+          />
+        </TaskProvider>
+      </SettingsProvider>
     </ErrorBoundary>
   );
 }
