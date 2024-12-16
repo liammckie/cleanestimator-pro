@@ -4,6 +4,7 @@ import { MainContent } from './components/layout/MainContent';
 import { TaskProvider } from './components/area/task/TaskContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { Site } from './data/types/site';
+import { Tabs } from "@/components/ui/tabs";
 import './App.css';
 
 function App() {
@@ -37,19 +38,21 @@ function App() {
     <ErrorBoundary>
       <SettingsProvider>
         <TaskProvider>
-          <MainContent
-            sites={sites}
-            onSitesChange={setSites}
-            laborCosts={laborCosts}
-            setLaborCosts={setLaborCosts}
-            equipmentCosts={equipmentCosts}
-            setEquipmentCosts={setEquipmentCosts}
-            contractDetails={contractDetails}
-            setContractDetails={setContractDetails}
-            costBreakdown={costBreakdown}
-            monthlyRevenue={monthlyRevenue}
-            overhead={overhead}
-          />
+          <Tabs defaultValue="sites" className="w-full">
+            <MainContent
+              sites={sites}
+              onSitesChange={setSites}
+              laborCosts={laborCosts}
+              setLaborCosts={setLaborCosts}
+              equipmentCosts={equipmentCosts}
+              setEquipmentCosts={setEquipmentCosts}
+              contractDetails={contractDetails}
+              setContractDetails={setContractDetails}
+              costBreakdown={costBreakdown}
+              monthlyRevenue={monthlyRevenue}
+              overhead={overhead}
+            />
+          </Tabs>
         </TaskProvider>
       </SettingsProvider>
     </ErrorBoundary>

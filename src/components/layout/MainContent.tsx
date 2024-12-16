@@ -1,5 +1,6 @@
 import React from 'react';
-import { TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { MainNavigation } from '../navigation/MainNavigation';
 import { SiteManager } from '@/components/SiteManager';
 import { EquipmentCosts } from '@/components/EquipmentCosts';
 import { RosterManager } from '@/components/roster/RosterManager';
@@ -57,54 +58,57 @@ export const MainContent: React.FC<MainContentProps> = ({
   };
 
   return (
-    <>
-      <TabsContent value="sites" className="space-y-6">
-        <SiteManager onSitesChange={onSitesChange} />
-      </TabsContent>
+    <div className="space-y-4">
+      <MainNavigation />
+      <div className="mt-4">
+        <TabsContent value="sites">
+          <SiteManager onSitesChange={onSitesChange} />
+        </TabsContent>
 
-      <TabsContent value="scope" className="space-y-6">
-        <ScopeOfWork 
-          sites={sites} 
-          onUpdateSite={handleUpdateSite}
+        <TabsContent value="scope">
+          <ScopeOfWork 
+            sites={sites} 
+            onUpdateSite={handleUpdateSite}
+          />
+        </TabsContent>
+
+        <TabsContent value="task-management">
+          <TaskManagementPage />
+        </TabsContent>
+
+        <TabsContent value="equipment">
+          <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+        </TabsContent>
+
+        <TabsContent value="roster">
+          <RosterManager />
+          <CostSummary costs={costBreakdown} />
+        </TabsContent>
+
+        <FinancialTabs
+          laborCosts={laborCosts}
+          setLaborCosts={setLaborCosts}
+          monthlyRevenue={monthlyRevenue}
+          overhead={overhead}
+          costBreakdown={costBreakdown}
+          equipmentCosts={equipmentCosts}
+          contractDetails={contractDetails}
+          setContractDetails={setContractDetails}
+          taskCosts={taskCosts}
+          onMarginChange={handleMarginChange}
         />
-      </TabsContent>
 
-      <TabsContent value="task-management" className="space-y-6">
-        <TaskManagementPage />
-      </TabsContent>
+        <TabsContent value="settings">
+          <AwardSettings
+            currentIncrease={awardIncrease}
+            onAwardIncreaseChange={handleAwardIncreaseChange}
+          />
+        </TabsContent>
 
-      <TabsContent value="equipment" className="space-y-6">
-        <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-      </TabsContent>
-
-      <TabsContent value="roster" className="space-y-6">
-        <RosterManager />
-        <CostSummary costs={costBreakdown} />
-      </TabsContent>
-
-      <FinancialTabs
-        laborCosts={laborCosts}
-        setLaborCosts={setLaborCosts}
-        monthlyRevenue={monthlyRevenue}
-        overhead={overhead}
-        costBreakdown={costBreakdown}
-        equipmentCosts={equipmentCosts}
-        contractDetails={contractDetails}
-        setContractDetails={setContractDetails}
-        taskCosts={taskCosts}
-        onMarginChange={handleMarginChange}
-      />
-
-      <TabsContent value="settings" className="space-y-6">
-        <AwardSettings
-          currentIncrease={awardIncrease}
-          onAwardIncreaseChange={handleAwardIncreaseChange}
-        />
-      </TabsContent>
-
-      <TabsContent value="overview" className="space-y-6">
-        <SiteOverview sites={sites} />
-      </TabsContent>
-    </>
+        <TabsContent value="overview">
+          <SiteOverview sites={sites} />
+        </TabsContent>
+      </div>
+    </div>
   );
 };
