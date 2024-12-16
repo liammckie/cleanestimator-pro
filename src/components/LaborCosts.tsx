@@ -47,7 +47,7 @@ const defaultOnCosts: OnCostsState = {
 };
 
 export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => {
-  const { totalWeeklyHours } = useTaskContext();
+  const { totalWeeklyHours, totalMonthlyHours } = useTaskContext();
   const { updateLaborRate } = useCostContext();
   const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
   const [contractedRate, setContractedRate] = useState<number>(38);
@@ -57,8 +57,20 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
   const [awardIncrease, setAwardIncrease] = useState<number>(0);
 
   useEffect(() => {
+    console.log('Labor costs component mounted with hours:', {
+      totalWeeklyHours,
+      totalMonthlyHours
+    });
     updateLaborCosts('contracted');
   }, []);
+
+  useEffect(() => {
+    console.log('Hours updated:', {
+      totalWeeklyHours,
+      totalMonthlyHours
+    });
+    updateLaborCosts(employmentType);
+  }, [totalWeeklyHours, totalMonthlyHours]);
 
   const handleEmploymentTypeChange = (value: 'contracted' | 'direct') => {
     setEmploymentType(value);
@@ -141,7 +153,10 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
         </CardHeader>
         <CardContent>
           <div className="grid gap-6">
-            <MonthlyHoursDisplay totalWeeklyHours={totalWeeklyHours} />
+            <MonthlyHoursDisplay 
+              totalWeeklyHours={totalWeeklyHours} 
+              totalMonthlyHours={totalMonthlyHours}
+            />
 
             <EmploymentTypeSelector
               value={employmentType}

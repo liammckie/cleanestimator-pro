@@ -2,14 +2,26 @@ import React from 'react';
 
 interface MonthlyHoursDisplayProps {
   totalWeeklyHours: number;
+  totalMonthlyHours: number;
 }
 
-export const MonthlyHoursDisplay: React.FC<MonthlyHoursDisplayProps> = ({ totalWeeklyHours }) => {
+export const MonthlyHoursDisplay: React.FC<MonthlyHoursDisplayProps> = ({ 
+  totalWeeklyHours,
+  totalMonthlyHours
+}) => {
   return (
     <div className="bg-accent/50 p-4 rounded-lg">
-      <p className="text-sm text-muted-foreground mb-2">Monthly Hours Required</p>
-      <p className="text-2xl font-bold">{(totalWeeklyHours * 4.33).toFixed(1)} hours</p>
-      <p className="text-sm text-muted-foreground">Weekly Hours: {totalWeeklyHours.toFixed(1)}</p>
+      <p className="text-sm text-muted-foreground mb-2">Hours Required</p>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <p className="text-2xl font-bold">{totalMonthlyHours.toFixed(1)}</p>
+          <p className="text-sm text-muted-foreground">Monthly Hours</p>
+        </div>
+        <div>
+          <p className="text-2xl font-bold">{totalWeeklyHours.toFixed(1)}</p>
+          <p className="text-sm text-muted-foreground">Weekly Hours</p>
+        </div>
+      </div>
     </div>
   );
 };
