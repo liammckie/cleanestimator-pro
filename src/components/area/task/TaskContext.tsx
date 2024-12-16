@@ -1,29 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import { getTaskById } from '@/data/tasks/cleaningProductivityRates';
-
-interface TaskFrequency {
-  timesPerWeek: number;
-  timesPerMonth: number;
-}
-
-export interface SelectedTask {
-  taskId: string;
-  quantity: number;
-  timeRequired: number;
-  frequency: TaskFrequency;
-  siteName?: string;
-  siteId?: string;
-}
-
-interface TaskContextType {
-  selectedTasks: SelectedTask[];
-  totalWeeklyHours: number;
-  totalMonthlyHours: number;
-  handleTaskSelection: (taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => void;
-  handleQuantityChange: (taskId: string, quantity: number) => void;
-  handleFrequencyChange: (taskId: string, timesPerWeek: number) => void;
-}
+import { TaskContextType, SelectedTask } from './types';
+import { calculateTaskTime } from '@/hooks/useTaskTimes';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
@@ -48,14 +27,6 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     }
   });
 
-  const calculateTaskTime = (taskId: string, quantity: number, frequency: TaskFrequency): number => {
-    const task = getTaskById(taskId);
-    if (!task || quantity <= 0) return 0;
-
-    const hoursPerService = quantity / task.productivityRate;
-    return hoursPerService;
-  };
-
   const handleTaskSelection = (taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
     if (isSelected) {
       const task = getTaskById(taskId);
@@ -77,14 +48,16 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
         frequency: {
           timesPerWeek: 1,
           timesPerMonth: 4.33
-        }
+        },
+        selectedTool: task.defaultTool,
+        laborRate: defaultLaborRate
       };
 
       setSelectedTasks(prev => [...prev, newTask]);
       
       toast({
         title: "Task Added",
-        description: `${task.taskName} has been added to your scope.`
+        description: `${task.name} has been added to your scope.`
       });
     } else {
       setSelectedTasks(prev => 
@@ -99,6 +72,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
         const timeRequired = calculateTaskTime(
           taskId,
           quantity,
+          task.selectedTool,
           task.frequency
         );
         return { ...task, quantity, timeRequired };
@@ -117,9 +91,49 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
         const timeRequired = calculateTaskTime(
           taskId,
           task.quantity,
+          task.selectedTool,
           frequency
         );
         return { ...task, frequency, timeRequired };
+      }
+      return task;
+    }));
+  };
+
+  const handleToolChange = (taskId: string, tool: string) => {
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        const timeRequired = calculateTaskTime(
+          taskId,
+          task.quantity,
+          tool,
+          task.frequency
+        );
+        return { ...task, selectedTool: tool, timeRequired };
+      }
+      return task;
+    }));
+  };
+
+  const handleLaborRateChange = (taskId: string, rate: number) => {
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        return { ...task, laborRate: rate };
+      }
+      return task;
+    }));
+  };
+
+  const handleProductivityOverride = (taskId: string, override: number) => {
+    setSelectedTasks(prev => prev.map(task => {
+      if (task.taskId === taskId) {
+        const timeRequired = calculateTaskTime(
+          taskId,
+          task.quantity,
+          task.selectedTool,
+          task.frequency
+        );
+        return { ...task, productivityOverride: override, timeRequired };
       }
       return task;
     }));
@@ -147,18 +161,17 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     }
   }, [selectedTasks, totalMonthlyHours, onTasksChange, defaultLaborRate]);
 
-  const contextValue = useMemo(() => ({
+  const contextValue = {
     selectedTasks,
     handleTaskSelection,
     handleQuantityChange,
     handleFrequencyChange,
+    handleToolChange,
+    handleLaborRateChange,
+    handleProductivityOverride,
     totalWeeklyHours,
     totalMonthlyHours
-  }), [
-    selectedTasks,
-    totalWeeklyHours,
-    totalMonthlyHours
-  ]);
+  };
 
   return (
     <TaskContext.Provider value={contextValue}>

@@ -26,20 +26,3 @@ export interface TaskContextType {
   totalWeeklyHours: number;
   totalMonthlyHours: number;
 }
-
-export interface AreaData {
-  squareMeters: number;
-  spaceType: string;
-  industryType: string;
-  selectedTasks: Array<{
-    taskId: string;
-    quantity: number;
-    timeRequired: number;
-    frequency: TaskFrequency;
-    productivityOverride?: number;
-    selectedTool?: string;
-    laborRate?: number;
-  }>;
-  totalTime: number;
-  totalLaborCost: number;
-}
