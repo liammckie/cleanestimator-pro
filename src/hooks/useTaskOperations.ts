@@ -3,22 +3,14 @@ import { SelectedTask } from '@/components/area/task/types';
 import { toast } from '@/components/ui/use-toast';
 import { getRateById } from '@/data/rates/ratesManager';
 import { validateTaskData } from '@/utils/taskValidation';
+import { TIME_CONSTANTS } from '@/utils/constants';
 
-/**
- * Custom hook for task operations (add, remove, update)
- * @param selectedTasks Current selected tasks array
- * @param setSelectedTasks Function to update selected tasks
- * @param calculateTaskTime Function to calculate task time
- * @param defaultLaborRate Default labor rate for new tasks
- * @returns Object containing task operation functions
- */
 export const useTaskOperations = (
   selectedTasks: SelectedTask[],
   setSelectedTasks: (tasks: SelectedTask[] | ((prev: SelectedTask[]) => SelectedTask[])) => void,
   calculateTaskTime: any,
   defaultLaborRate: number = 38
 ) => {
-  // Handle task selection/deselection
   const handleTaskSelection = useCallback((
     taskId: string,
     isSelected: boolean,
@@ -44,7 +36,7 @@ export const useTaskOperations = (
         timeRequired: 0,
         frequency: {
           timesPerWeek: 1,
-          timesPerMonth: 4.33
+          timesPerMonth: TIME_CONSTANTS.WEEKS_PER_MONTH
         },
         selectedTool: rate.tool,
         laborRate: defaultLaborRate
@@ -68,7 +60,6 @@ export const useTaskOperations = (
     }
   }, [setSelectedTasks, defaultLaborRate]);
 
-  // Handle quantity changes
   const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
     setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
       if (task.taskId === taskId) {
@@ -81,6 +72,13 @@ export const useTaskOperations = (
           task.frequency
         );
         
+        console.log('Updated task time:', {
+          taskId,
+          quantity,
+          timeRequired,
+          frequency: task.frequency
+        });
+        
         return {
           ...task,
           quantity,
@@ -91,13 +89,12 @@ export const useTaskOperations = (
     }));
   }, [calculateTaskTime, setSelectedTasks]);
 
-  // Handle frequency changes
   const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
     setSelectedTasks((prev: SelectedTask[]): SelectedTask[] => prev.map(task => {
       if (task.taskId === taskId) {
         const frequency = {
           timesPerWeek,
-          timesPerMonth: timesPerWeek * 4.33
+          timesPerMonth: timesPerWeek * TIME_CONSTANTS.WEEKS_PER_MONTH
         };
         
         const timeRequired = calculateTaskTime(
@@ -106,6 +103,12 @@ export const useTaskOperations = (
           task.selectedTool,
           frequency
         );
+        
+        console.log('Updated task frequency:', {
+          taskId,
+          frequency,
+          timeRequired
+        });
         
         return {
           ...task,
