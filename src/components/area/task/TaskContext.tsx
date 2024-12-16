@@ -18,7 +18,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   onTasksChange,
   defaultLaborRate = 38 
 }) => {
-  // Initialize with an empty array explicitly
+  // Initialize with an explicitly empty array
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
   
   const { calculateTaskTime } = useTaskManagement(
