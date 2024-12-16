@@ -22,18 +22,20 @@ export const EquipmentBasicInfo: React.FC<EquipmentBasicInfoProps> = ({
   return (
     <div className="grid grid-cols-2 md:grid-cols-[1fr,1fr,1fr] gap-2 items-end">
       <div>
-        <Label htmlFor="itemName">Item Name</Label>
+        <Label htmlFor="equipment-name">Item Name</Label>
         <Input
-          id="itemName"
+          id="equipment-name"
+          name="equipment-name"
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
           placeholder="Enter item name"
         />
       </div>
       <div>
-        <Label htmlFor="itemCost">Cost ($)</Label>
+        <Label htmlFor="equipment-cost">Cost ($)</Label>
         <Input
-          id="itemCost"
+          id="equipment-cost"
+          name="equipment-cost"
           type="number"
           value={cost}
           onChange={(e) => onCostChange(e.target.value)}
@@ -41,9 +43,10 @@ export const EquipmentBasicInfo: React.FC<EquipmentBasicInfoProps> = ({
         />
       </div>
       <div>
-        <Label htmlFor="purchaseDate">Purchase Date</Label>
+        <Label htmlFor="equipment-purchase-date">Purchase Date</Label>
         <Input
-          id="purchaseDate"
+          id="equipment-purchase-date"
+          name="equipment-purchase-date"
           type="date"
           value={purchaseDate}
           onChange={(e) => onPurchaseDateChange(e.target.value)}

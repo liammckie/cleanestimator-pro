@@ -13,9 +13,10 @@ export const AreaMetrics: React.FC<AreaMetricsProps> = ({
 }) => {
   return (
     <div className="space-y-2">
-      <Label htmlFor="squareMeters">Total Area (Square Meters)</Label>
+      <Label htmlFor="area-square-meters">Total Area (Square Meters)</Label>
       <Input
-        id="squareMeters"
+        id="area-square-meters"
+        name="area-square-meters"
         type="number"
         placeholder="Enter total area in square meters"
         value={squareMeters || ''}

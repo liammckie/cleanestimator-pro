@@ -22,9 +22,10 @@ export const CPIInputs: React.FC<CPIInputsProps> = ({
       <Label>CPI Increases (%)</Label>
       <div className="grid gap-4">
         <div className="space-y-2">
-          <Label htmlFor="yearOne">Year One</Label>
+          <Label htmlFor="cpi-year-one">Year One</Label>
           <Input
-            id="yearOne"
+            id="cpi-year-one"
+            name="cpi-year-one"
             type="number"
             step="0.1"
             value={values.yearOne}
@@ -34,9 +35,10 @@ export const CPIInputs: React.FC<CPIInputsProps> = ({
         </div>
         {contractLength >= 2 && (
           <div className="space-y-2">
-            <Label htmlFor="yearTwo">Year Two</Label>
+            <Label htmlFor="cpi-year-two">Year Two</Label>
             <Input
-              id="yearTwo"
+              id="cpi-year-two"
+              name="cpi-year-two"
               type="number"
               step="0.1"
               value={values.yearTwo}
@@ -47,9 +49,10 @@ export const CPIInputs: React.FC<CPIInputsProps> = ({
         )}
         {contractLength >= 3 && (
           <div className="space-y-2">
-            <Label htmlFor="yearThree">Year Three</Label>
+            <Label htmlFor="cpi-year-three">Year Three</Label>
             <Input
-              id="yearThree"
+              id="cpi-year-three"
+              name="cpi-year-three"
               type="number"
               step="0.1"
               value={values.yearThree}

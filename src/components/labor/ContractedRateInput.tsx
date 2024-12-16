@@ -13,9 +13,10 @@ export const ContractedRateInput: React.FC<ContractedRateInputProps> = ({
 }) => {
   return (
     <div className="space-y-2">
-      <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
+      <Label htmlFor="contracted-rate">Hourly Rate ($)</Label>
       <Input
-        id="hourlyRate"
+        id="contracted-rate"
+        name="contracted-rate"
         type="number"
         value={contractedRate}
         placeholder="Enter hourly rate"
