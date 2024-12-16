@@ -36,39 +36,35 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
   const calculateTotalHours = () => {
-    console.log('Calculating total hours for tasks:', selectedTasks);
+    console.log('=== HOURS CALCULATION START ===');
+    console.log('Number of selected tasks:', selectedTasks.length);
     
-    const totalMonthlyHours = selectedTasks.reduce((total, task) => {
-      // Log individual task calculation
-      console.log('Processing task:', {
+    const totalMonthlyHours = selectedTasks.reduce((total, task, index) => {
+      console.log(`Task ${index + 1}:`, {
         taskId: task.taskId,
         timeRequired: task.timeRequired,
         frequency: task.frequency
       });
       
       if (!task.timeRequired) {
-        console.log('Task has no timeRequired:', task.taskId);
+        console.log(`Task ${task.taskId} has no timeRequired`);
         return total;
       }
 
       const taskMonthlyHours = task.timeRequired;
-      console.log('Task monthly hours:', taskMonthlyHours);
+      console.log(`Task ${task.taskId} monthly hours:`, taskMonthlyHours);
       
       return total + taskMonthlyHours;
     }, 0);
     
     const totalWeeklyHours = totalMonthlyHours / TIME_CONSTANTS.WEEKS_PER_MONTH;
     
-    console.log('Final hours calculation:', {
+    console.log('Final calculation:', {
       totalWeeklyHours,
       totalMonthlyHours,
-      selectedTasksCount: selectedTasks.length,
-      taskDetails: selectedTasks.map(task => ({
-        taskId: task.taskId,
-        timeRequired: task.timeRequired,
-        frequency: task.frequency
-      }))
+      selectedTasksCount: selectedTasks.length
     });
+    console.log('=== HOURS CALCULATION END ===');
     
     return { totalWeeklyHours, totalMonthlyHours };
   };
@@ -77,12 +73,9 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
 
   useEffect(() => {
     if (selectedTasks.length > 0) {
-      console.log('Selected tasks changed, recalculating hours:', selectedTasks);
       const newTotalHours = calculateTotalHours();
-      console.log('New total hours:', newTotalHours);
       setTotalHours(newTotalHours);
     } else {
-      console.log('No tasks selected, resetting hours to 0');
       setTotalHours({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
     }
   }, [selectedTasks]);
