@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { AreaData, SelectedTask, TaskContextType } from './types';
 import { useTaskManagement } from '@/hooks/useTaskManagement';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
@@ -18,8 +18,6 @@ export const TaskProvider: React.FC<TaskProviderProps> = React.memo(({
   onTasksChange,
   defaultLaborRate = 38 
 }) => {
-  console.log('TASK_FLOW: TaskProvider initializing with props:', { defaultLaborRate });
-  
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
   
   const { calculateTaskTime } = useTaskManagement(
@@ -39,67 +37,38 @@ export const TaskProvider: React.FC<TaskProviderProps> = React.memo(({
     handleProductivityOverride
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
-  const calculateTotalHours = () => {
-    console.log('TASK_FLOW: Starting hours calculation');
-    console.log('TASK_FLOW: Selected tasks:', selectedTasks);
-    
+  const calculateTotalHours = useCallback(() => {
     if (!selectedTasks || selectedTasks.length === 0) {
-      console.log('TASK_FLOW: No tasks selected, returning 0');
       return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
     }
 
     const totalMonthlyHours = selectedTasks.reduce((total, task) => {
-      console.log('TASK_FLOW: Processing task for hours:', task);
       return total + (task.timeRequired || 0);
     }, 0);
     
     const totalWeeklyHours = totalMonthlyHours / TIME_CONSTANTS.WEEKS_PER_MONTH;
     
-    console.log('TASK_FLOW: Hours calculation complete:', {
-      totalWeeklyHours,
-      totalMonthlyHours,
-      selectedTasksCount: selectedTasks.length
-    });
-    
     return { totalWeeklyHours, totalMonthlyHours };
-  };
+  }, [selectedTasks]);
 
-  const handleTaskSelection = (taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
-    console.log('TASK_FLOW: Task selection triggered:', {
-      taskId,
-      isSelected,
-      siteId,
-      siteName,
-      currentSelectedTasks: selectedTasks
-    });
+  const handleTaskSelection = useCallback((taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => {
     baseHandleTaskSelection(taskId, isSelected, siteId, siteName);
-  };
+  }, [baseHandleTaskSelection]);
 
-  const handleQuantityChange = (taskId: string, quantity: number) => {
-    console.log('TASK_FLOW: Quantity change triggered:', {
-      taskId,
-      quantity,
-      currentSelectedTasks: selectedTasks
-    });
+  const handleQuantityChange = useCallback((taskId: string, quantity: number) => {
     baseHandleQuantityChange(taskId, quantity);
-  };
+  }, [baseHandleQuantityChange]);
 
-  const handleFrequencyChange = (taskId: string, timesPerWeek: number) => {
-    console.log('TASK_FLOW: Frequency change triggered:', {
-      taskId,
-      timesPerWeek,
-      currentSelectedTasks: selectedTasks
-    });
+  const handleFrequencyChange = useCallback((taskId: string, timesPerWeek: number) => {
     baseHandleFrequencyChange(taskId, timesPerWeek);
-  };
+  }, [baseHandleFrequencyChange]);
 
   const [totalHours, setTotalHours] = useState({ totalWeeklyHours: 0, totalMonthlyHours: 0 });
 
   useEffect(() => {
-    console.log('TASK_FLOW: Tasks state changed:', selectedTasks);
     const newTotalHours = calculateTotalHours();
     setTotalHours(newTotalHours);
-  }, [selectedTasks]);
+  }, [selectedTasks, calculateTotalHours]);
 
   const contextValue = useMemo(() => ({
     selectedTasks,
@@ -113,14 +82,15 @@ export const TaskProvider: React.FC<TaskProviderProps> = React.memo(({
     totalMonthlyHours: totalHours.totalMonthlyHours
   }), [
     selectedTasks,
+    handleTaskSelection,
+    handleQuantityChange,
+    handleFrequencyChange,
     handleToolChange,
     handleLaborRateChange,
     handleProductivityOverride,
     totalHours.totalWeeklyHours,
     totalHours.totalMonthlyHours
   ]);
-
-  console.log('TASK_FLOW: TaskProvider rendering with value:', contextValue);
 
   return (
     <TaskContext.Provider value={contextValue}>

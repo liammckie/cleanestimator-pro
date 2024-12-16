@@ -96,16 +96,21 @@ const Index = () => {
                   options={formattedMenuOptions} 
                   className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
                 />
-                <TaskProvider onTasksChange={handleAreaChange}>
-                  <div className="flex-1 px-6">
-                    <MainNavigation />
-                    {renderContent()}
-                  </div>
-                  <ScopeOfWorkSidebar 
-                    selectedTasks={selectedTasks} 
-                    sites={sites} 
-                  />
-                </TaskProvider>
+                <div className="flex flex-1">
+                  <TaskProvider 
+                    onTasksChange={handleAreaChange}
+                    key="main-task-provider"
+                  >
+                    <div className="flex-1 px-6">
+                      <MainNavigation />
+                      {renderContent()}
+                    </div>
+                    <ScopeOfWorkSidebar 
+                      selectedTasks={selectedTasks} 
+                      sites={sites} 
+                    />
+                  </TaskProvider>
+                </div>
               </div>
             </Tabs>
           </div>
