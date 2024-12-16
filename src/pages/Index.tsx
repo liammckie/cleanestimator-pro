@@ -7,6 +7,7 @@ import { menuOptions } from '@/components/navigation/MenuOptions';
 import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { TaskProvider } from '@/components/area/task/TaskContext';
+import { CostProvider } from '@/contexts/CostContext';
 import { AreaContainer } from '@/components/area/AreaContainer';
 import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
 import { AreaData } from '@/components/area/task/types';
@@ -107,34 +108,36 @@ const Index = () => {
   return (
     <SettingsProvider>
       <TaskProvider>
-        <div className="min-h-screen flex w-full bg-background">
-          <div className="flex-1">
-            <div className="container mx-auto px-4 py-8">
-              <h1 className="text-3xl font-bold text-primary mb-8">
-                Commercial Cleaning Estimation Tool
-              </h1>
-              
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <div className="flex">
-                  <DynamicMenu 
-                    options={formattedMenuOptions} 
-                    className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
-                  />
-                  <div className="flex flex-1">
-                    <div className="flex-1 px-6">
-                      <MainNavigation />
-                      {activeTab === 'scope' ? taskManagementContent : mainContent}
-                    </div>
-                    <ScopeOfWorkSidebar 
-                      selectedTasks={selectedTasks} 
-                      sites={sites} 
+        <CostProvider>
+          <div className="min-h-screen flex w-full bg-background">
+            <div className="flex-1">
+              <div className="container mx-auto px-4 py-8">
+                <h1 className="text-3xl font-bold text-primary mb-8">
+                  Commercial Cleaning Estimation Tool
+                </h1>
+                
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <div className="flex">
+                    <DynamicMenu 
+                      options={formattedMenuOptions} 
+                      className="w-[250px] shrink-0 bg-card rounded-lg border border-border"
                     />
+                    <div className="flex flex-1">
+                      <div className="flex-1 px-6">
+                        <MainNavigation />
+                        {activeTab === 'scope' ? taskManagementContent : mainContent}
+                      </div>
+                      <ScopeOfWorkSidebar 
+                        selectedTasks={selectedTasks} 
+                        sites={sites} 
+                      />
+                    </div>
                   </div>
-                </div>
-              </Tabs>
+                </Tabs>
+              </div>
             </div>
           </div>
-        </div>
+        </CostProvider>
       </TaskProvider>
     </SettingsProvider>
   );
