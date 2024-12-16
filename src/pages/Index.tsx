@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { DynamicMenu } from '@/components/ui/dynamic-menu';
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { calculateCosts } from '@/utils/costCalculations';
 import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { menuOptions } from '@/components/navigation/MenuOptions';
@@ -76,7 +76,10 @@ const AppContent = React.memo(({
               onAreaChange={onAreaChange}
             />
           </div>
-          <ScopeOfWorkSidebar sites={sites} />
+          <ScopeOfWorkSidebar 
+            sites={sites}
+            selectedTasks={[]} // Initialize with empty array since tasks are managed by TaskContext
+          />
         </div>
       </div>
     </Tabs>
