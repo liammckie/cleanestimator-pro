@@ -35,9 +35,9 @@ interface TaskListProps {
 }
 
 const frequencyOptions = [
-  { label: 'Weekly', value: '1', timesPerMonth: 4.33 },
-  { label: 'Fortnightly', value: '0.5', timesPerMonth: 2.17 },
   { label: 'Monthly', value: '0.25', timesPerMonth: 1 },
+  { label: 'Fortnightly', value: '0.5', timesPerMonth: 2.17 },
+  { label: 'Weekly', value: '1', timesPerMonth: 4.33 },
   { label: '2x Weekly', value: '2', timesPerMonth: 8.66 },
   { label: '3x Weekly', value: '3', timesPerMonth: 13 },
   { label: '4x Weekly', value: '4', timesPerMonth: 17.33 },
