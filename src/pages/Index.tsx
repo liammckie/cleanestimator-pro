@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { DynamicMenu } from '@/components/ui/dynamic-menu';
-import { Tabs } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { calculateCosts } from '@/utils/costCalculations';
 import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { menuOptions } from '@/components/navigation/MenuOptions';
@@ -51,7 +51,7 @@ const AppContent = React.memo(({
         Commercial Cleaning Estimation Tool
       </h1>
       
-      <Tabs value={activeTab}>
+      <Tabs defaultValue={activeTab} value={activeTab}>
         <div className="flex">
           <DynamicMenu 
             options={formattedMenuOptions} 
@@ -60,26 +60,28 @@ const AppContent = React.memo(({
           <div className="flex flex-1">
             <div className="flex-1 px-6">
               <MainNavigation />
-              {activeTab === 'scope' ? (
-                <TaskManagementContent 
-                  activeTab={activeTab} 
-                  onAreaChange={onAreaChange}
-                />
-              ) : (
-                <MainContent
-                  sites={sites}
-                  onSitesChange={setSites}
-                  laborCosts={laborCosts}
-                  setLaborCosts={setLaborCosts}
-                  equipmentCosts={equipmentCosts}
-                  setEquipmentCosts={setEquipmentCosts}
-                  contractDetails={contractDetails}
-                  setContractDetails={setContractDetails}
-                  costBreakdown={costBreakdown}
-                  monthlyRevenue={monthlyRevenue}
-                  overhead={overhead}
-                />
-              )}
+              <TabsContent value={activeTab}>
+                {activeTab === 'scope' ? (
+                  <TaskManagementContent 
+                    activeTab={activeTab} 
+                    onAreaChange={onAreaChange}
+                  />
+                ) : (
+                  <MainContent
+                    sites={sites}
+                    onSitesChange={setSites}
+                    laborCosts={laborCosts}
+                    setLaborCosts={setLaborCosts}
+                    equipmentCosts={equipmentCosts}
+                    setEquipmentCosts={setEquipmentCosts}
+                    contractDetails={contractDetails}
+                    setContractDetails={setContractDetails}
+                    costBreakdown={costBreakdown}
+                    monthlyRevenue={monthlyRevenue}
+                    overhead={overhead}
+                  />
+                )}
+              </TabsContent>
             </div>
             <ScopeOfWorkSidebar 
               selectedTasks={selectedTasks} 
