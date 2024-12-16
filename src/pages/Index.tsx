@@ -43,7 +43,8 @@ const AppContent = React.memo(({
   setContractDetails,
   setSites,
   selectedTasks,
-  formattedMenuOptions
+  formattedMenuOptions,
+  onTabChange
 }: any) => {
   return (
     <div className="container mx-auto px-4 py-8">
@@ -51,7 +52,7 @@ const AppContent = React.memo(({
         Commercial Cleaning Estimation Tool
       </h1>
       
-      <Tabs defaultValue={activeTab} value={activeTab}>
+      <Tabs value={activeTab} onValueChange={onTabChange}>
         <div className="flex">
           <DynamicMenu 
             options={formattedMenuOptions} 
@@ -60,28 +61,25 @@ const AppContent = React.memo(({
           <div className="flex flex-1">
             <div className="flex-1 px-6">
               <MainNavigation />
-              <TabsContent value={activeTab}>
-                {activeTab === 'scope' ? (
-                  <TaskManagementContent 
-                    activeTab={activeTab} 
-                    onAreaChange={onAreaChange}
-                  />
-                ) : (
-                  <MainContent
-                    sites={sites}
-                    onSitesChange={setSites}
-                    laborCosts={laborCosts}
-                    setLaborCosts={setLaborCosts}
-                    equipmentCosts={equipmentCosts}
-                    setEquipmentCosts={setEquipmentCosts}
-                    contractDetails={contractDetails}
-                    setContractDetails={setContractDetails}
-                    costBreakdown={costBreakdown}
-                    monthlyRevenue={monthlyRevenue}
-                    overhead={overhead}
-                  />
-                )}
-              </TabsContent>
+              <MainContent
+                sites={sites}
+                onSitesChange={setSites}
+                laborCosts={laborCosts}
+                setLaborCosts={setLaborCosts}
+                equipmentCosts={equipmentCosts}
+                setEquipmentCosts={setEquipmentCosts}
+                contractDetails={contractDetails}
+                setContractDetails={setContractDetails}
+                costBreakdown={costBreakdown}
+                monthlyRevenue={monthlyRevenue}
+                overhead={overhead}
+              />
+              {activeTab === 'scope' && (
+                <TaskManagementContent 
+                  activeTab={activeTab} 
+                  onAreaChange={onAreaChange}
+                />
+              )}
             </div>
             <ScopeOfWorkSidebar 
               selectedTasks={selectedTasks} 
@@ -132,13 +130,17 @@ const Index = () => {
   const monthlyRevenue = costBreakdown.totalMonthlyCost * 1.5;
   const overhead = monthlyRevenue * OVERHEAD_PERCENTAGE;
 
+  const handleTabChange = useCallback((value: string) => {
+    setActiveTab(value);
+  }, []);
+
   const formattedMenuOptions = useMemo(() => 
     menuOptions.map(option => ({
       name: option.label,
       icon: option.icon as "layout" | "file-text" | "list" | "user" | "wrench" | "calendar" | "check-square" | "globe" | "settings",
-      onClick: () => setActiveTab(option.id)
+      onClick: () => handleTabChange(option.id)
     })), 
-    []
+    [handleTabChange]
   );
 
   const selectedTasks = useMemo(() => 
@@ -173,6 +175,7 @@ const Index = () => {
                 setSites={setSites}
                 selectedTasks={selectedTasks}
                 formattedMenuOptions={formattedMenuOptions}
+                onTabChange={handleTabChange}
               />
             </div>
           </div>
