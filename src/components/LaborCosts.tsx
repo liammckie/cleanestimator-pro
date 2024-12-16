@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { cleaningAwardLevels } from '@/data/award/cleaningAward';
 import { OnCostsManager } from './OnCostsManager';
 import { OnCostsState } from '@/data/types/onCosts';
@@ -10,6 +8,8 @@ import { DirectEmploymentOptions } from './labor/DirectEmploymentOptions';
 import { AwardIncreaseManager } from './labor/AwardIncreaseManager';
 import { useTaskContext } from './area/task/TaskContext';
 import { useCostContext } from '@/contexts/CostContext';
+import { MonthlyHoursDisplay } from './labor/MonthlyHoursDisplay';
+import { ContractedRateInput } from './labor/ContractedRateInput';
 
 interface LaborCostsProps {
   onLaborCostChange: (costs: { 
@@ -57,7 +57,6 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
   const [awardIncrease, setAwardIncrease] = useState<number>(0);
 
   useEffect(() => {
-    // Initialize with default contracted rate
     updateLaborCosts('contracted');
   }, []);
 
@@ -142,11 +141,7 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
         </CardHeader>
         <CardContent>
           <div className="grid gap-6">
-            <div className="bg-accent/50 p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground mb-2">Monthly Hours Required</p>
-              <p className="text-2xl font-bold">{(totalWeeklyHours * 4.33).toFixed(1)} hours</p>
-              <p className="text-sm text-muted-foreground">Weekly Hours: {totalWeeklyHours.toFixed(1)}</p>
-            </div>
+            <MonthlyHoursDisplay totalWeeklyHours={totalWeeklyHours} />
 
             <EmploymentTypeSelector
               value={employmentType}
@@ -154,16 +149,10 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
             />
 
             {employmentType === 'contracted' ? (
-              <div className="space-y-2">
-                <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
-                <Input
-                  id="hourlyRate"
-                  type="number"
-                  value={contractedRate}
-                  placeholder="Enter hourly rate"
-                  onChange={handleContractedRateChange}
-                />
-              </div>
+              <ContractedRateInput
+                contractedRate={contractedRate}
+                onChange={handleContractedRateChange}
+              />
             ) : (
               <>
                 <DirectEmploymentOptions
