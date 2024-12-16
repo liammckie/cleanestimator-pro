@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useMemo } from 'react';
-import { TaskContextType } from './types';
-import { useTaskInitialization } from '@/hooks/useTaskInitialization';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { TaskContextType, SelectedTask } from './types';
+import { useTaskTimes } from '@/hooks/useTaskTimes';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
 import { useTaskModifiers } from '@/hooks/useTaskModifiers';
 
@@ -22,27 +22,18 @@ export const TaskProvider = React.memo(({
     defaultLaborRate
   });
 
-  const {
-    selectedTasks,
-    setSelectedTasks,
-    calculateTaskTime,
-    calculateTotalHours
-  } = useTaskInitialization(onTasksChange, defaultLaborRate);
-
-  console.log('TASK_FLOW: Task initialization complete:', {
-    selectedTasksCount: selectedTasks.length,
-    tasks: selectedTasks.map(task => ({
-      taskId: task.taskId,
-      quantity: task.quantity,
-      timeRequired: task.timeRequired
-    }))
+  const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>(() => {
+    const savedTasks = localStorage.getItem('selectedTasks');
+    return savedTasks ? JSON.parse(savedTasks) : [];
   });
+
+  const { calculateTaskTime } = useTaskTimes();
 
   const {
     handleTaskSelection,
     handleQuantityChange,
     handleFrequencyChange
-  } = useTaskOperations(selectedTasks, setSelectedTasks, calculateTaskTime);
+  } = useTaskOperations(selectedTasks, setSelectedTasks, calculateTaskTime, defaultLaborRate);
 
   const {
     handleToolChange,
@@ -50,13 +41,66 @@ export const TaskProvider = React.memo(({
     handleProductivityOverride
   } = useTaskModifiers(selectedTasks, setSelectedTasks, calculateTaskTime);
 
+  const calculateTotalHours = () => {
+    if (!selectedTasks || selectedTasks.length === 0) {
+      console.log('HOURS_CALC: No tasks selected, returning 0');
+      return { totalWeeklyHours: 0, totalMonthlyHours: 0 };
+    }
+
+    const totalMonthlyHours = selectedTasks.reduce((total, task) => {
+      return total + (task.timeRequired * task.frequency.timesPerMonth);
+    }, 0);
+
+    const totalWeeklyHours = totalMonthlyHours / 4.33;
+
+    console.log('TASK_FLOW: Hours calculation complete:', {
+      totalWeeklyHours,
+      totalMonthlyHours,
+      selectedTasksCount: selectedTasks.length
+    });
+
+    return { totalWeeklyHours, totalMonthlyHours };
+  };
+
   const { totalWeeklyHours, totalMonthlyHours } = calculateTotalHours();
 
-  console.log('TASK_FLOW: Hours calculation complete:', {
-    totalWeeklyHours,
-    totalMonthlyHours,
-    selectedTasksCount: selectedTasks.length
-  });
+  // Save tasks to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('selectedTasks', JSON.stringify(selectedTasks));
+  }, [selectedTasks]);
+
+  // Update area data when tasks change
+  useEffect(() => {
+    if (onTasksChange) {
+      const areaData = {
+        squareMeters: 0,
+        spaceType: '',
+        industryType: '',
+        selectedTasks: selectedTasks.map(task => ({
+          taskId: task.taskId,
+          quantity: task.quantity,
+          timeRequired: task.timeRequired,
+          frequency: task.frequency,
+          productivityOverride: task.productivityOverride,
+          selectedTool: task.selectedTool,
+          laborRate: task.laborRate || defaultLaborRate
+        })),
+        totalTime: totalMonthlyHours,
+        totalLaborCost: selectedTasks.reduce((sum, task) => {
+          const hourlyRate = task.laborRate || defaultLaborRate;
+          return sum + (task.timeRequired * hourlyRate * task.frequency.timesPerMonth);
+        }, 0)
+      };
+
+      console.log('AREA_UPDATE: Updating area data:', {
+        totalMonthlyHours,
+        totalLaborCost: areaData.totalLaborCost,
+        taskCount: selectedTasks.length
+      });
+
+      onTasksChange(areaData);
+    }
+  }, [selectedTasks, totalMonthlyHours, onTasksChange, defaultLaborRate]);
 
   const contextValue = useMemo(() => ({
     selectedTasks,
