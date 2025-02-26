@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import { SiteManager } from '@/components/SiteManager';
@@ -11,11 +12,16 @@ import { TaskManagementPage } from '@/components/task-management/TaskManagementP
 import { ScopeOfWork } from '@/components/scope/ScopeOfWork';
 import { FinancialTabs } from '@/components/financial/FinancialTabs';
 import { useCostCalculations } from '@/hooks/useCostCalculations';
+import { OnCostsState } from '@/data/types/onCosts';
 
 interface MainContentProps {
   sites: any[];
   onSitesChange: (sites: any[]) => void;
-  laborCosts: any;
+  laborCosts: {
+    hourlyRate: number;
+    employmentType: 'direct' | 'contracted';
+    onCosts?: OnCostsState;
+  };
   setLaborCosts: (costs: any) => void;
   equipmentCosts: any;
   setEquipmentCosts: (costs: any) => void;
@@ -44,7 +50,10 @@ export const MainContent: React.FC<MainContentProps> = ({
     handleUpdateSite, 
     handleMarginChange,
     taskCosts
-  } = useCostCalculations(sites, laborCosts, setLaborCosts);
+  } = useCostCalculations(sites, {
+    hourlyRate: laborCosts.hourlyRate,
+    onCosts: laborCosts.onCosts
+  }, setLaborCosts);
 
   const handleAwardIncreaseChange = (increase: number) => {
     setAwardIncrease(increase);

@@ -1,3 +1,4 @@
+
 export interface TaskFrequency {
   timesPerWeek: number;
   timesPerMonth: number;
@@ -13,6 +14,8 @@ export interface SelectedTask {
   productivityOverride?: number;
   selectedTool?: string;
   laborRate?: number;
+  name?: string;
+  defaultTool?: string;
 }
 
 export interface TaskContextType {

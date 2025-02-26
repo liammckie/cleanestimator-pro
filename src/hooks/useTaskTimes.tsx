@@ -1,6 +1,7 @@
+
 import { useCallback } from 'react';
 import { calculateTaskProductivity } from '@/utils/productivityCalculations';
-import { TaskFrequency } from '@/components/area/task/types';
+import type { TaskFrequency } from '@/components/area/task/types';
 
 export const calculateTaskTime = (
   taskId: string,
