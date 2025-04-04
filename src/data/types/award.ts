@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export interface AwardLevel {
   level: number;
-  description?: string;
+  description: string;
   baseRate: number;
   payRates: {
     standard: number;
@@ -39,7 +39,7 @@ export const ShiftTimingSchema = z.object({
   startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).optional(),
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).optional(),
   loading: z.number(),
-  description?: z.string().optional()
+  description: z.string().optional()
 });
 
 export type ShiftTiming = z.infer<typeof ShiftTimingSchema>;
