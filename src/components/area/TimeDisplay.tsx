@@ -13,13 +13,14 @@ export const TimeDisplay: React.FC<TimeDisplayProps> = ({ selectedTasks }) => {
   
   if (selectedTasks.length === 0 && totalMonthlyHours === 0) return null;
 
-  // Convert hours to minutes for display
-  const totalMinutes = totalMonthlyHours * 60;
+  // Calculate hours and minutes from total monthly hours
+  const hours = Math.floor(totalMonthlyHours);
+  const minutes = Math.round((totalMonthlyHours - hours) * 60);
 
   return (
     <div className="p-4 bg-gray-50 rounded">
       <h3 className="font-medium mb-2">Total Monthly Time Required</h3>
-      <p>{totalMinutes.toFixed(1)} minutes</p>
+      <p>{hours} hours{minutes > 0 ? ` ${minutes} minutes` : ''}</p>
     </div>
   );
 };
