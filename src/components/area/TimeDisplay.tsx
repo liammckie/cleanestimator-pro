@@ -1,4 +1,6 @@
+
 import React from 'react';
+import { useTaskContext } from './task/TaskContext';
 
 interface TimeDisplayProps {
   selectedTasks: Array<{
@@ -7,9 +9,12 @@ interface TimeDisplayProps {
 }
 
 export const TimeDisplay: React.FC<TimeDisplayProps> = ({ selectedTasks }) => {
-  if (selectedTasks.length === 0) return null;
+  const { totalMonthlyHours } = useTaskContext();
+  
+  if (selectedTasks.length === 0 && totalMonthlyHours === 0) return null;
 
-  const totalMinutes = selectedTasks.reduce((sum, task) => sum + (task.timeRequired || 0), 0) * 60;
+  // Convert hours to minutes for display
+  const totalMinutes = totalMonthlyHours * 60;
 
   return (
     <div className="p-4 bg-gray-50 rounded">

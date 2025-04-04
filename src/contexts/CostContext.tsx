@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTaskContext } from '@/components/area/task/TaskContext';
 
@@ -16,48 +17,28 @@ const CostContext = createContext<CostContextType | undefined>(undefined);
 export const CostProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [totalLaborCost, setTotalLaborCost] = useState(0);
   const [totalEquipmentCost, setTotalEquipmentCost] = useState(0);
-  const [totalWeeklyHours, setTotalWeeklyHours] = useState(0);
   const [laborRate, setLaborRate] = useState(38);
-
-  // Try to get task context, but provide fallback if not available
-  let selectedTasks: any[] = [];
-  try {
-    const taskContext = useTaskContext();
-    selectedTasks = taskContext?.selectedTasks || [];
-    console.log('COST_CONTEXT: Retrieved tasks from context:', {
-      taskCount: selectedTasks.length,
-      tasks: selectedTasks.map(task => ({
-        taskId: task.taskId,
-        timeRequired: task.timeRequired,
-        weeklyHours: task.timeRequired * task.frequency.timesPerWeek,
-        monthlyHours: task.timeRequired * task.frequency.timesPerMonth
-      }))
-    });
-  } catch (error) {
-    console.log('COST_CONTEXT: Task context not available yet, using default values');
-  }
+  
+  // Get task data from the shared TaskContext
+  const { selectedTasks, totalWeeklyHours, totalMonthlyHours } = useTaskContext();
 
   useEffect(() => {
-    // Calculate total weekly hours and costs from selected tasks
-    const weeklyHours = selectedTasks.reduce((total, task) => {
-      const monthlyHours = task.timeRequired || 0;
-      return total + (monthlyHours / 4.33); // Convert monthly to weekly
+    // Calculate labor costs from tasks and rates
+    const laborCost = selectedTasks.reduce((total, task) => {
+      const taskRate = task.laborRate || laborRate;
+      const monthlyHours = task.timeRequired * task.frequency.timesPerMonth;
+      return total + (monthlyHours * taskRate);
     }, 0);
     
-    const monthlyHours = weeklyHours * 4.33;
-    const laborCost = monthlyHours * laborRate;
-    
-    setTotalWeeklyHours(weeklyHours);
     setTotalLaborCost(laborCost);
     
     console.log('COST_CONTEXT: Updated calculations:', {
-      weeklyHours,
-      monthlyHours,
-      laborRate,
       laborCost,
-      selectedTasks: selectedTasks.length
+      totalWeeklyHours,
+      totalMonthlyHours,
+      selectedTasksCount: selectedTasks.length
     });
-  }, [selectedTasks, laborRate]);
+  }, [selectedTasks, laborRate, totalWeeklyHours, totalMonthlyHours]);
 
   const updateLaborCost = (cost: number) => {
     console.log('COST_CONTEXT: Updating labor cost:', cost);

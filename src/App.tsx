@@ -13,7 +13,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <TaskProvider onTasksChange={(area) => console.log('Area changed:', area)}>
+      <TaskProvider>
         <CostProvider>
           <Toaster />
           <Sonner />

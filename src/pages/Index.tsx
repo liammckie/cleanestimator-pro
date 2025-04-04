@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useMemo } from 'react';
 import { DynamicMenu } from '@/components/ui/dynamic-menu';
 import { Tabs } from "@/components/ui/tabs";
@@ -6,11 +7,11 @@ import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { menuOptions } from '@/components/navigation/MenuOptions';
 import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
-import { TaskProvider } from '@/components/area/task/TaskContext';
 import { CostProvider } from '@/contexts/CostContext';
 import { AreaContainer } from '@/components/area/AreaContainer';
 import { ScopeOfWorkSidebar } from '@/components/ScopeOfWorkSidebar';
 import { AreaData } from '@/components/area/task/types';
+import { useTaskContext } from '@/components/area/task/TaskContext';
 
 const OVERHEAD_PERCENTAGE = 0.15;
 
@@ -103,6 +104,9 @@ const Index = () => {
       yearThree: 0,
     },
   });
+  
+  // Use the shared TaskContext
+  const { totalMonthlyHours, selectedTasks } = useTaskContext();
 
   const handleAreaChange = useCallback((area: AreaData) => {
     console.log('Area changed:', area);
@@ -112,6 +116,16 @@ const Index = () => {
       taskCosts: area.selectedTasks
     }));
   }, []);
+
+  // Update labor costs when tasks change
+  React.useEffect(() => {
+    if (totalMonthlyHours > 0) {
+      setLaborCosts(prev => ({
+        ...prev,
+        totalMonthlyHours
+      }));
+    }
+  }, [totalMonthlyHours]);
 
   const costBreakdown = useMemo(() => 
     calculateCosts(sites, laborCosts.hourlyRate),
@@ -136,31 +150,27 @@ const Index = () => {
 
   return (
     <SettingsProvider>
-      <CostProvider>
-        <TaskProvider onTasksChange={handleAreaChange}>
-          <div className="min-h-screen flex w-full bg-background">
-            <div className="flex-1">
-              <AppContent
-                activeTab={activeTab}
-                onAreaChange={handleAreaChange}
-                sites={sites}
-                laborCosts={laborCosts}
-                equipmentCosts={equipmentCosts}
-                contractDetails={contractDetails}
-                costBreakdown={costBreakdown}
-                monthlyRevenue={monthlyRevenue}
-                overhead={overhead}
-                setLaborCosts={setLaborCosts}
-                setEquipmentCosts={setEquipmentCosts}
-                setContractDetails={setContractDetails}
-                setSites={setSites}
-                formattedMenuOptions={formattedMenuOptions}
-                onTabChange={handleTabChange}
-              />
-            </div>
-          </div>
-        </TaskProvider>
-      </CostProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <div className="flex-1">
+          <AppContent
+            activeTab={activeTab}
+            onAreaChange={handleAreaChange}
+            sites={sites}
+            laborCosts={laborCosts}
+            equipmentCosts={equipmentCosts}
+            contractDetails={contractDetails}
+            costBreakdown={costBreakdown}
+            monthlyRevenue={monthlyRevenue}
+            overhead={overhead}
+            setLaborCosts={setLaborCosts}
+            setEquipmentCosts={setEquipmentCosts}
+            setContractDetails={setContractDetails}
+            setSites={setSites}
+            formattedMenuOptions={formattedMenuOptions}
+            onTabChange={handleTabChange}
+          />
+        </div>
+      </div>
     </SettingsProvider>
   );
 };

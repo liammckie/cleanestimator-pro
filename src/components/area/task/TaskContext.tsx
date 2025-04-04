@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { TaskContextType, SelectedTask } from './types';
 import { useTaskTimes } from '@/hooks/useTaskTimes';
@@ -84,39 +85,7 @@ export const TaskProvider = React.memo(({
     }
   }, [selectedTasks]);
 
-  // Update area data when tasks change
-  useEffect(() => {
-    if (onTasksChange) {
-      const areaData = {
-        squareMeters: 0,
-        spaceType: '',
-        industryType: '',
-        selectedTasks: selectedTasks.map(task => ({
-          taskId: task.taskId,
-          quantity: task.quantity,
-          timeRequired: task.timeRequired,
-          frequency: task.frequency,
-          productivityOverride: task.productivityOverride,
-          selectedTool: task.selectedTool,
-          laborRate: task.laborRate || defaultLaborRate
-        })),
-        totalTime: totalMonthlyHours,
-        totalLaborCost: selectedTasks.reduce((sum, task) => {
-          const hourlyRate = task.laborRate || defaultLaborRate;
-          return sum + (task.timeRequired * hourlyRate * task.frequency.timesPerMonth);
-        }, 0)
-      };
-
-      console.log('AREA_UPDATE: Updating area data:', {
-        totalMonthlyHours,
-        totalLaborCost: areaData.totalLaborCost,
-        taskCount: selectedTasks.length
-      });
-
-      onTasksChange(areaData);
-    }
-  }, [selectedTasks, totalMonthlyHours, onTasksChange, defaultLaborRate]);
-
+  // Forward the context's value to anyone consuming it
   const contextValue = useMemo(() => ({
     selectedTasks,
     handleTaskSelection,

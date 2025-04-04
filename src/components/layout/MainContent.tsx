@@ -13,6 +13,7 @@ import { ScopeOfWork } from '@/components/scope/ScopeOfWork';
 import { FinancialTabs } from '@/components/financial/FinancialTabs';
 import { useCostCalculations } from '@/hooks/useCostCalculations';
 import { OnCostsState } from '@/data/types/onCosts';
+import { useTaskContext } from '@/components/area/task/TaskContext';
 
 interface MainContentProps {
   sites: any[];
@@ -46,6 +47,8 @@ export const MainContent: React.FC<MainContentProps> = ({
   overhead,
 }) => {
   const { awardIncrease, setAwardIncrease } = useSettings();
+  const { selectedTasks } = useTaskContext();
+  
   const { 
     handleUpdateSite, 
     handleMarginChange,
@@ -60,8 +63,7 @@ export const MainContent: React.FC<MainContentProps> = ({
     if (laborCosts.employmentType === 'direct') {
       setLaborCosts(prev => ({
         ...prev,
-        hourlyRate: prev.hourlyRate * (1 + (increase /
- 100))
+        hourlyRate: prev.hourlyRate * (1 + (increase / 100))
       }));
     }
   };

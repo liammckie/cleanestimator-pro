@@ -1,6 +1,7 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useTaskContext } from '../area/task/TaskContext';
 import { Site } from '@/data/types/site';
 import { TimeSummaryCard } from './TimeSummaryCard';
@@ -19,19 +20,20 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
     handleQuantityChange, 
     handleFrequencyChange, 
     handleToolChange, 
-    totalWeeklyHours 
+    totalWeeklyHours,
+    totalMonthlyHours
   } = useTaskContext();
   
   const { toast } = useToast();
 
-  // Calculate monthly hours
-  const totalMonthlyHours = totalWeeklyHours * 4.33;
-
-  console.log('Current total weekly hours:', totalWeeklyHours);
-  console.log('Selected tasks:', selectedTasks);
+  console.log('ScopeOfWork rendering with:', {
+    selectedTasks: selectedTasks.length,
+    totalWeeklyHours,
+    totalMonthlyHours
+  });
 
   // Update site's tasks whenever selectedTasks changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (sites.length > 0 && selectedTasks.length > 0) {
       // For now, we'll add all tasks to the first site
       const siteId = sites[0].id;
@@ -45,7 +47,11 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
         productivityOverride: task.productivityOverride
       }));
 
-      console.log('Updating site tasks:', formattedTasks);
+      console.log('Updating site tasks:', {
+        siteId,
+        taskCount: formattedTasks.length
+      });
+      
       onUpdateSite(siteId, formattedTasks);
     }
   }, [selectedTasks, sites, onUpdateSite]);
@@ -102,8 +108,8 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
                   return acc + (productivity.timeRequired * 60 * task.frequency.timesPerWeek) / site.daysPerWeek;
                 }, 0);
 
-                const totalWeeklyHours = (totalDailyMinutes * site.daysPerWeek) / 60;
-                const totalMonthlyHours = totalWeeklyHours * 4.33;
+                const siteWeeklyHours = (totalDailyMinutes * site.daysPerWeek) / 60;
+                const siteMonthlyHours = siteWeeklyHours * 4.33;
 
                 return (
                   <div key={site.id} className="border-b pb-4 last:border-b-0">
@@ -115,11 +121,11 @@ export const ScopeOfWork: React.FC<ScopeOfWorkProps> = ({ sites, onUpdateSite })
                       </div>
                       <div>
                         <span className="text-muted-foreground">Weekly Hours:</span>
-                        <p>{totalWeeklyHours.toFixed(1)}</p>
+                        <p>{siteWeeklyHours.toFixed(1)}</p>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Monthly Hours:</span>
-                        <p>{totalMonthlyHours.toFixed(1)}</p>
+                        <p>{siteMonthlyHours.toFixed(1)}</p>
                       </div>
                     </div>
                   </div>

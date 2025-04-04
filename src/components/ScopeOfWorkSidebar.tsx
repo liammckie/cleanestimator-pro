@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Clock } from "lucide-react";
 import { Site } from '@/data/types/site';
 import { useTaskContext } from './area/task/TaskContext';
-import { toast } from './ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { TaskList } from './scope/TaskList';
 import { SiteSummaryCard } from './scope/SiteSummaryCard';
 import { TimeSummaryCards } from './scope/TimeSummaryCards';
@@ -24,9 +25,10 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
     handleFrequencyChange,
     handleToolChange 
   } = useTaskContext();
+  const { toast } = useToast();
 
   console.log('ScopeOfWorkSidebar rendering with tasks:', {
-    selectedTasks,
+    selectedTasks: selectedTasks.length,
     totalWeeklyHours,
     totalMonthlyHours
   });
@@ -64,7 +66,7 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
 
           {Object.entries(tasksBySite).map(([siteName, siteTasks]) => {
             const siteMonthlyTime = siteTasks.reduce((sum, task) => 
-              sum + (task.timeRequired || 0), 0);
+              sum + (task.timeRequired * task.frequency.timesPerMonth || 0), 0);
             const siteWeeklyTime = siteMonthlyTime / 4.33;
             
             return (
