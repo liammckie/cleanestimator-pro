@@ -60,7 +60,8 @@ export const MainContent: React.FC<MainContentProps> = ({
     if (laborCosts.employmentType === 'direct') {
       setLaborCosts(prev => ({
         ...prev,
-        hourlyRate: prev.hourlyRate * (1 + (increase / 100))
+        hourlyRate: prev.hourlyRate * (1 + (increase /
+ 100))
       }));
     }
   };
