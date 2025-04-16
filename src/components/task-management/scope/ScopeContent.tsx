@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskEditPanel } from './TaskEditPanel';
-import { SelectedTask } from '@/data/types/taskManagement';
+import { SelectedTask } from '@/components/area/task/types';
 
 interface ScopeContentProps {
   selectedTasks: SelectedTask[];
@@ -37,7 +38,7 @@ export const ScopeContent: React.FC<ScopeContentProps> = ({
         <div className="space-y-4">
           {selectedTasks.map((task) => (
             <TaskEditPanel
-              key={task.id}
+              key={task.taskId}
               task={task}
               onQuantityChange={onQuantityChange}
               onFrequencyChange={onFrequencyChange}

@@ -1,32 +1,22 @@
 
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CleaningTask, SelectedTask } from '@/data/types/taskManagement';
+import { CleaningTask } from '@/data/types/taskManagement';
 import { loadTasks } from '@/utils/taskStorage';
 import { useToast } from '@/hooks/use-toast';
-import { calculateManHours, validateTaskInput } from '@/utils/manHourCalculations';
 import { TaskDatabase } from './TaskDatabase';
 import { ScopeContent } from './scope/ScopeContent';
 import { useTaskContext } from '@/components/area/task/TaskContext';
 
-const SELECTED_TASKS_STORAGE_KEY = 'selected-tasks';
-
 export const TaskManagementPage = () => {
   const [tasks, setTasks] = useState<CleaningTask[]>(() => loadTasks());
-  const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>(() => {
-    const savedTasks = localStorage.getItem(SELECTED_TASKS_STORAGE_KEY);
-    return savedTasks ? JSON.parse(savedTasks) : [];
-  });
   const { toast } = useToast();
   const { 
+    selectedTasks,
     handleTaskSelection,
     handleQuantityChange,
     handleFrequencyChange 
   } = useTaskContext();
-
-  useEffect(() => {
-    localStorage.setItem(SELECTED_TASKS_STORAGE_KEY, JSON.stringify(selectedTasks));
-  }, [selectedTasks]);
 
   const handleTaskSelect = (task: CleaningTask) => {
     // Use the global task context

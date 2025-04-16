@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Site } from '@/data/types/site';
 import { v4 as uuidv4 } from 'uuid';
 import { SiteList } from './site/SiteList';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+import { useTaskContext } from './area/task/TaskContext';
 
 interface SiteManagerProps {
   onSitesChange: (sites: Site[]) => void;
 }
 
 export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
+  const { selectedTasks } = useTaskContext();
   const [sites, setSites] = useState<Site[]>([
     {
       id: uuidv4(),
@@ -31,6 +32,32 @@ export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
       }
     }
   ]);
+
+  // Update sites when selectedTasks change
+  useEffect(() => {
+    if (selectedTasks.length > 0 && sites.length > 0) {
+      const updatedSites = [...sites];
+      // Assign tasks to the first site for simplicity
+      updatedSites[0] = {
+        ...updatedSites[0],
+        area: {
+          ...updatedSites[0].area,
+          selectedTasks: selectedTasks.map(task => ({
+            taskId: task.taskId,
+            quantity: task.quantity,
+            timeRequired: task.timeRequired,
+            frequency: task.frequency,
+            productivityOverride: task.productivityOverride
+          })),
+          totalTime: selectedTasks.reduce((total, task) => {
+            return total + (task.timeRequired * task.frequency.timesPerMonth);
+          }, 0)
+        }
+      };
+      setSites(updatedSites);
+      onSitesChange(updatedSites);
+    }
+  }, [selectedTasks]);
 
   const addSite = () => {
     const clientName = sites[0]?.client || '';

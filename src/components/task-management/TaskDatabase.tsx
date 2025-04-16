@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -8,8 +9,9 @@ import {
 } from "@/components/ui/accordion";
 import { TaskSelectionPanel } from './TaskSelectionPanel';
 import { CsvImport } from './CsvImport';
-import { CleaningTask, SelectedTask } from '@/data/types/taskManagement';
+import { CleaningTask } from '@/data/types/taskManagement';
 import { saveTasks } from '@/utils/taskStorage';
+import { SelectedTask } from '@/components/area/task/types';
 
 interface TaskDatabaseProps {
   tasks: CleaningTask[];
@@ -36,6 +38,16 @@ export const TaskDatabase: React.FC<TaskDatabaseProps> = ({
     return acc;
   }, {} as Record<string, CleaningTask[]>);
 
+  // Function to check if a task is selected
+  const isTaskSelected = (taskId: string) => {
+    return selectedTasks.some(t => t.taskId === taskId);
+  };
+
+  // Function to get the selected task by ID
+  const getSelectedTask = (taskId: string) => {
+    return selectedTasks.find(t => t.taskId === taskId);
+  };
+
   return (
     <>
       <Card>
@@ -55,10 +67,10 @@ export const TaskDatabase: React.FC<TaskDatabaseProps> = ({
                       <TaskSelectionPanel
                         key={task.id}
                         task={task}
-                        selectedTask={selectedTasks.find(t => t.id === task.id)}
+                        selectedTask={isTaskSelected(task.id) ? getSelectedTask(task.id) : undefined}
                         onSelect={() => onTaskSelection(task)}
-                        onQuantityChange={onQuantityChange}
-                        onFrequencyChange={onFrequencyChange}
+                        onQuantityChange={(id, quantity) => onQuantityChange(id, quantity)}
+                        onFrequencyChange={(id, timesPerWeek) => onFrequencyChange(id, timesPerWeek)}
                       />
                     ))}
                   </div>

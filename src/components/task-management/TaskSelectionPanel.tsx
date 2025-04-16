@@ -1,10 +1,12 @@
+
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CleaningTask, SelectedTask } from '@/data/types/taskManagement';
+import { CleaningTask } from '@/data/types/taskManagement';
+import { SelectedTask } from '@/components/area/task/types';
 
 interface TaskSelectionPanelProps {
   task: CleaningTask;
@@ -26,62 +28,60 @@ export const TaskSelectionPanel: React.FC<TaskSelectionPanelProps> = ({
   return (
     <Card className="w-full">
       <CardContent className="pt-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="font-medium">{task.taskName}</h3>
-            <p className="text-sm text-muted-foreground">
-              {task.productivityRate} {task.measurementUnit}
-            </p>
-          </div>
-          <Button
-            variant={isSelected ? "secondary" : "default"}
-            onClick={onSelect}
-          >
-            {isSelected ? "Selected" : "Add Task"}
-          </Button>
+        <div className="flex items-center space-x-3 mb-4">
+          <Checkbox 
+            id={`task-${task.id}`}
+            checked={isSelected}
+            onCheckedChange={onSelect}
+          />
+          <Label htmlFor={`task-${task.id}`} className="text-base font-medium cursor-pointer">
+            {task.taskName}
+          </Label>
+          <span className="text-sm text-muted-foreground ml-auto">
+            {task.measurementUnit}
+          </span>
         </div>
-
+        
         {isSelected && (
-          <div className="space-y-4">
-            <div>
-              <Label>
-                {task.measurementUnit === 'SQM/hour' ? 'Area (SQM)' : 'Unit Count'}
+          <div className="space-y-4 pl-7 mt-2">
+            <div className="grid gap-2">
+              <Label htmlFor={`quantity-${task.id}`}>
+                {task.measurementUnit === 'SQM/hour' ? 'Area (SQM)' : 'Units'}
               </Label>
               <Input
+                id={`quantity-${task.id}`}
                 type="number"
                 value={selectedTask.quantity || ''}
                 onChange={(e) => onQuantityChange(task.id, Number(e.target.value))}
-                placeholder={`Enter ${task.measurementUnit === 'SQM/hour' ? 'area' : 'units'}`}
+                placeholder="Enter quantity"
               />
             </div>
-
-            <div>
-              <Label>Frequency (times per week)</Label>
-              <Select
-                value={selectedTask.frequency.timesPerWeek.toString()}
+            
+            <div className="grid gap-2">
+              <Label htmlFor={`frequency-${task.id}`}>Frequency (times per week)</Label>
+              <Select 
+                value={selectedTask.frequency?.timesPerWeek?.toString() || '1'}
                 onValueChange={(value) => onFrequencyChange(task.id, Number(value))}
               >
-                <SelectTrigger>
+                <SelectTrigger id={`frequency-${task.id}`}>
                   <SelectValue placeholder="Select frequency" />
                 </SelectTrigger>
                 <SelectContent>
-                  {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
-                    <SelectItem key={freq} value={freq.toString()}>
-                      {freq}x per week
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="1">1x per week</SelectItem>
+                  <SelectItem value="2">2x per week</SelectItem>
+                  <SelectItem value="3">3x per week</SelectItem>
+                  <SelectItem value="5">5x per week</SelectItem>
+                  <SelectItem value="7">7x per week</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-
-            {selectedTask.manHours > 0 && (
-              <div className="text-sm text-muted-foreground">
-                <p>Monthly Hours: {selectedTask.manHours.toFixed(2)}</p>
-                <p>Hours per Service: {(selectedTask.manHours / selectedTask.frequency.timesPerMonth).toFixed(2)}</p>
-              </div>
-            )}
           </div>
         )}
+        
+        <div className="text-sm text-muted-foreground mt-2">
+          <p>Rate: {task.productivityRate} {task.measurementUnit}</p>
+          {task.notes && <p className="mt-1">{task.notes}</p>}
+        </div>
       </CardContent>
     </Card>
   );

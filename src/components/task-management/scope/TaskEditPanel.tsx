@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { SelectedTask } from '@/data/types/taskManagement';
+import { SelectedTask } from '@/components/area/task/types';
 
 interface TaskEditPanelProps {
   task: SelectedTask;
@@ -22,23 +23,27 @@ export const TaskEditPanel: React.FC<TaskEditPanelProps> = ({
   onRemoveTask,
 }) => {
   const { toast } = useToast();
-
+  const taskId = task.taskId;
+  const taskName = task.name || 'Task';
+  
   const handleRemove = () => {
-    onRemoveTask(task.id);
+    onRemoveTask(taskId);
     toast({
       title: "Task Removed",
-      description: `${task.taskName} has been removed from the scope.`,
+      description: `${taskName} has been removed from the scope.`,
     });
   };
+
+  const monthlyHours = task.timeRequired * task.frequency.timesPerMonth;
 
   return (
     <Card className="w-full mb-4">
       <CardContent className="pt-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="font-medium">{task.taskName}</h3>
+            <h3 className="font-medium">{taskName}</h3>
             <p className="text-sm text-muted-foreground">
-              {task.measurementUnit === 'SQM/hour' ? 'Area Coverage' : 'Unit Count'}
+              Task ID: {taskId}
             </p>
           </div>
           <Button
@@ -53,14 +58,12 @@ export const TaskEditPanel: React.FC<TaskEditPanelProps> = ({
 
         <div className="grid gap-4">
           <div>
-            <Label>
-              {task.measurementUnit === 'SQM/hour' ? 'Area (SQM)' : 'Units'}
-            </Label>
+            <Label>Quantity</Label>
             <Input
               type="number"
               value={task.quantity || ''}
-              onChange={(e) => onQuantityChange(task.id, Number(e.target.value))}
-              placeholder={`Enter ${task.measurementUnit === 'SQM/hour' ? 'area' : 'units'}`}
+              onChange={(e) => onQuantityChange(taskId, Number(e.target.value))}
+              placeholder="Enter quantity"
               className="mt-1"
             />
           </div>
@@ -69,7 +72,7 @@ export const TaskEditPanel: React.FC<TaskEditPanelProps> = ({
             <Label>Frequency (times per week)</Label>
             <Select
               value={task.frequency.timesPerWeek.toString()}
-              onValueChange={(value) => onFrequencyChange(task.id, Number(value))}
+              onValueChange={(value) => onFrequencyChange(taskId, Number(value))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select frequency" />
@@ -87,8 +90,8 @@ export const TaskEditPanel: React.FC<TaskEditPanelProps> = ({
           <div className="bg-accent/50 p-4 rounded-lg space-y-2">
             <h4 className="font-medium">Time Requirements</h4>
             <div className="text-sm space-y-1">
-              <p>Time per service: {((task.manHours * 60) / task.frequency.timesPerMonth).toFixed(1)} minutes</p>
-              <p>Monthly hours: {task.manHours.toFixed(1)} hours</p>
+              <p>Time per service: {((task.timeRequired * 60)).toFixed(1)} minutes</p>
+              <p>Monthly hours: {monthlyHours.toFixed(1)} hours</p>
             </div>
           </div>
         </div>

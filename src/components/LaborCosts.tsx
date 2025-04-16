@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cleaningAwardLevels } from '@/data/award/cleaningAward';
@@ -47,7 +48,7 @@ const defaultOnCosts: OnCostsState = {
 };
 
 export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => {
-  const { totalWeeklyHours = 0, totalMonthlyHours = 0 } = useTaskContext();
+  const { totalWeeklyHours = 0, totalMonthlyHours = 0, selectedTasks } = useTaskContext();
   const { updateLaborRate } = useCostContext();
   const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
   const [contractedRate, setContractedRate] = useState<number>(38);
@@ -59,7 +60,8 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
   useEffect(() => {
     console.log('Labor costs component mounted with hours:', {
       totalWeeklyHours,
-      totalMonthlyHours
+      totalMonthlyHours,
+      selectedTasksCount: selectedTasks.length
     });
     updateLaborCosts('contracted');
   }, []);
@@ -67,10 +69,11 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
   useEffect(() => {
     console.log('Hours updated:', {
       totalWeeklyHours,
-      totalMonthlyHours
+      totalMonthlyHours,
+      selectedTasksCount: selectedTasks.length
     });
     updateLaborCosts(employmentType);
-  }, [totalWeeklyHours, totalMonthlyHours]);
+  }, [totalWeeklyHours, totalMonthlyHours, selectedTasks.length]);
 
   const handleEmploymentTypeChange = (value: 'contracted' | 'direct') => {
     setEmploymentType(value);
