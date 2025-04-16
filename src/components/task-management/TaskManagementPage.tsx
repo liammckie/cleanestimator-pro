@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { TaskDatabase } from './TaskDatabase';
 import { ScopeContent } from './scope/ScopeContent';
 import { useTaskContext } from '@/components/area/task/TaskContext';
+import { getRateById } from '@/data/rates/ratesManager';
 
 export const TaskManagementPage = () => {
   const [tasks, setTasks] = useState<CleaningTask[]>(() => loadTasks());
@@ -19,12 +20,20 @@ export const TaskManagementPage = () => {
   } = useTaskContext();
 
   const handleTaskSelect = (task: CleaningTask) => {
+    // Get task details for better display in sidebar and other components
+    const rateDetails = getRateById(task.id);
+    
     // Use the global task context
-    handleTaskSelection(task.id, true, undefined, task.taskName);
+    handleTaskSelection(
+      task.id, 
+      true, 
+      undefined, 
+      task.taskName || rateDetails?.task || `Task ${task.id.slice(0, 8)}...`
+    );
     
     toast({
       title: "Task Added",
-      description: `${task.taskName} has been added to your scope of work.`,
+      description: `${task.taskName || 'Task'} has been added to your scope of work.`,
     });
   };
 
@@ -37,6 +46,11 @@ export const TaskManagementPage = () => {
       description: "Task has been removed from the scope of work.",
     });
   };
+
+  // Log tasks when they change to help with debugging
+  useEffect(() => {
+    console.log('TaskManagementPage - Current selected tasks:', selectedTasks);
+  }, [selectedTasks]);
 
   return (
     <div className="space-y-6">

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SelectedTask } from '@/components/area/task/types';
+import { getRateById } from '@/data/rates/ratesManager';
 
 interface TaskEditPanelProps {
   task: SelectedTask;
@@ -24,7 +25,13 @@ export const TaskEditPanel: React.FC<TaskEditPanelProps> = ({
 }) => {
   const { toast } = useToast();
   const taskId = task.taskId;
-  const taskName = task.name || 'Task';
+  
+  // Get task details from productivity rates if not available in task object
+  const taskDetails = useMemo(() => {
+    return getRateById(taskId);
+  }, [taskId]);
+
+  const taskName = task.name || taskDetails?.task || 'Unknown Task';
   
   const handleRemove = () => {
     onRemoveTask(taskId);
@@ -43,7 +50,7 @@ export const TaskEditPanel: React.FC<TaskEditPanelProps> = ({
           <div>
             <h3 className="font-medium">{taskName}</h3>
             <p className="text-sm text-muted-foreground">
-              Task ID: {taskId}
+              {taskDetails?.category || 'General Task'} • ID: {taskId.slice(0, 8)}...
             </p>
           </div>
           <Button
@@ -58,7 +65,7 @@ export const TaskEditPanel: React.FC<TaskEditPanelProps> = ({
 
         <div className="grid gap-4">
           <div>
-            <Label>Quantity</Label>
+            <Label>Quantity {taskDetails?.unit && `(${taskDetails.unit})`}</Label>
             <Input
               type="number"
               value={task.quantity || ''}

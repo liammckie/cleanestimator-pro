@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskEditPanel } from './TaskEditPanel';
 import { SelectedTask } from '@/components/area/task/types';
+import { getRateById } from '@/data/rates/ratesManager';
 
 interface ScopeContentProps {
   selectedTasks: SelectedTask[];
@@ -17,7 +18,19 @@ export const ScopeContent: React.FC<ScopeContentProps> = ({
   onFrequencyChange,
   onRemoveTask,
 }) => {
-  if (selectedTasks.length === 0) {
+  // Add task details for display if not present
+  const tasksWithDetails = selectedTasks.map(task => {
+    if (!task.name) {
+      const rateDetails = getRateById(task.taskId);
+      return {
+        ...task,
+        name: rateDetails?.task || `Task ${task.taskId.slice(0, 6)}...`
+      };
+    }
+    return task;
+  });
+
+  if (tasksWithDetails.length === 0) {
     return (
       <Card>
         <CardContent className="pt-6">
@@ -36,7 +49,7 @@ export const ScopeContent: React.FC<ScopeContentProps> = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {selectedTasks.map((task) => (
+          {tasksWithDetails.map((task) => (
             <TaskEditPanel
               key={task.taskId}
               task={task}
