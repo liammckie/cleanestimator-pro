@@ -7,6 +7,18 @@ import { CleaningTask } from '@/data/types/taskManagement';
 
 const LOCAL_STORAGE_KEY = 'cleaning-tasks';
 
+const mapRowToTask = (row: any): CleaningTask => ({
+  id: row.id,
+  category: row.category,
+  taskName: row.task_name,
+  productivityRate: row.productivity_rate,
+  measurementUnit: row.measurement_unit,
+  minimumQuantity: row.minimum_quantity ?? undefined,
+  chargeRate: row.charge_rate ?? undefined,
+  notes: row.notes ?? undefined,
+  defaultTool: row.default_tool ?? undefined,
+});
+
 export const fetchTasks = async (): Promise<CleaningTask[]> => {
   try {
     // Try to get tasks from localStorage
@@ -20,64 +32,5 @@ export const fetchTasks = async (): Promise<CleaningTask[]> => {
   } catch (error) {
     console.error('Error fetching tasks:', error);
     return [];
-  }
-};
-
-export const insertTask = async (task: Omit<CleaningTask, 'id'>): Promise<CleaningTask | null> => {
-  try {
-    // Generate a UUID for the task
-    const newTask: CleaningTask = {
-      ...task,
-      id: crypto.randomUUID()
-    };
-    
-    // Get existing tasks
-    const existingTasks = await fetchTasks();
-    
-    // Add new task
-    const updatedTasks = [...existingTasks, newTask];
-    
-    // Save to localStorage
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedTasks));
-    
-    console.log('Task inserted successfully:', newTask);
-    return newTask;
-  } catch (error) {
-    console.error('Error inserting task:', error);
-    return null;
-  }
-};
-
-// Additional methods can be added as needed
-export const updateTask = async (id: string, updates: Partial<CleaningTask>): Promise<CleaningTask | null> => {
-  try {
-    const tasks = await fetchTasks();
-    const taskIndex = tasks.findIndex(t => t.id === id);
-    
-    if (taskIndex === -1) {
-      return null;
-    }
-    
-    const updatedTask = { ...tasks[taskIndex], ...updates };
-    tasks[taskIndex] = updatedTask;
-    
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(tasks));
-    return updatedTask;
-  } catch (error) {
-    console.error('Error updating task:', error);
-    return null;
-  }
-};
-
-export const deleteTask = async (id: string): Promise<boolean> => {
-  try {
-    const tasks = await fetchTasks();
-    const filteredTasks = tasks.filter(t => t.id !== id);
-    
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filteredTasks));
-    return true;
-  } catch (error) {
-    console.error('Error deleting task:', error);
-    return false;
-  }
+  }\
 };
