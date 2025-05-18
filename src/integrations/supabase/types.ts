@@ -9,7 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      periodic_cleaning_services: {
+        Row: {
+          category: string
+          condition: string | null
+          created_at: string | null
+          id: string
+          minimum_hours: number | null
+          minimum_quantity: number | null
+          rate: number
+          service_name: string
+          unit_of_measure: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          condition?: string | null
+          created_at?: string | null
+          id?: string
+          minimum_hours?: number | null
+          minimum_quantity?: number | null
+          rate: number
+          service_name: string
+          unit_of_measure: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          condition?: string | null
+          created_at?: string | null
+          id?: string
+          minimum_hours?: number | null
+          minimum_quantity?: number | null
+          rate?: number
+          service_name?: string
+          unit_of_measure?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

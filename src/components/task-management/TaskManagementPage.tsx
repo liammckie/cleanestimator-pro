@@ -8,6 +8,7 @@ import { TaskDatabase } from './TaskDatabase';
 import { ScopeContent } from './scope/ScopeContent';
 import { useTaskContext } from '@/components/area/task/TaskContext';
 import { getRateById } from '@/data/rates/ratesManager';
+import { PeriodicServicesPage } from '../periodic-services/PeriodicServicesPage';
 
 export const TaskManagementPage = () => {
   const [tasks, setTasks] = useState<CleaningTask[]>(() => loadTasks());
@@ -58,6 +59,7 @@ export const TaskManagementPage = () => {
         <TabsList>
           <TabsTrigger value="database">Task Database</TabsTrigger>
           <TabsTrigger value="scope">Scope of Work</TabsTrigger>
+          <TabsTrigger value="periodic">Periodic Services</TabsTrigger>
         </TabsList>
 
         <TabsContent value="database">
@@ -78,6 +80,10 @@ export const TaskManagementPage = () => {
             onFrequencyChange={handleFrequencyChange}
             onRemoveTask={handleRemoveTask}
           />
+        </TabsContent>
+        
+        <TabsContent value="periodic">
+          <PeriodicServicesPage />
         </TabsContent>
       </Tabs>
     </div>

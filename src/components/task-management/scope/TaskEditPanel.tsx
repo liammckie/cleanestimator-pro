@@ -1,14 +1,14 @@
 
-import React, { useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { SelectedTask } from '@/components/area/task/types';
 import { getRateById } from '@/data/rates/ratesManager';
+import { getServiceById } from '@/services/periodicServicesService';
 
 interface TaskEditPanelProps {
   task: SelectedTask;
@@ -23,83 +23,100 @@ export const TaskEditPanel: React.FC<TaskEditPanelProps> = ({
   onFrequencyChange,
   onRemoveTask,
 }) => {
-  const { toast } = useToast();
-  const taskId = task.taskId;
-  
-  // Get task details from productivity rates if not available in task object
-  const taskDetails = useMemo(() => {
-    return getRateById(taskId);
-  }, [taskId]);
+  const [taskName, setTaskName] = useState(task.name || '');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const taskName = task.name || taskDetails?.task || 'Unknown Task';
-  
-  const handleRemove = () => {
-    onRemoveTask(taskId);
-    toast({
-      title: "Task Removed",
-      description: `${taskName} has been removed from the scope.`,
-    });
-  };
+  // Attempt to get task details from various sources
+  useEffect(() => {
+    const loadTaskDetails = async () => {
+      // If we already have a name, don't need to fetch
+      if (task.name) {
+        setTaskName(task.name);
+        return;
+      }
 
-  const monthlyHours = task.timeRequired * task.frequency.timesPerMonth;
+      setIsLoading(true);
+      
+      // First try from rates data
+      const rateDetails = getRateById(task.taskId);
+      if (rateDetails?.task) {
+        setTaskName(rateDetails.task);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Then try from periodic services
+      try {
+        const serviceDetails = await getServiceById(task.taskId);
+        if (serviceDetails?.service_name) {
+          setTaskName(serviceDetails.service_name);
+        } else {
+          // Fallback to task ID
+          setTaskName(`Task ${task.taskId.slice(0, 8)}...`);
+        }
+      } catch (error) {
+        console.error('Failed to load task details:', error);
+        setTaskName(`Task ${task.taskId.slice(0, 8)}...`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadTaskDetails();
+  }, [task.taskId, task.name]);
 
   return (
-    <Card className="w-full mb-4">
+    <Card>
       <CardContent className="pt-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex justify-between items-start mb-4">
           <div>
-            <h3 className="font-medium">{taskName}</h3>
+            <h3 className="text-lg font-medium">
+              {isLoading ? 'Loading task details...' : taskName}
+            </h3>
             <p className="text-sm text-muted-foreground">
-              {taskDetails?.category || 'General Task'} • ID: {taskId.slice(0, 8)}...
+              Time Required: {task.timeRequired.toFixed(1)} hours/month
             </p>
           </div>
-          <Button
-            variant="ghost"
+          <Button 
+            variant="ghost" 
             size="icon"
-            onClick={handleRemove}
-            className="text-destructive hover:text-destructive/90"
+            onClick={() => onRemoveTask(task.taskId)}
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-5 w-5" />
           </Button>
         </div>
 
-        <div className="grid gap-4">
-          <div>
-            <Label>Quantity {taskDetails?.unit && `(${taskDetails.unit})`}</Label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor={`quantity-${task.taskId}`}>Quantity</Label>
             <Input
+              id={`quantity-${task.taskId}`}
               type="number"
+              min="0"
               value={task.quantity || ''}
-              onChange={(e) => onQuantityChange(taskId, Number(e.target.value))}
-              placeholder="Enter quantity"
-              className="mt-1"
+              onChange={(e) => onQuantityChange(task.taskId, Number(e.target.value))}
             />
           </div>
 
-          <div>
-            <Label>Frequency (times per week)</Label>
+          <div className="space-y-2">
+            <Label htmlFor={`frequency-${task.taskId}`}>Frequency (times per week)</Label>
             <Select
               value={task.frequency.timesPerWeek.toString()}
-              onValueChange={(value) => onFrequencyChange(taskId, Number(value))}
+              onValueChange={(value) => onFrequencyChange(task.taskId, Number(value))}
             >
-              <SelectTrigger>
+              <SelectTrigger id={`frequency-${task.taskId}`}>
                 <SelectValue placeholder="Select frequency" />
               </SelectTrigger>
               <SelectContent>
-                {[1, 2, 3, 4, 5, 6, 7].map((freq) => (
-                  <SelectItem key={freq} value={freq.toString()}>
-                    {freq}x per week
-                  </SelectItem>
-                ))}
+                <SelectItem value="1">1x per week</SelectItem>
+                <SelectItem value="2">2x per week</SelectItem>
+                <SelectItem value="3">3x per week</SelectItem>
+                <SelectItem value="4">4x per week</SelectItem>
+                <SelectItem value="5">5x per week</SelectItem>
+                <SelectItem value="6">6x per week</SelectItem>
+                <SelectItem value="7">7x per week</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="bg-accent/50 p-4 rounded-lg space-y-2">
-            <h4 className="font-medium">Time Requirements</h4>
-            <div className="text-sm space-y-1">
-              <p>Time per service: {((task.timeRequired * 60)).toFixed(1)} minutes</p>
-              <p>Monthly hours: {monthlyHours.toFixed(1)} hours</p>
-            </div>
           </div>
         </div>
       </CardContent>
