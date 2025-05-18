@@ -37,7 +37,9 @@ export const databaseHandler = {
     data: TableRow<T>[] | null;
     error: PostgrestError | null;
   }> {
-    let query = supabase.from(table).select(options?.select || '*');
+    let query = supabase
+      .from<TableRow<T>>(table)
+      .select(options?.select || '*');
 
     if (options?.filter) {
       Object.entries(options.filter).forEach(([column, value]) => {
@@ -60,7 +62,7 @@ export const databaseHandler = {
     }
 
     const result = await query;
-    return { data: result.data as TableRow<T>[] | null, error: result.error };
+    return { data: result.data as unknown as TableRow<T>[] | null, error: result.error };
   },
 
   /**
@@ -76,10 +78,10 @@ export const databaseHandler = {
     error: PostgrestError | null;
   }> {
     const result = await supabase
-      .from(table)
-      .insert(data)
+      .from<TableRow<T>>(table)
+      .insert(data as TableInsert<T> | TableInsert<T>[])
       .select();
-    return { data: result.data as TableRow<T>[] | null, error: result.error };
+    return { data: result.data as unknown as TableRow<T>[] | null, error: result.error };
   },
 
   /**
@@ -96,14 +98,16 @@ export const databaseHandler = {
     data: TableRow<T>[] | null;
     error: PostgrestError | null;
   }> {
-    let queryBuilder = supabase.from(table).update(data);
+    let queryBuilder = supabase
+      .from<TableRow<T>>(table)
+      .update(data as TableUpdate<T>);
 
     Object.entries(filter).forEach(([column, value]) => {
       queryBuilder = queryBuilder.eq(column, value);
     });
 
     const result = await queryBuilder.select();
-    return { data: result.data as TableRow<T>[] | null, error: result.error };
+    return { data: result.data as unknown as TableRow<T>[] | null, error: result.error };
   },
 
   /**
@@ -118,14 +122,16 @@ export const databaseHandler = {
     data: TableRow<T>[] | null;
     error: PostgrestError | null;
   }> {
-    let queryBuilder = supabase.from(table).delete();
+    let queryBuilder = supabase
+      .from<TableRow<T>>(table)
+      .delete();
 
     Object.entries(filter).forEach(([column, value]) => {
       queryBuilder = queryBuilder.eq(column, value);
     });
     
     const result = await queryBuilder.select();
-    return { data: result.data as TableRow<T>[] | null, error: result.error };
+    return { data: result.data as unknown as TableRow<T>[] | null, error: result.error };
   },
 
   /**
