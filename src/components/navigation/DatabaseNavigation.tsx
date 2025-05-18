@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Buildings, Home } from 'lucide-react';
+import { Building, Home } from 'lucide-react';
 
 export const DatabaseNavigation = () => {
   return (
@@ -15,7 +15,7 @@ export const DatabaseNavigation = () => {
       </Button>
       <Button variant="outline" asChild>
         <Link to="/industry-database" className="flex items-center gap-2">
-          <Buildings className="h-4 w-4" />
+          <Building className="h-4 w-4" />
           Industry Database
         </Link>
       </Button>

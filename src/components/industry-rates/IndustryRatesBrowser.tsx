@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getIndustryTypes } from '@/services/industryRatesService';
 import { IndustryRatesTable } from './IndustryRatesTable';
-import { Buildings, Info } from 'lucide-react';
+import { Building, Info } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 export const IndustryRatesBrowser = () => {
@@ -41,7 +41,7 @@ export const IndustryRatesBrowser = () => {
     <Card>
       <CardHeader className="bg-primary/5">
         <CardTitle className="flex items-center gap-2">
-          <Buildings className="h-5 w-5" />
+          <Building className="h-5 w-5" />
           Industry Productivity Rates
         </CardTitle>
       </CardHeader>

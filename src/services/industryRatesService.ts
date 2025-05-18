@@ -17,18 +17,20 @@ export type IndustryProductivityRate = {
 };
 
 export const getIndustryTypes = async (): Promise<string[]> => {
+  // Instead of distinctOn which isn't available, we'll use a different approach
   const { data, error } = await supabase
     .from('industry_productivity_rates')
     .select('industry_type')
-    .order('industry_type')
-    .distinctOn('industry_type');
+    .order('industry_type');
   
   if (error) {
     console.error('Error fetching industry types:', error);
     return [];
   }
   
-  return data.map(item => item.industry_type);
+  // Filter unique industry_types manually
+  const uniqueTypes = [...new Set(data.map(item => item.industry_type))];
+  return uniqueTypes;
 };
 
 export const getRatesByIndustry = async (industryType: string): Promise<IndustryProductivityRate[]> => {
