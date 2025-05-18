@@ -16,6 +16,12 @@ const taskSchema = z.object({
   productivityRate: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
     message: 'Must be a positive number',
   }),
+  minimumQuantity: z.string().optional().refine((val) => val === undefined || val === '' || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0), {
+    message: 'Must be a non-negative number',
+  }),
+  chargeRate: z.string().optional().refine((val) => val === undefined || val === '' || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0), {
+    message: 'Must be a non-negative number',
+  }),
   measurementUnit: z.enum(['SQM/hour', 'Units/hour']),
   notes: z.string().optional(),
 });
@@ -33,10 +39,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, initialData, mode 
     defaultValues: initialData ? {
       ...initialData,
       productivityRate: String(initialData.productivityRate),
+      minimumQuantity: initialData.minimumQuantity ? String(initialData.minimumQuantity) : '',
+      chargeRate: initialData.chargeRate ? String(initialData.chargeRate) : '',
     } : {
       category: 'Core Cleaning',
       taskName: '',
       productivityRate: '',
+      minimumQuantity: '',
+      chargeRate: '',
       measurementUnit: 'SQM/hour',
       notes: '',
     },
@@ -47,6 +57,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, initialData, mode 
       category: values.category as TaskCategory,
       taskName: values.taskName,
       productivityRate: parseFloat(values.productivityRate),
+      minimumQuantity: values.minimumQuantity ? parseFloat(values.minimumQuantity) : undefined,
+      chargeRate: values.chargeRate ? parseFloat(values.chargeRate) : undefined,
       measurementUnit: values.measurementUnit,
       notes: values.notes,
     });
@@ -105,6 +117,34 @@ export const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, initialData, mode 
               <FormLabel>Productivity Rate</FormLabel>
               <FormControl>
                 <Input type="number" placeholder="Enter rate" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="minimumQuantity"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Minimum Quantity (optional)</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="0" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="chargeRate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Charge Rate per Unit (optional)</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="0" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -22,10 +22,10 @@ export const CsvImport: React.FC<CsvImportProps> = ({ onImport }) => {
       const line = lines[i].trim();
       if (!line) continue;
 
-      const [category, taskName, productivityRate, measurementUnit, notes = ''] = line.split(',').map(item => item.trim());
+      const [category, taskName, productivityRate, measurementUnit, minimumQuantity = '', chargeRate = '', notes = ''] = line.split(',').map(item => item.trim());
 
       if (!category || !taskName || !productivityRate || !measurementUnit) {
-        throw new Error(`Invalid format in line ${i + 1}. Expected: Category,TaskName,ProductivityRate,MeasurementUnit[,Notes]`);
+        throw new Error(`Invalid format in line ${i + 1}. Expected: Category,TaskName,ProductivityRate,MeasurementUnit[,MinimumQuantity,ChargeRate,Notes]`);
       }
 
       if (!['Core Cleaning', 'Specialized Cleaning', 'Industry-Specific Cleaning'].includes(category)) {
@@ -46,6 +46,8 @@ export const CsvImport: React.FC<CsvImportProps> = ({ onImport }) => {
         taskName,
         productivityRate: rate,
         measurementUnit: measurementUnit as 'SQM/hour' | 'Units/hour',
+        minimumQuantity: minimumQuantity ? parseFloat(minimumQuantity) : undefined,
+        chargeRate: chargeRate ? parseFloat(chargeRate) : undefined,
         notes
       });
     }
@@ -76,13 +78,13 @@ export const CsvImport: React.FC<CsvImportProps> = ({ onImport }) => {
       <div>
         <h3 className="text-lg font-medium mb-2">Import Tasks from CSV</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Paste CSV data in the format: Category,TaskName,ProductivityRate,MeasurementUnit,Notes(optional)
+          Paste CSV data in the format: Category,TaskName,ProductivityRate,MeasurementUnit[,MinimumQuantity,ChargeRate,Notes]
         </p>
       </div>
       <Textarea
         value={csvText}
         onChange={(e) => setCsvText(e.target.value)}
-        placeholder="Core Cleaning,Vacuum Carpets,200,SQM/hour,Regular vacuuming of carpeted areas"
+        placeholder="Core Cleaning,Vacuum Carpets,200,SQM/hour,10,5,Regular vacuuming of carpeted areas"
         className="min-h-[200px]"
       />
       {error && (
