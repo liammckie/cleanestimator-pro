@@ -9,6 +9,51 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      industry_productivity_rates: {
+        Row: {
+          area_name: string
+          basin_min: number | null
+          ceramic_urinal_min: number | null
+          created_at: string | null
+          id: string
+          industry_type: string
+          pans_min: number | null
+          prod_rate_hard_floor: number | null
+          prod_rate_soft_floor: number | null
+          shower_min: number | null
+          ss_urinal_min: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          area_name: string
+          basin_min?: number | null
+          ceramic_urinal_min?: number | null
+          created_at?: string | null
+          id?: string
+          industry_type: string
+          pans_min?: number | null
+          prod_rate_hard_floor?: number | null
+          prod_rate_soft_floor?: number | null
+          shower_min?: number | null
+          ss_urinal_min?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          area_name?: string
+          basin_min?: number | null
+          ceramic_urinal_min?: number | null
+          created_at?: string | null
+          id?: string
+          industry_type?: string
+          pans_min?: number | null
+          prod_rate_hard_floor?: number | null
+          prod_rate_soft_floor?: number | null
+          shower_min?: number | null
+          ss_urinal_min?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       periodic_cleaning_services: {
         Row: {
           category: string

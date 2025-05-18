@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TaskProvider } from "./components/area/task/TaskContext";
 import { CostProvider } from "./contexts/CostContext";
 import Index from "./pages/Index";
+import IndustryDatabase from "./pages/IndustryDatabase";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
             <Sonner />
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/industry-database" element={<IndustryDatabase />} />
             </Routes>
           </TooltipProvider>
         </CostProvider>
