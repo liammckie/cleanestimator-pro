@@ -40,6 +40,7 @@ export const PeriodicServiceEditor: React.FC<PeriodicServiceEditorProps> = ({
         variant="ghost" 
         onClick={handleSave}
         className="h-8 w-8 text-green-500"
+        title="Save changes"
       >
         <Check className="h-4 w-4" />
       </Button>
@@ -48,6 +49,7 @@ export const PeriodicServiceEditor: React.FC<PeriodicServiceEditorProps> = ({
         variant="ghost" 
         onClick={onCancel}
         className="h-8 w-8 text-red-500"
+        title="Cancel"
       >
         <X className="h-4 w-4" />
       </Button>

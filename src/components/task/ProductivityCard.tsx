@@ -1,10 +1,10 @@
+
 import React, { memo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Activity, HelpCircle } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
@@ -28,16 +28,14 @@ export const ProductivityCard = memo(({ productivity }: ProductivityCardProps) =
       <div className="flex items-center gap-2 mb-2">
         <Activity className="h-4 w-4 text-blue-500" />
         <span className="font-medium">Productivity Analysis</span>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Base rate is adjusted based on tool efficiency, area size, and frequency factors</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Base rate is adjusted based on tool efficiency, area size, and frequency factors</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
       <div className="text-sm space-y-1">
         <p>Base Rate: {productivity.baseRate.toFixed(2)} units/hour</p>
