@@ -29,7 +29,7 @@ export const databaseHandler = {
     options?: {
       select?: string;
       filter?: Record<string, any>;
-      order?: { column: keyof TableRow<T> | (string & {}); ascending?: boolean }; // Made column keyof TableRow<T>
+      order?: { column: string; ascending?: boolean };
       limit?: number;
       range?: [number, number];
     }
@@ -41,12 +41,12 @@ export const databaseHandler = {
 
     if (options?.filter) {
       Object.entries(options.filter).forEach(([column, value]) => {
-        query = query.eq(column as keyof TableRow<T>, value); // Added type assertion for column
+        query = query.eq(column, value);
       });
     }
 
     if (options?.order) {
-      query = query.order(options.order.column as string, { // Cast to string as Supabase client expects string
+      query = query.order(options.order.column, {
         ascending: options.order.ascending ?? true,
       });
     }
@@ -59,8 +59,8 @@ export const databaseHandler = {
       query = query.range(options.range[0], options.range[1]);
     }
 
-    const result: PostgrestSingleResponse<TableRow<T>[]> = await query;
-    return { data: result.data, error: result.error };
+    const result = await query;
+    return { data: result.data as TableRow<T>[] | null, error: result.error };
   },
 
   /**
@@ -70,16 +70,16 @@ export const databaseHandler = {
    */
   async insert<T extends TableName>(
     table: T,
-    data: TableInsert<T> | TableInsert<T>[]
+    data: Tables[T]['Insert'] | Tables[T]['Insert'][]
   ): Promise<{
-    data: TableRow<T>[] | null; // .select() returns an array of inserted rows
+    data: TableRow<T>[] | null;
     error: PostgrestError | null;
   }> {
-    const result: PostgrestSingleResponse<TableRow<T>[]> = await supabase
+    const result = await supabase
       .from(table)
       .insert(data)
       .select();
-    return { data: result.data, error: result.error };
+    return { data: result.data as TableRow<T>[] | null, error: result.error };
   },
 
   /**
@@ -90,20 +90,20 @@ export const databaseHandler = {
    */
   async update<T extends TableName>(
     table: T,
-    data: TableUpdate<T>,
-    filter: Partial<TableRow<T>> // Filter should be based on Row properties
+    data: Tables[T]['Update'],
+    filter: Partial<TableRow<T>>
   ): Promise<{
-    data: TableRow<T>[] | null; // .select() returns an array of updated rows
+    data: TableRow<T>[] | null;
     error: PostgrestError | null;
   }> {
     let queryBuilder = supabase.from(table).update(data);
 
     Object.entries(filter).forEach(([column, value]) => {
-      queryBuilder = queryBuilder.eq(column as keyof TableRow<T>, value); // Added type assertion
+      queryBuilder = queryBuilder.eq(column, value);
     });
 
-    const result: PostgrestSingleResponse<TableRow<T>[]> = await queryBuilder.select();
-    return { data: result.data, error: result.error };
+    const result = await queryBuilder.select();
+    return { data: result.data as TableRow<T>[] | null, error: result.error };
   },
 
   /**
@@ -113,21 +113,19 @@ export const databaseHandler = {
    */
   async delete<T extends TableName>(
     table: T,
-    filter: Partial<TableRow<T>> // Filter should be based on Row properties
+    filter: Partial<TableRow<T>>
   ): Promise<{
-    data: TableRow<T>[] | null; // Supabase delete can return the deleted rows if .select() is used
+    data: TableRow<T>[] | null;
     error: PostgrestError | null;
   }> {
     let queryBuilder = supabase.from(table).delete();
 
     Object.entries(filter).forEach(([column, value]) => {
-      queryBuilder = queryBuilder.eq(column as keyof TableRow<T>, value); // Added type assertion
+      queryBuilder = queryBuilder.eq(column, value);
     });
     
-    // If you want the deleted rows, use .select(). 
-    // If not, and you expect `data` to be, for example, just `null` or a count, adjust the return type and call.
-    const result: PostgrestSingleResponse<TableRow<T>[]> = await queryBuilder.select();
-    return { data: result.data, error: result.error };
+    const result = await queryBuilder.select();
+    return { data: result.data as TableRow<T>[] | null, error: result.error };
   },
 
   /**
@@ -135,11 +133,11 @@ export const databaseHandler = {
    * @param functionName The function name
    * @param params The parameters
    */
-  async rpc<TParams = Record<string, any>, TResult = any>( // Added TParams for better type safety on params
+  async rpc<TResult = any, TParams = Record<string, any>>(
     functionName: string,
     params?: TParams
   ): Promise<{ data: TResult | null; error: PostgrestError | null }> {
-    const result: PostgrestSingleResponse<TResult> = await supabase.rpc(functionName, params);
+    const result = await supabase.rpc(functionName, params as any);
     return { data: result.data, error: result.error };
   }
 };
