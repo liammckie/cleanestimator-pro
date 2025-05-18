@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CleaningTask } from '@/data/types/taskManagement';
 import { loadTasks } from '@/utils/taskStorage';
+import { fetchTasks, insertTask } from '@/integrations/supabase/taskService';
 import { useToast } from '@/hooks/use-toast';
 import { TaskDatabase } from './TaskDatabase';
 import { ScopeContent } from './scope/ScopeContent';
@@ -12,6 +13,14 @@ import { getRateById } from '@/data/rates/ratesManager';
 export const TaskManagementPage = () => {
   const [tasks, setTasks] = useState<CleaningTask[]>(() => loadTasks());
   const { toast } = useToast();
+
+  useEffect(() => {
+    fetchTasks().then(fetched => {
+      if (fetched && fetched.length > 0) {
+        setTasks(fetched);
+      }
+    });
+  }, []);
   const { 
     selectedTasks,
     handleTaskSelection,

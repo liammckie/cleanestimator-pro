@@ -80,6 +80,12 @@ export const TaskSelectionPanel: React.FC<TaskSelectionPanelProps> = ({
         
         <div className="text-sm text-muted-foreground mt-2">
           <p>Rate: {task.productivityRate} {task.measurementUnit}</p>
+          {task.minimumQuantity !== undefined && (
+            <p className="mt-1">Min Qty: {task.minimumQuantity}</p>
+          )}
+          {task.chargeRate !== undefined && (
+            <p className="mt-1">Charge Rate: {task.chargeRate}</p>
+          )}
           {task.notes && <p className="mt-1">{task.notes}</p>}
         </div>
       </CardContent>

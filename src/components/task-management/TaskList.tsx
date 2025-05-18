@@ -35,6 +35,8 @@ export const TaskList: React.FC<TaskListProps> = ({
           <TableHead>Category</TableHead>
           <TableHead>Productivity Rate</TableHead>
           <TableHead>Unit</TableHead>
+          <TableHead>Min Qty</TableHead>
+          <TableHead>Charge Rate</TableHead>
           <TableHead className="w-[300px]">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -45,6 +47,8 @@ export const TaskList: React.FC<TaskListProps> = ({
             <TableCell>{task.category}</TableCell>
             <TableCell>{task.productivityRate}</TableCell>
             <TableCell>{task.measurementUnit}</TableCell>
+            <TableCell>{task.minimumQuantity ?? '-'}</TableCell>
+            <TableCell>{task.chargeRate ?? '-'}</TableCell>
             <TableCell>
               <div className="flex gap-4">
                 <div className="w-32">

@@ -7,6 +7,10 @@ export interface CleaningTask {
   taskName: string;
   productivityRate: number;
   measurementUnit: MeasurementUnit;
+  /** Minimum quantity that can be charged for this task */
+  minimumQuantity?: number;
+  /** Charge per unit or square metre */
+  chargeRate?: number;
   notes?: string;
   defaultTool?: string;
 }
