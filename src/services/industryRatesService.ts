@@ -17,7 +17,6 @@ export type IndustryProductivityRate = {
 };
 
 export const getIndustryTypes = async (): Promise<string[]> => {
-  // Instead of distinctOn which isn't available, we'll use a different approach
   const { data, error } = await supabase
     .from('industry_productivity_rates')
     .select('industry_type')
