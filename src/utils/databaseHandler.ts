@@ -1,10 +1,10 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
-import type { PostgrestError, PostgrestSingleResponse } from "@supabase/supabase-js";
+import type { PostgrestError } from "@supabase/supabase-js";
 
-// Define the database schema tables
-type Tables = Database['public']['Tables'];
+// Define a type for table row based on the table name
+type TableName = "industry_productivity_rates" | "periodic_cleaning_services";
+type TableColumns = Record<string, any>;
 
 /**
  * General purpose database handler functions to streamline database operations
@@ -15,7 +15,7 @@ export const databaseHandler = {
    * @param table The table name
    * @param options Query options
    */
-  async fetch<T extends keyof Tables>(
+  async fetch<T extends TableName>(
     table: T,
     options?: {
       select?: string;
@@ -25,7 +25,7 @@ export const databaseHandler = {
       range?: [number, number];
     }
   ): Promise<{
-    data: Tables[T]['Row'][] | null;
+    data: any[] | null;
     error: PostgrestError | null;
   }> {
     let query = supabase
@@ -54,7 +54,7 @@ export const databaseHandler = {
 
     const result = await query;
     return { 
-      data: result.data as Tables[T]['Row'][] | null, 
+      data: result.data, 
       error: result.error 
     };
   },
@@ -64,11 +64,11 @@ export const databaseHandler = {
    * @param table The table name
    * @param data The data to insert (single object or array of objects)
    */
-  async insert<T extends keyof Tables>(
+  async insert<T extends TableName>(
     table: T,
-    data: Tables[T]['Insert'] | Tables[T]['Insert'][]
+    data: TableColumns | TableColumns[]
   ): Promise<{
-    data: Tables[T]['Row'][] | null;
+    data: any[] | null;
     error: PostgrestError | null;
   }> {
     const result = await supabase
@@ -77,7 +77,7 @@ export const databaseHandler = {
       .select();
     
     return { 
-      data: result.data as Tables[T]['Row'][] | null, 
+      data: result.data, 
       error: result.error 
     };
   },
@@ -88,12 +88,12 @@ export const databaseHandler = {
    * @param data The data to update
    * @param filter The filter to apply for the update
    */
-  async update<T extends keyof Tables>(
+  async update<T extends TableName>(
     table: T,
-    data: Tables[T]['Update'],
-    filter: Partial<Tables[T]['Row']>
+    data: TableColumns,
+    filter: Record<string, any>
   ): Promise<{
-    data: Tables[T]['Row'][] | null;
+    data: any[] | null;
     error: PostgrestError | null;
   }> {
     let queryBuilder = supabase
@@ -106,7 +106,7 @@ export const databaseHandler = {
 
     const result = await queryBuilder.select();
     return { 
-      data: result.data as Tables[T]['Row'][] | null, 
+      data: result.data, 
       error: result.error 
     };
   },
@@ -116,11 +116,11 @@ export const databaseHandler = {
    * @param table The table name
    * @param filter The filter to apply for the deletion
    */
-  async delete<T extends keyof Tables>(
+  async delete<T extends TableName>(
     table: T,
-    filter: Partial<Tables[T]['Row']>
+    filter: Record<string, any>
   ): Promise<{
-    data: Tables[T]['Row'][] | null;
+    data: any[] | null;
     error: PostgrestError | null;
   }> {
     let queryBuilder = supabase
@@ -133,7 +133,7 @@ export const databaseHandler = {
     
     const result = await queryBuilder.select();
     return { 
-      data: result.data as Tables[T]['Row'][] | null, 
+      data: result.data, 
       error: result.error 
     };
   },

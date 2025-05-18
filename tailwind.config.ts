@@ -24,11 +24,11 @@ export default {
         '1000': '1000',
       },
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        border: 'hsl(240 15% 20%)',
+        input: 'hsl(240 15% 20%)',
+        ring: 'hsl(260 72% 75%)',
+        background: 'hsl(240 29% 9%)',
+        foreground: 'hsl(0 0% 100%)',
         primary: {
           DEFAULT: '#9b87f5',
           foreground: '#FFFFFF'

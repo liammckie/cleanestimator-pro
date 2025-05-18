@@ -1,7 +1,11 @@
+
 import { supabase } from './client';
 import { CleaningTask } from '@/data/types/taskManagement';
 
-const TABLE = 'tasks';
+// In a real implementation, this service would interact with a Supabase 'tasks' table
+// For now, we'll use local storage since the 'tasks' table doesn't exist in Supabase yet
+
+const LOCAL_STORAGE_KEY = 'cleaning-tasks';
 
 const mapRowToTask = (row: any): CleaningTask => ({
   id: row.id,
@@ -16,34 +20,17 @@ const mapRowToTask = (row: any): CleaningTask => ({
 });
 
 export const fetchTasks = async (): Promise<CleaningTask[]> => {
-  const { data, error } = await supabase.from(TABLE).select('*');
-  if (error) {
-    console.error('Error fetching tasks:', error.message);
+  try {
+    // Try to get tasks from localStorage
+    const savedTasks = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (savedTasks) {
+      return JSON.parse(savedTasks) as CleaningTask[];
+    }
+    
+    console.log('No tasks found in localStorage');
     return [];
-  }
-  return data ? (data as any[]).map(mapRowToTask) : [];
-};
-
-export const insertTask = async (task: Omit<CleaningTask, 'id'>): Promise<CleaningTask | null> => {
-  const payload = {
-    category: task.category,
-    task_name: task.taskName,
-    productivity_rate: task.productivityRate,
-    measurement_unit: task.measurementUnit,
-    minimum_quantity: task.minimumQuantity ?? null,
-    charge_rate: task.chargeRate ?? null,
-    notes: task.notes ?? null,
-    default_tool: task.defaultTool ?? null,
-  };
-
-  const { data, error } = await supabase
-    .from(TABLE)
-    .insert(payload)
-    .select()
-    .single();
-  if (error) {
-    console.error('Error inserting task:', error.message);
-    return null;
-  }
-  return data ? mapRowToTask(data) : null;
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    return [];
+  }\
 };
