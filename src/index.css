@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,62 +8,62 @@
     --background: 240 29% 9%;
     --foreground: 0 0% 100%;
 
-    --card: 240 24% 14%;
+    --card: 223 24% 19%;
     --card-foreground: 0 0% 100%;
 
     --popover: 240 20% 14%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 260 24% 54%;
+    --primary: 260 72% 75%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 260 29% 50%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 5% 25%;
-    --muted-foreground: 240 5% 65%;
+    --muted: 240 5% 17%;
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 240 24% 14%;
+    --accent: 223 24% 19%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 100% 27%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 240 15% 20%;
     --input: 240 15% 20%;
-    --ring: 260 24% 54%;
+    --ring: 260 72% 75%;
 
-    --radius: 0.25rem;
+    --radius: 0.5rem;
   }
 
   .dark {
     --background: 240 29% 9%;
     --foreground: 0 0% 100%;
 
-    --card: 240 24% 14%;
+    --card: 223 24% 19%;
     --card-foreground: 0 0% 100%;
 
     --popover: 240 20% 14%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 260 24% 54%;
+    --primary: 260 72% 75%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 260 29% 50%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 5% 25%;
-    --muted-foreground: 240 5% 65%;
+    --muted: 240 5% 17%;
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 240 24% 14%;
+    --accent: 223 24% 19%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 100% 27%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 240 15% 20%;
     --input: 240 15% 20%;
-    --ring: 260 24% 54%;
+    --ring: 260 72% 75%;
   }
 }
 
@@ -74,4 +75,23 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom Spotify-like scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
