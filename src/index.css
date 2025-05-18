@@ -64,6 +64,23 @@
   .spotify-highlight {
     @apply bg-primary/20 border-l-4 border-primary rounded-r-md;
   }
+  
+  /* Vivid color theme additions */
+  .vivid-gradient {
+    @apply bg-gradient-to-br from-[#9b87f5] via-[#8A6EFD] to-[#7647FF];
+  }
+  
+  .vivid-card {
+    @apply bg-gradient-to-br from-card to-[#1A1F2C] border border-[#333] backdrop-blur-sm;
+  }
+  
+  .vivid-highlight {
+    @apply bg-primary/25 hover:bg-primary/30 transition-colors;
+  }
+  
+  .glass-panel {
+    @apply bg-black/30 backdrop-blur-md border border-white/10 rounded-lg;
+  }
 }
 
 /* Custom Spotify-like scrollbar */
@@ -83,4 +100,37 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+/* Enhanced button effects */
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-glow::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+
+.btn-glow:hover::after {
+  opacity: 1;
+}
+
+/* Card hover effect */
+.card-hover-effect {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(155, 135, 245, 0.3);
 }
