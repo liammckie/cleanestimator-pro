@@ -35,36 +35,6 @@
 
     --radius: 0.5rem;
   }
-
-  .dark {
-    --background: 240 29% 9%;
-    --foreground: 0 0% 100%;
-
-    --card: 223 24% 19%;
-    --card-foreground: 0 0% 100%;
-
-    --popover: 240 20% 14%;
-    --popover-foreground: 0 0% 100%;
-
-    --primary: 260 72% 75%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 260 29% 50%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 240 5% 17%;
-    --muted-foreground: 0 0% 60%;
-
-    --accent: 223 24% 19%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 240 15% 20%;
-    --input: 240 15% 20%;
-    --ring: 260 72% 75%;
-  }
 }
 
 @layer base {
@@ -74,6 +44,25 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* Spotify-like Animation */
+  @keyframes spotify-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .spotify-animate-in {
+    animation: spotify-fade-in 0.4s ease-out forwards;
+  }
+  
+  /* Spotify-like UI Elements */
+  .spotify-card {
+    @apply bg-card rounded-lg transition-all duration-300 hover:bg-card/80;
+  }
+  
+  .spotify-highlight {
+    @apply bg-primary/20 border-l-4 border-primary rounded-r-md;
   }
 }
 

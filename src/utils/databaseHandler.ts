@@ -1,5 +1,9 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type Tables = Database['public']['Tables'];
+type TableName = keyof Tables;
 
 /**
  * General purpose database handler functions to streamline database operations
@@ -10,8 +14,8 @@ export const databaseHandler = {
    * @param table The table name
    * @param options Query options
    */
-  async fetch<T>(
-    table: string,
+  async fetch<T extends TableName>(
+    table: T,
     options?: {
       select?: string;
       filter?: Record<string, any>;
@@ -19,7 +23,10 @@ export const databaseHandler = {
       limit?: number;
       range?: [number, number];
     }
-  ): Promise<{ data: T[] | null; error: any }> {
+  ): Promise<{ 
+    data: Tables[T]['Row'][] | null; 
+    error: any 
+  }> {
     let query = supabase.from(table).select(options?.select || '*');
 
     // Apply filters
@@ -46,7 +53,8 @@ export const databaseHandler = {
       query = query.range(options.range[0], options.range[1]);
     }
 
-    return await query;
+    const result = await query;
+    return { data: result.data, error: result.error };
   },
 
   /**
@@ -54,11 +62,15 @@ export const databaseHandler = {
    * @param table The table name
    * @param data The data to insert
    */
-  async insert<T>(
-    table: string,
-    data: Record<string, any> | Record<string, any>[]
-  ): Promise<{ data: T[] | null; error: any }> {
-    return await supabase.from(table).insert(data).select();
+  async insert<T extends TableName>(
+    table: T,
+    data: Tables[T]['Insert'] | Tables[T]['Insert'][]
+  ): Promise<{ 
+    data: Tables[T]['Row'][] | null; 
+    error: any 
+  }> {
+    const result = await supabase.from(table).insert(data).select();
+    return { data: result.data, error: result.error };
   },
 
   /**
@@ -67,11 +79,14 @@ export const databaseHandler = {
    * @param data The data to update
    * @param filter The filter to apply for the update
    */
-  async update<T>(
-    table: string,
-    data: Record<string, any>,
+  async update<T extends TableName>(
+    table: T,
+    data: Tables[T]['Update'],
     filter: Record<string, any>
-  ): Promise<{ data: T[] | null; error: any }> {
+  ): Promise<{ 
+    data: Tables[T]['Row'][] | null; 
+    error: any 
+  }> {
     let query = supabase.from(table).update(data);
 
     // Apply filters
@@ -79,7 +94,8 @@ export const databaseHandler = {
       query = query.eq(column, value);
     });
 
-    return await query.select();
+    const result = await query.select();
+    return { data: result.data, error: result.error };
   },
 
   /**
@@ -87,10 +103,13 @@ export const databaseHandler = {
    * @param table The table name
    * @param filter The filter to apply for the deletion
    */
-  async delete<T>(
-    table: string,
+  async delete<T extends TableName>(
+    table: T,
     filter: Record<string, any>
-  ): Promise<{ data: T[] | null; error: any }> {
+  ): Promise<{ 
+    data: Tables[T]['Row'][] | null; 
+    error: any 
+  }> {
     let query = supabase.from(table).delete();
 
     // Apply filters
@@ -98,7 +117,8 @@ export const databaseHandler = {
       query = query.eq(column, value);
     });
 
-    return await query.select();
+    const result = await query.select();
+    return { data: result.data, error: result.error };
   },
 
   /**
@@ -109,7 +129,8 @@ export const databaseHandler = {
   async rpc<T>(
     functionName: string,
     params?: Record<string, any>
-  ): Promise<{ data: T[] | null; error: any }> {
-    return await supabase.rpc(functionName, params);
+  ): Promise<{ data: T | null; error: any }> {
+    const result = await supabase.rpc(functionName, params);
+    return { data: result.data, error: result.error };
   }
 };

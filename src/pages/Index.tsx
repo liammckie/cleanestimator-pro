@@ -6,6 +6,7 @@ import { DatabaseNavigation } from '@/components/navigation/DatabaseNavigation';
 import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { MainContent } from '@/components/layout/MainContent';
 import { SettingsProvider } from '@/contexts/SettingsContext';
+import { useLocation } from 'react-router-dom';
 import { 
   SidebarProvider, 
   Sidebar, 
@@ -16,10 +17,31 @@ import {
   SidebarHeader,
   SidebarRail
 } from "@/components/ui/sidebar";
-import { Home, LayoutGrid, Users, Wrench, Calendar, FileText, BarChart2, Settings, Globe } from "lucide-react";
+import { 
+  Home, 
+  LayoutGrid, 
+  Users, 
+  Wrench, 
+  Calendar, 
+  FileText, 
+  BarChart2, 
+  Settings, 
+  Globe 
+} from "lucide-react";
 import { OnCostsState } from '@/data/types/onCosts';
 
 const Index = () => {
+  const location = useLocation();
+  const [activeTab, setActiveTab] = React.useState('sites');
+  
+  // Set the active tab based on the URL when the component mounts or URL changes
+  React.useEffect(() => {
+    // Extract the tab name from URL or use a default
+    const pathParts = location.pathname.split('/');
+    const tabFromPath = pathParts[1] || 'sites';
+    setActiveTab(tabFromPath || 'sites');
+  }, [location]);
+  
   // We'll need to provide initial state values for the MainContent component
   const [sites, setSites] = React.useState([]);
   
@@ -49,6 +71,22 @@ const Index = () => {
   const [monthlyRevenue, setMonthlyRevenue] = React.useState(0);
   const [overhead, setOverhead] = React.useState(0);
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
+  const sidebarItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: Home },
+    { id: 'sites', label: 'Site Manager', icon: LayoutGrid },
+    { id: 'labor', label: 'Labor Costs', icon: Users },
+    { id: 'equipment', label: 'Equipment', icon: Wrench },
+    { id: 'roster', label: 'Roster', icon: Calendar },
+    { id: 'contract', label: 'Contract', icon: FileText },
+    { id: 'summary', label: 'Summary', icon: BarChart2 },
+    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'overview', label: 'Overview', icon: Globe }
+  ];
+
   return (
     <SettingsProvider>
       <SidebarProvider>
@@ -60,71 +98,35 @@ const Index = () => {
             <SidebarRail />
             <SidebarContent className="pt-4">
               <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Home" className="flex items-center gap-3">
-                    <Home className="h-5 w-5" />
-                    <span>Dashboard</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Sites" className="flex items-center gap-3">
-                    <LayoutGrid className="h-5 w-5" />
-                    <span>Site Manager</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Labor" className="flex items-center gap-3">
-                    <Users className="h-5 w-5" />
-                    <span>Labor Costs</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Equipment" className="flex items-center gap-3">
-                    <Wrench className="h-5 w-5" />
-                    <span>Equipment</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Roster" className="flex items-center gap-3">
-                    <Calendar className="h-5 w-5" />
-                    <span>Roster</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Contract" className="flex items-center gap-3">
-                    <FileText className="h-5 w-5" />
-                    <span>Contract</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Summary" className="flex items-center gap-3">
-                    <BarChart2 className="h-5 w-5" />
-                    <span>Summary</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Settings" className="flex items-center gap-3">
-                    <Settings className="h-5 w-5" />
-                    <span>Settings</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Overview" className="flex items-center gap-3">
-                    <Globe className="h-5 w-5" />
-                    <span>Overview</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {sidebarItems.map((item) => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton 
+                        tooltip={item.label} 
+                        className={`flex items-center gap-3 ${isActive ? 'bg-primary/20 text-primary' : ''}`}
+                        onClick={() => handleTabChange(item.id)}
+                        isActive={isActive}
+                      >
+                        <item.icon className="h-5 w-5" />
+                        <span>{item.label}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarContent>
           </Sidebar>
           
           <div className="flex-1 flex flex-col h-full overflow-auto bg-background">
             <div className="container p-6">
-              <h1 className="text-3xl font-bold mb-6 text-primary">Commercial Cleaning Estimation Tool</h1>
+              <h1 className="text-3xl font-bold mb-6 text-primary spotify-animate-in">
+                Commercial Cleaning Estimation Tool
+              </h1>
               
               <DatabaseNavigation />
               
-              <Tabs defaultValue="sites" className="mt-6">
+              <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-6">
                 <TabsList className="w-full justify-start mb-6 bg-card rounded-lg p-1">
                   <MainNavigation />
                 </TabsList>
