@@ -4,6 +4,7 @@ import type { PostgrestError } from "@supabase/supabase-js";
 
 // Define a type for table row based on the table name
 type TableName = "industry_productivity_rates" | "periodic_cleaning_services";
+type TableColumns = Record<string, any>;
 
 /**
  * General purpose database handler functions to streamline database operations
@@ -65,7 +66,7 @@ export const databaseHandler = {
    */
   async insert<T extends TableName>(
     table: T,
-    data: any | any[]
+    data: TableColumns | TableColumns[]
   ): Promise<{
     data: any[] | null;
     error: PostgrestError | null;
@@ -89,7 +90,7 @@ export const databaseHandler = {
    */
   async update<T extends TableName>(
     table: T,
-    data: any,
+    data: TableColumns,
     filter: Record<string, any>
   ): Promise<{
     data: any[] | null;

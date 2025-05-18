@@ -64,6 +64,12 @@ export const CostSummary: React.FC<CostSummaryProps> = ({ costs }) => {
               {costs?.rosterSuggestion?.casualStaff > 0 && (
                 <p>Casual staff: {costs.rosterSuggestion.casualStaff}</p>
               )}
+              {(!costs?.rosterSuggestion || 
+                (!costs.rosterSuggestion.fullTimeStaff && 
+                 !costs.rosterSuggestion.partTimeStaff && 
+                 !costs.rosterSuggestion.casualStaff)) && (
+                <p className="text-muted-foreground">No staffing data available</p>
+              )}
             </div>
           </div>
         </div>
