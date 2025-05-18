@@ -1,3 +1,4 @@
+
 export const menuOptions = [
   { id: 'sites', label: 'Site Manager', icon: 'layout' },
   { id: 'task-management', label: 'Task Management', icon: 'list' },
