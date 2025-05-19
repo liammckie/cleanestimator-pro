@@ -32,5 +32,5 @@ export const fetchTasks = async (): Promise<CleaningTask[]> => {
   } catch (error) {
     console.error('Error fetching tasks:', error);
     return [];
-  }\
+  }
 };
