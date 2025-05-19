@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { TaskProvider } from './components/area/task/TaskContext';
 import { TemplatesPage } from './components/templates/TemplatesPage';
+import { TaskManagementPage } from './components/task-management/TaskManagementPage';
 import { MainNavigation } from './components/navigation/MainNavigation';
 import { menuOptions } from './components/navigation/MenuOptions';
 
@@ -25,9 +26,38 @@ const App = () => {
       <TaskProvider>
         <Routes>
           <Route path="/" element={<Navigate to="/templates" replace />} />
+          <Route path="/dashboard" element={
+            <AppLayout>
+              <div className="mt-4">
+                <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="bg-card rounded-lg shadow-md p-6">
+                    <h2 className="text-xl font-semibold mb-4">Recent Templates</h2>
+                    <p className="text-muted-foreground">No recent templates found</p>
+                  </div>
+                  <div className="bg-card rounded-lg shadow-md p-6">
+                    <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+                    <div className="space-y-3">
+                      <button className="w-full bg-primary text-primary-foreground py-2 rounded-md">Create Template</button>
+                      <button className="w-full bg-secondary text-secondary-foreground py-2 rounded-md">Manage Tasks</button>
+                    </div>
+                  </div>
+                  <div className="bg-card rounded-lg shadow-md p-6">
+                    <h2 className="text-xl font-semibold mb-4">Task Stats</h2>
+                    <p className="text-muted-foreground">No stats available</p>
+                  </div>
+                </div>
+              </div>
+            </AppLayout>
+          } />
           <Route path="/templates" element={
             <AppLayout>
               <TemplatesPage />
+            </AppLayout>
+          } />
+          <Route path="/task-management" element={
+            <AppLayout>
+              <TaskManagementPage />
             </AppLayout>
           } />
           {menuOptions.map((option) => (
@@ -44,8 +74,6 @@ const App = () => {
                       <div>Site Manager Content</div>
                     ) : option.id === 'scope' ? (
                       <div>Scope of Work Content</div>
-                    ) : option.id === 'task-management' ? (
-                      <div>Task Management Content</div>
                     ) : (
                       <div className="text-center text-muted-foreground">
                         <p>This page is currently under development.</p>
