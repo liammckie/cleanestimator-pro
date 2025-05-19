@@ -31,3 +31,31 @@ export interface IndustryTemplate {
   industryType: string;
   areas: IndustryArea[];
 }
+
+export interface TemplateTask {
+  id: string;
+  name: string;
+  frequency: string;
+  isArea: boolean;
+  areaType?: string;
+  floorType?: 'soft' | 'hard';
+  measurement?: number;
+  unitType: 'sqm' | 'units';
+  timeRequired?: number;
+  toiletFixtures?: {
+    pans?: number;
+    basins?: number;
+    ssUrinals?: number;
+    ceramicUrinals?: number;
+    showers?: number;
+  };
+}
+
+export interface SavedIndustryTemplate {
+  id: string;
+  name: string;
+  industry: string;
+  tasks: TemplateTask[];
+  totalTime: number;
+  createdAt: string;
+}
