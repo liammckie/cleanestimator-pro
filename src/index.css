@@ -5,19 +5,19 @@
 
 @layer base {
   :root {
-    --background: 240 29% 9%;
+    --background: 0 0% 8%;
     --foreground: 0 0% 100%;
 
-    --card: 223 24% 19%;
+    --card: 0 0% 12%;
     --card-foreground: 0 0% 100%;
 
-    --popover: 240 20% 14%;
+    --popover: 0 0% 12%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 260 72% 75%;
+    --primary: 141 72% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 260 29% 50%;
+    --secondary: 0 0% 20%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 240 5% 17%;
@@ -31,7 +31,7 @@
 
     --border: 240 15% 20%;
     --input: 240 15% 20%;
-    --ring: 260 72% 75%;
+    --ring: 141 72% 45%;
 
     --radius: 0.5rem;
   }
@@ -67,7 +67,7 @@
   
   /* Vivid color theme additions */
   .vivid-gradient {
-    @apply bg-gradient-to-br from-[#9b87f5] via-[#8A6EFD] to-[#7647FF];
+    @apply bg-gradient-to-br from-[#1db954] via-[#1ed760] to-[#1aa34a];
   }
   
   .vivid-card {
@@ -132,5 +132,5 @@
 
 .card-hover-effect:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px -5px rgba(155, 135, 245, 0.3);
+  box-shadow: 0 10px 25px -5px rgba(29, 185, 84, 0.3);
 }

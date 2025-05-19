@@ -145,9 +145,6 @@ const Index = () => {
                   overhead={overhead}
                 />
                 
-                <TabsContent value="task-management" className="space-y-6">
-                  <TaskManagementPage />
-                </TabsContent>
               </Tabs>
             </div>
           </div>

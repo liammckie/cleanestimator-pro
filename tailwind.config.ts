@@ -24,17 +24,17 @@ export default {
         '1000': '1000',
       },
       colors: {
-        border: 'hsl(240 15% 20%)',
-        input: 'hsl(240 15% 20%)',
-        ring: 'hsl(260 72% 75%)',
-        background: 'hsl(240 29% 9%)',
+        border: 'hsl(0 0% 20%)',
+        input: 'hsl(0 0% 20%)',
+        ring: 'hsl(141 72% 45%)',
+        background: 'hsl(0 0% 8%)',
         foreground: 'hsl(0 0% 100%)',
         primary: {
-          DEFAULT: '#9b87f5',
+          DEFAULT: '#1db954',
           foreground: '#FFFFFF'
         },
         secondary: {
-          DEFAULT: '#6E59A5',
+          DEFAULT: '#2f2f2f',
           foreground: '#FFFFFF'
         },
         destructive: {
@@ -63,7 +63,7 @@ export default {
           border: '#333333',
           accent: '#232e3c',
           'accent-foreground': '#FFFFFF',
-          ring: '#9b87f5',
+          ring: '#1db954',
         }
       },
       borderRadius: {
