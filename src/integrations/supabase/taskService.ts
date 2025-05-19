@@ -34,3 +34,19 @@ export const fetchTasks = async (): Promise<CleaningTask[]> => {
     return [];
   }
 };
+
+export const insertTask = async (task: CleaningTask): Promise<CleaningTask> => {
+  try {
+    // In a real implementation, this would insert into Supabase
+    // For now, save to localStorage
+    const currentTasks = await fetchTasks();
+    const updatedTasks = [...currentTasks, task];
+    
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedTasks));
+    console.log('Task inserted successfully:', task);
+    return task;
+  } catch (error) {
+    console.error('Error inserting task:', error);
+    throw error;
+  }
+};
