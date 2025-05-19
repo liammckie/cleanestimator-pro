@@ -1,6 +1,7 @@
 
 export const menuOptions = [
   { id: 'sites', label: 'Site Manager', icon: 'layout' },
+  { id: 'scope', label: 'Scope of Work', icon: 'check-square' },
   { id: 'task-management', label: 'Task Management', icon: 'list' },
   { id: 'labor', label: 'Labor Costs', icon: 'user' },
   { id: 'equipment', label: 'Equipment', icon: 'wrench' },
