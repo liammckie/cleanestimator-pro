@@ -104,10 +104,10 @@ export const TaskEditPanel: React.FC<TaskEditPanelProps> = ({
               value={task.frequency.timesPerWeek.toString()}
               onValueChange={(value) => onFrequencyChange(task.taskId, Number(value))}
             >
-              <SelectTrigger id={`frequency-${task.taskId}`}>
+              <SelectTrigger id={`frequency-${task.taskId}`} className="bg-background">
                 <SelectValue placeholder="Select frequency" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background">
                 <SelectItem value="1">1x per week</SelectItem>
                 <SelectItem value="2">2x per week</SelectItem>
                 <SelectItem value="3">3x per week</SelectItem>

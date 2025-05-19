@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -99,7 +100,7 @@ export const CategorySelect = ({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
+      <PopoverContent className="w-full p-0 bg-background">
         <Command>
           <CommandInput placeholder="Search categories..." />
           <CommandEmpty>No category found.</CommandEmpty>
@@ -113,25 +114,30 @@ export const CategorySelect = ({
             if (!validCategories.length) return null;
 
             return (
-              <CommandGroup key={group.id} heading={group.name}>
-                {validCategories.map((category) => (
-                  <CommandItem
-                    key={category.id}
-                    value={category.name.toLowerCase()}
-                    onSelect={(currentValue) => {
-                      onValueChange(currentValue === value ? '' : currentValue);
-                      setOpen(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === category.name.toLowerCase() ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {category.name}
-                  </CommandItem>
-                ))}
+              <CommandGroup key={group.id || group.name} heading={group.name}>
+                {validCategories.map((category) => {
+                  // Ensure we have a valid value for the category name
+                  if (!category.name) return null;
+                  
+                  return (
+                    <CommandItem
+                      key={category.id || category.name}
+                      value={category.name.toLowerCase() || `category-${category.id || Math.random()}`}
+                      onSelect={(currentValue) => {
+                        onValueChange(currentValue === value ? '' : currentValue);
+                        setOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          value === category.name.toLowerCase() ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {category.name}
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             );
           })}

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -67,7 +68,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                     <SelectTrigger className="w-full bg-background">
                       <SelectValue placeholder="Select frequency" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background z-50">
+                    <SelectContent className="bg-background">
                       {frequencyOptions.map((option) => (
                         <SelectItem 
                           key={option.value} 

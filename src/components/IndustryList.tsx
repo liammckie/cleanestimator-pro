@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Check, Building } from "lucide-react";
 import { CommandGroup, CommandItem } from "@/components/ui/command";
@@ -92,6 +93,9 @@ export const IndustryList: React.FC<IndustryListProps> = ({
             <AccordionContent>
               <CommandGroup>
                 {filteredCategories.map((category) => {
+                  // Skip empty category values
+                  if (!category) return null;
+                  
                   const isSelected = selectedValue === category;
                   console.log('INDUSTRY_SELECT Rendering category:', {
                     category,

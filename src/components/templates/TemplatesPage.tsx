@@ -57,8 +57,8 @@ export const TemplatesPage: React.FC = () => {
                     <SelectTrigger id="task-category">
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Categories</SelectItem>
+                    <SelectContent className="bg-background">
+                      <SelectItem value="_all">All Categories</SelectItem>
                       {categories.map(category => (
                         <SelectItem key={category} value={category}>
                           {category}
