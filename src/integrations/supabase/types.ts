@@ -93,48 +93,6 @@ export type Database = {
         }
         Relationships: []
       }
-      tasks: {
-        Row: {
-          id: string
-          category: string
-          task_name: string
-          productivity_rate: number
-          measurement_unit: string
-          minimum_quantity: number | null
-          charge_rate: number | null
-          notes: string | null
-          default_tool: string | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          category: string
-          task_name: string
-          productivity_rate: number
-          measurement_unit: string
-          minimum_quantity?: number | null
-          charge_rate?: number | null
-          notes?: string | null
-          default_tool?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          category?: string
-          task_name?: string
-          productivity_rate?: number
-          measurement_unit?: string
-          minimum_quantity?: number | null
-          charge_rate?: number | null
-          notes?: string | null
-          default_tool?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never

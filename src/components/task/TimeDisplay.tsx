@@ -1,3 +1,4 @@
+
 import React, { memo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Clock } from "lucide-react";
@@ -10,13 +11,17 @@ interface TimeDisplayProps {
 }
 
 export const TimeDisplay = memo(({ timeRequired, frequency }: TimeDisplayProps) => {
-  const timePerService = ((timeRequired / (frequency?.timesPerWeek || 1)) / 4 * 60).toFixed(1);
-  const monthlyTime = (timeRequired * 60).toFixed(1);
+  // Add null checks and default values to prevent undefined errors
+  const safeTimeRequired = timeRequired || 0;
+  const safeTimesPerWeek = frequency?.timesPerWeek || 0;
+  
+  const timePerService = ((safeTimeRequired / (safeTimesPerWeek || 1)) / 4 * 60).toFixed(1);
+  const monthlyTime = (safeTimeRequired * 60).toFixed(1);
 
   return (
     <Card className="p-3">
       <div className="flex items-center gap-2 mb-2">
-        <Clock className="h-4 w-4 text-blue-500" />
+        <Clock className="h-4 w-4 text-primary" />
         <span className="font-medium">Time Requirements</span>
       </div>
       <div className="text-sm space-y-1">

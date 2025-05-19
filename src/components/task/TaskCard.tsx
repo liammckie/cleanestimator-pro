@@ -1,3 +1,4 @@
+
 import React, { useCallback, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -45,9 +46,11 @@ export const TaskCard = React.memo(({
     onRemoveTask(rate.id);
   }, [rate.id, onRemoveTask]);
 
+  // Add null safety
+  const timeRequired = selectedTask?.timeRequired || 0;
   const weeklyHours = useMemo(() => {
-    return selectedTask.timeRequired / TIME_CONSTANTS.WEEKS_PER_MONTH;
-  }, [selectedTask.timeRequired]);
+    return timeRequired / TIME_CONSTANTS.WEEKS_PER_MONTH;
+  }, [timeRequired]);
 
   return (
     <Card className="p-4">
@@ -87,7 +90,7 @@ export const TaskCard = React.memo(({
         </div>
 
         <TaskTimeRequirements
-          timeRequired={selectedTask.timeRequired}
+          timeRequired={timeRequired}
           weeklyHours={weeklyHours}
           ratePerHour={rate.ratePerHour}
           unit={rate.unit}

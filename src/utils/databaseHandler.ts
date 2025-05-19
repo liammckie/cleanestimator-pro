@@ -1,156 +1,142 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import type { PostgrestError } from "@supabase/supabase-js";
+import { supabase } from "../integrations/supabase/client";
 
-// Define a type for table row based on the table name
-type TableName = "industry_productivity_rates" | "periodic_cleaning_services";
-type TableColumns = Record<string, any>;
+// Define a more specific type that matches the structure expected by Supabase
+interface TableColumns {
+  [key: string]: any;
+}
+
+// Define the type for table names
+type TableName = 'industry_productivity_rates' | 'periodic_cleaning_services';
 
 /**
- * General purpose database handler functions to streamline database operations
+ * Fetches all records from a specified table
+ * @param tableName - The name of the table to fetch from
+ * @returns A promise containing the data or error
  */
-export const databaseHandler = {
-  /**
-   * Fetch data from a specific table
-   * @param table The table name
-   * @param options Query options
-   */
-  async fetch<T extends TableName>(
-    table: T,
-    options?: {
-      select?: string;
-      filter?: Record<string, any>;
-      order?: { column: string; ascending?: boolean };
-      limit?: number;
-      range?: [number, number];
+export const fetchAllRecords = async (tableName: TableName) => {
+  try {
+    const { data, error } = await supabase.from(tableName).select('*');
+    
+    if (error) {
+      console.error(`Error fetching ${tableName}:`, error);
+      return { data: null, error };
     }
-  ): Promise<{
-    data: any[] | null;
-    error: PostgrestError | null;
-  }> {
-    let query = supabase
-      .from(table)
-      .select(options?.select || '*');
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error(`Error in fetchAllRecords for ${tableName}:`, error);
+    return { data: null, error };
+  }
+};
 
-    if (options?.filter) {
-      Object.entries(options.filter).forEach(([column, value]) => {
-        query = query.eq(column, value);
-      });
+/**
+ * Fetches a single record by ID
+ * @param tableName - The name of the table to fetch from
+ * @param id - The ID of the record to fetch
+ * @returns A promise containing the data or error
+ */
+export const fetchRecordById = async (tableName: TableName, id: string) => {
+  try {
+    // Use maybeSingle instead of single to handle possibility of no records found
+    const { data, error } = await supabase
+      .from(tableName)
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+    
+    if (error) {
+      console.error(`Error fetching ${tableName} with ID ${id}:`, error);
+      return { data: null, error };
     }
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error(`Error in fetchRecordById for ${tableName} with ID ${id}:`, error);
+    return { data: null, error };
+  }
+};
 
-    if (options?.order) {
-      query = query.order(options.order.column, {
-        ascending: options.order.ascending ?? true,
-      });
-    }
-
-    if (options?.limit) {
-      query = query.limit(options.limit);
-    }
-
-    if (options?.range) {
-      query = query.range(options.range[0], options.range[1]);
-    }
-
-    const result = await query;
-    return { 
-      data: result.data, 
-      error: result.error 
-    };
-  },
-
-  /**
-   * Insert data into a specific table
-   * @param table The table name
-   * @param data The data to insert (single object or array of objects)
-   */
-  async insert<T extends TableName>(
-    table: T,
-    data: TableColumns | TableColumns[]
-  ): Promise<{
-    data: any[] | null;
-    error: PostgrestError | null;
-  }> {
-    const result = await supabase
-      .from(table)
-      .insert(data)
+/**
+ * Creates a new record in the specified table
+ * @param tableName - The name of the table to insert into
+ * @param record - The record data to insert
+ * @returns A promise containing the inserted data or error
+ */
+export const createRecord = async (tableName: TableName, record: TableColumns) => {
+  try {
+    // Convert record to array if it's not already an array
+    const recordToInsert = Array.isArray(record) ? record : [record];
+    
+    const { data, error } = await supabase
+      .from(tableName)
+      .insert(recordToInsert as any[])
       .select();
     
-    return { 
-      data: result.data, 
-      error: result.error 
-    };
-  },
-
-  /**
-   * Update data in a specific table
-   * @param table The table name
-   * @param data The data to update
-   * @param filter The filter to apply for the update
-   */
-  async update<T extends TableName>(
-    table: T,
-    data: TableColumns,
-    filter: Record<string, any>
-  ): Promise<{
-    data: any[] | null;
-    error: PostgrestError | null;
-  }> {
-    let queryBuilder = supabase
-      .from(table)
-      .update(data);
-
-    Object.entries(filter).forEach(([column, value]) => {
-      queryBuilder = queryBuilder.eq(column, value);
-    });
-
-    const result = await queryBuilder.select();
-    return { 
-      data: result.data, 
-      error: result.error 
-    };
-  },
-
-  /**
-   * Delete data from a specific table
-   * @param table The table name
-   * @param filter The filter to apply for the deletion
-   */
-  async delete<T extends TableName>(
-    table: T,
-    filter: Record<string, any>
-  ): Promise<{
-    data: any[] | null;
-    error: PostgrestError | null;
-  }> {
-    let queryBuilder = supabase
-      .from(table)
-      .delete();
-
-    Object.entries(filter).forEach(([column, value]) => {
-      queryBuilder = queryBuilder.eq(column, value);
-    });
+    if (error) {
+      console.error(`Error creating record in ${tableName}:`, error);
+      return { data: null, error };
+    }
     
-    const result = await queryBuilder.select();
-    return { 
-      data: result.data, 
-      error: result.error 
-    };
-  },
+    return { data, error: null };
+  } catch (error) {
+    console.error(`Error in createRecord for ${tableName}:`, error);
+    return { data: null, error };
+  }
+};
 
-  /**
-   * Execute a custom query using the RPC functionality
-   * @param functionName The function name
-   * @param params The parameters
-   */
-  async rpc<TResult = any, TParams = Record<string, any>>(
-    functionName: string,
-    params?: TParams
-  ): Promise<{ data: TResult | null; error: PostgrestError | null }> {
-    const result = await supabase.rpc(functionName, params as any);
-    return { 
-      data: result.data as TResult | null, 
-      error: result.error 
-    };
+/**
+ * Updates an existing record in the specified table
+ * @param tableName - The name of the table to update
+ * @param id - The ID of the record to update
+ * @param updates - The data to update
+ * @returns A promise containing the updated data or error
+ */
+export const updateRecord = async (
+  tableName: TableName,
+  id: string,
+  updates: TableColumns
+) => {
+  try {
+    const { data, error } = await supabase
+      .from(tableName)
+      .update(updates as any)
+      .eq('id', id)
+      .select();
+    
+    if (error) {
+      console.error(`Error updating record in ${tableName} with ID ${id}:`, error);
+      return { data: null, error };
+    }
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error(`Error in updateRecord for ${tableName} with ID ${id}:`, error);
+    return { data: null, error };
+  }
+};
+
+/**
+ * Deletes a record from the specified table
+ * @param tableName - The name of the table to delete from
+ * @param id - The ID of the record to delete
+ * @returns A promise containing the result of the deletion
+ */
+export const deleteRecord = async (tableName: TableName, id: string) => {
+  try {
+    const { error } = await supabase
+      .from(tableName)
+      .delete()
+      .eq('id', id);
+    
+    if (error) {
+      console.error(`Error deleting record from ${tableName} with ID ${id}:`, error);
+      return { success: false, error };
+    }
+    
+    return { success: true, error: null };
+  } catch (error) {
+    console.error(`Error in deleteRecord for ${tableName} with ID ${id}:`, error);
+    return { success: false, error };
   }
 };

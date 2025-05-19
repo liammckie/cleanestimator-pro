@@ -11,11 +11,14 @@ interface TimeDisplayProps {
 export const TimeDisplay: React.FC<TimeDisplayProps> = ({ selectedTasks }) => {
   const { totalMonthlyHours } = useTaskContext();
   
-  if (selectedTasks.length === 0 && totalMonthlyHours === 0) return null;
+  // Add null check
+  const safeMonthlyHours = totalMonthlyHours || 0;
+  
+  if (selectedTasks.length === 0 && safeMonthlyHours === 0) return null;
 
   // Calculate hours and minutes from total monthly hours
-  const hours = Math.floor(totalMonthlyHours);
-  const minutes = Math.round((totalMonthlyHours - hours) * 60);
+  const hours = Math.floor(safeMonthlyHours);
+  const minutes = Math.round((safeMonthlyHours - hours) * 60);
 
   return (
     <div className="p-4 bg-gray-50 rounded">
