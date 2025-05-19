@@ -76,7 +76,7 @@ export const calculateTaskTimes = (tasks: TemplateTask[]): TemplateTask[] => {
     let timeRequired = 0;
     
     if (task.isArea && task.floorType) {
-      // Calculate based on floor type and area's productivity rate
+      // Create an area object from task data
       const area: IndustryArea = {
         areaName: task.areaType || task.name,
         prodRateSoftFloor: task.productivityRate?.softFloor || 0,

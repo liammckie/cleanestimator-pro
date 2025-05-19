@@ -49,6 +49,17 @@ export interface TemplateTask {
     ceramicUrinals?: number;
     showers?: number;
   };
+  productivityRate?: {
+    softFloor?: number;
+    hardFloor?: number;
+    toiletFixtures?: {
+      pans?: number;
+      basins?: number;
+      ssUrinals?: number;
+      ceramicUrinals?: number;
+      showers?: number;
+    };
+  };
 }
 
 export interface SavedIndustryTemplate {

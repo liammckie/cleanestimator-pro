@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import { TaskProvider } from './components/area/task/TaskContext';
 import { TemplatesPage } from './components/templates/TemplatesPage';
 import { MainNavigation } from './components/navigation/MainNavigation';
+import { menuOptions } from './components/navigation/MenuOptions';
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
@@ -29,21 +30,32 @@ const App = () => {
               <TemplatesPage />
             </AppLayout>
           } />
-          <Route path="*" element={
-            <AppLayout>
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                  <h1 className="text-2xl font-bold mb-4">Page Under Construction</h1>
-                  <p className="text-muted-foreground mb-4">
-                    This section is currently being developed.
-                  </p>
-                  <p className="text-muted-foreground">
-                    Please check back later or use the available navigation options.
-                  </p>
-                </div>
-              </div>
-            </AppLayout>
-          } />
+          {menuOptions.map((option) => (
+            <Route
+              key={option.id}
+              path={`/${option.id}`}
+              element={
+                <AppLayout>
+                  <div className="mt-4">
+                    <h1 className="text-2xl font-bold mb-6">{option.label}</h1>
+                    {option.id === 'settings' ? (
+                      <div>Settings Content</div>
+                    ) : option.id === 'sites' ? (
+                      <div>Site Manager Content</div>
+                    ) : option.id === 'scope' ? (
+                      <div>Scope of Work Content</div>
+                    ) : option.id === 'task-management' ? (
+                      <div>Task Management Content</div>
+                    ) : (
+                      <div className="text-center text-muted-foreground">
+                        <p>This page is currently under development.</p>
+                      </div>
+                    )}
+                  </div>
+                </AppLayout>
+              }
+            />
+          ))}
         </Routes>
       </TaskProvider>
     </Router>
