@@ -8,11 +8,11 @@ import { menuOptions } from './components/navigation/MenuOptions';
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="flex h-screen">
-      <div className="w-64 border-r bg-gray-100 dark:bg-gray-900 dark:border-gray-800">
+    <div className="flex h-screen bg-background">
+      <div className="w-64 border-r bg-gray-900 dark:bg-gray-900 dark:border-gray-800">
         <MainNavigation />
       </div>
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-6 bg-gray-100 dark:bg-gray-900">
         {children}
       </div>
     </div>
