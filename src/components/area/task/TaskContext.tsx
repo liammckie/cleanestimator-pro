@@ -59,6 +59,34 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     }
   }, []);
 
+  // Handle template application event
+  useEffect(() => {
+    const handleTemplateApplication = (event: Event) => {
+      const customEvent = event as CustomEvent<{
+        taskId: string;
+        quantity: number;
+        frequency: number;
+      }>;
+      
+      const { taskId, quantity, frequency } = customEvent.detail;
+      
+      handleQuantityChange(taskId, quantity);
+      handleFrequencyChange(taskId, frequency);
+      
+      console.log('TASK_FLOW: Applied template to task:', {
+        taskId,
+        quantity,
+        frequency
+      });
+    };
+
+    window.addEventListener('apply-task-template', handleTemplateApplication);
+    
+    return () => {
+      window.removeEventListener('apply-task-template', handleTemplateApplication);
+    };
+  }, [handleQuantityChange, handleFrequencyChange]);
+
   // Save tasks to localStorage when they change
   useEffect(() => {
     console.log('TASK_FLOW: Context value updated:', {

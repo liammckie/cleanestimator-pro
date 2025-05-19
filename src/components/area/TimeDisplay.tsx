@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { useTaskContext } from './task/TaskContext';
+import { Card, CardContent } from "@/components/ui/card";
+import { Clock } from "lucide-react";
 
 interface TimeDisplayProps {
   selectedTasks: Array<{
@@ -21,9 +23,17 @@ export const TimeDisplay: React.FC<TimeDisplayProps> = ({ selectedTasks }) => {
   const minutes = Math.round((safeMonthlyHours - hours) * 60);
 
   return (
-    <div className="p-4 bg-gray-50 rounded">
-      <h3 className="font-medium mb-2">Total Monthly Time Required</h3>
-      <p>{hours} hours{minutes > 0 ? ` ${minutes} minutes` : ''}</p>
-    </div>
+    <Card className="mt-4">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <Clock className="h-5 w-5 text-primary" />
+          <h3 className="font-medium">Total Monthly Time Required</h3>
+        </div>
+        <div className="bg-accent/30 p-3 rounded-md mt-2">
+          <p className="text-lg font-semibold">{hours} hours{minutes > 0 ? ` ${minutes} minutes` : ''}</p>
+          <p className="text-sm text-muted-foreground mt-1">Based on {selectedTasks.length} task{selectedTasks.length !== 1 ? 's' : ''}</p>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

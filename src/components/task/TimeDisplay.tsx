@@ -15,8 +15,11 @@ export const TimeDisplay = memo(({ timeRequired, frequency }: TimeDisplayProps) 
   const safeTimeRequired = timeRequired || 0;
   const safeTimesPerWeek = frequency?.timesPerWeek || 0;
   
-  const timePerService = ((safeTimeRequired / (safeTimesPerWeek || 1)) / 4 * 60).toFixed(1);
-  const monthlyTime = (safeTimeRequired * 60).toFixed(1);
+  // Calculate time metrics
+  const timePerService = safeTimeRequired / (safeTimesPerWeek || 1) / 4.33;
+  const timePerServiceMinutes = (timePerService * 60).toFixed(1);
+  const weeklyTimeHours = (safeTimeRequired / 4.33).toFixed(1);
+  const monthlyTimeMinutes = (safeTimeRequired * 60).toFixed(1);
 
   return (
     <Card className="p-3">
@@ -25,8 +28,9 @@ export const TimeDisplay = memo(({ timeRequired, frequency }: TimeDisplayProps) 
         <span className="font-medium">Time Requirements</span>
       </div>
       <div className="text-sm space-y-1">
-        <p>Time per service: {timePerService} minutes</p>
-        <p>Monthly time: {monthlyTime} minutes</p>
+        <p>Time per service: {timePerServiceMinutes} minutes</p>
+        <p>Weekly time: {weeklyTimeHours} hours</p>
+        <p>Monthly time: {safeTimeRequired.toFixed(1)} hours ({monthlyTimeMinutes} minutes)</p>
       </div>
     </Card>
   );

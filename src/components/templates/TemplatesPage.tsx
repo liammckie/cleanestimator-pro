@@ -1,0 +1,111 @@
+
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TaskTemplate } from '../task/TaskTemplate';
+import { TemplateManager } from '../task/TemplateManager';
+import { getAllProductivityRates } from '@/data/productivityRates';
+
+export const TemplatesPage: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedTaskId, setSelectedTaskId] = useState<string>('');
+  
+  const allRates = getAllProductivityRates();
+  const categories = [...new Set(allRates.map(rate => rate.category))].sort();
+  
+  const filteredRates = allRates.filter(rate => {
+    if (selectedCategory && rate.category !== selectedCategory) return false;
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        rate.task.toLowerCase().includes(query) ||
+        rate.category.toLowerCase().includes(query) ||
+        rate.tool.toLowerCase().includes(query)
+      );
+    }
+    return true;
+  });
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Task Templates</h1>
+      
+      <Tabs defaultValue="create" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="create">Create Template</TabsTrigger>
+          <TabsTrigger value="saved">Saved Templates</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="create" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Find a Task</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="task-category">Category</Label>
+                  <Select
+                    value={selectedCategory}
+                    onValueChange={setSelectedCategory}
+                  >
+                    <SelectTrigger id="task-category">
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All Categories</SelectItem>
+                      {categories.map(category => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="task-search">Search</Label>
+                  <Input
+                    id="task-search"
+                    placeholder="Search tasks..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                {filteredRates.slice(0, 9).map(rate => (
+                  <Button
+                    key={rate.id}
+                    variant={selectedTaskId === rate.id ? "default" : "outline"}
+                    className="h-auto py-3 justify-start"
+                    onClick={() => setSelectedTaskId(rate.id)}
+                  >
+                    <div className="text-left">
+                      <p className="font-medium">{rate.task}</p>
+                      <p className="text-xs text-muted-foreground">{rate.category}</p>
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          
+          {selectedTaskId && (
+            <TaskTemplate taskId={selectedTaskId} />
+          )}
+        </TabsContent>
+        
+        <TabsContent value="saved">
+          <TemplateManager />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
