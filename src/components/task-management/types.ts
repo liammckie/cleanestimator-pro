@@ -1,3 +1,4 @@
+
 import { CleaningTask } from '@/data/types/taskManagement';
 
 export interface SelectedTask extends CleaningTask {
@@ -9,6 +10,7 @@ export interface SelectedTask extends CleaningTask {
   timeRequired: number;
   selectedTool?: string;
   taskId?: string;
+  unitType?: 'sqm' | 'units';
 }
 
 export interface TaskProductivity {

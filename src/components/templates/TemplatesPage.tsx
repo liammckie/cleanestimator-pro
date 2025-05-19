@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -10,7 +9,7 @@ import { TaskTemplate } from '../task/TaskTemplate';
 import { TemplateManager } from '../task/TemplateManager';
 import { getAllProductivityRates } from '@/data/productivityRates';
 import { IndustryTemplatesPage } from './IndustryTemplatesPage';
-import { Plus, Search, Clock, Minus, Ruler, SquareMeter } from 'lucide-react';
+import { Plus, Search, Clock, Minus, Ruler, Square } from 'lucide-react';
 import { useTaskContext } from '../area/task/TaskContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -53,7 +52,7 @@ export const TemplatesPage: React.FC = () => {
     });
     
     setTaskMeasurements(initialMeasurements);
-  }, []);
+  }, [selectedTasks]);
 
   // Function to handle adding a task
   const handleAddTask = (taskId: string) => {
@@ -108,14 +107,6 @@ export const TemplatesPage: React.FC = () => {
       ...prev,
       [taskId]: { ...prev[taskId], unitType }
     }));
-    
-    // You may need to create a function in TaskContext to handle unit type changes
-    const taskIndex = selectedTasks.findIndex(t => t.taskId === taskId);
-    if (taskIndex >= 0) {
-      const updatedTasks = [...selectedTasks];
-      updatedTasks[taskIndex] = { ...updatedTasks[taskIndex], unitType };
-      // Update context with updated tasks or add a specific handler
-    }
   };
 
   // Check if task is already selected
@@ -297,7 +288,7 @@ export const TemplatesPage: React.FC = () => {
                               htmlFor={`unit-${task.taskId}`}
                               className="flex items-center gap-1 text-xs text-muted-foreground mb-1"
                             >
-                              <SquareMeter className="h-3 w-3" /> Unit Type
+                              <Square className="h-3 w-3" /> Unit Type
                             </Label>
                             <Select
                               value={taskMeasurements[task.taskId]?.unitType || 'sqm'}

@@ -1,3 +1,4 @@
+
 export type TaskCategory = 'Core Cleaning' | 'Specialized Cleaning' | 'Industry-Specific Cleaning';
 export type MeasurementUnit = 'SQM/hour' | 'Units/hour';
 
@@ -25,6 +26,8 @@ export interface SelectedTask extends CleaningTask {
   timeRequired: number;
   selectedTool?: string;
   taskId?: string;
+  unitType?: 'sqm' | 'units';
+  siteId?: string;
 }
 
 export interface TaskState {

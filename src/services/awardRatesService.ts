@@ -11,6 +11,8 @@ export interface AwardRate {
   shift_type: ShiftType;
   hourly_rate: number;
   effective_date: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const fetchAwardRates = async (): Promise<AwardRate[]> => {
@@ -27,7 +29,7 @@ export const fetchAwardRates = async (): Promise<AwardRate[]> => {
       return [];
     }
     
-    return data || [];
+    return (data as AwardRate[]) || [];
   } catch (error) {
     console.error('Error in fetchAwardRates:', error);
     return [];
