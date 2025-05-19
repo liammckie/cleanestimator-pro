@@ -13,7 +13,7 @@ import { IndustryTemplatesPage } from './IndustryTemplatesPage';
 
 export const TemplatesPage: React.FC = () => {
   const [templateType, setTemplateType] = useState<string>("general");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("_all");
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
   
