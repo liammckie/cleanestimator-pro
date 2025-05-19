@@ -85,15 +85,6 @@ export const MainContent: React.FC<MainContentProps> = ({
         <TaskManagementPage />
       </TabsContent>
 
-      <TabsContent value="equipment" className="space-y-6">
-        <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
-      </TabsContent>
-
-      <TabsContent value="roster" className="space-y-6">
-        <RosterManager />
-        <CostSummary costs={costBreakdown} />
-      </TabsContent>
-
       <FinancialTabs
         laborCosts={laborCosts}
         setLaborCosts={setLaborCosts}
@@ -106,6 +97,15 @@ export const MainContent: React.FC<MainContentProps> = ({
         taskCosts={taskCosts}
         onMarginChange={handleMarginChange}
       />
+
+      <TabsContent value="equipment" className="space-y-6">
+        <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
+      </TabsContent>
+
+      <TabsContent value="roster" className="space-y-6">
+        <RosterManager />
+        <CostSummary costs={costBreakdown} />
+      </TabsContent>
 
       <TabsContent value="settings" className="space-y-6">
         <AwardSettings
