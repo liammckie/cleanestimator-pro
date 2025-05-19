@@ -1,3 +1,6 @@
+<think>
+
+</think>
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
@@ -12,7 +15,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <div className="w-64 border-r bg-gray-900 dark:bg-gray-900 dark:border-gray-800">
         <MainNavigation />
       </div>
-      <div className="flex-1 overflow-auto p-6 bg-gray-100 dark:bg-gray-900">
+      <div className="flex-1 overflow-auto p-6 bg-background text-foreground">
         {children}
       </div>
     </div>

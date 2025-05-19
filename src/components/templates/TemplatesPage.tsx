@@ -35,12 +35,12 @@ export const TemplatesPage: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Task Templates</h1>
+      <h1 className="text-3xl font-bold mb-6 text-foreground">Task Templates</h1>
       
       <Tabs value={templateType} onValueChange={setTemplateType} className="mb-6">
-        <TabsList>
-          <TabsTrigger value="general">General Templates</TabsTrigger>
-          <TabsTrigger value="industry">Industry-Specific Templates</TabsTrigger>
+        <TabsList className="bg-muted">
+          <TabsTrigger value="general" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">General Templates</TabsTrigger>
+          <TabsTrigger value="industry" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Industry-Specific Templates</TabsTrigger>
         </TabsList>
       </Tabs>
       
@@ -48,13 +48,13 @@ export const TemplatesPage: React.FC = () => {
         <IndustryTemplatesPage />
       ) : (
         <Tabs defaultValue="create" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="create">Create Template</TabsTrigger>
-            <TabsTrigger value="saved">Saved Templates</TabsTrigger>
+          <TabsList className="bg-muted">
+            <TabsTrigger value="create" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Create Template</TabsTrigger>
+            <TabsTrigger value="saved" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Saved Templates</TabsTrigger>
           </TabsList>
           
           <TabsContent value="create" className="space-y-6">
-            <Card>
+            <Card className="bg-card text-card-foreground">
               <CardHeader>
                 <CardTitle>Find a Task</CardTitle>
               </CardHeader>
@@ -87,6 +87,7 @@ export const TemplatesPage: React.FC = () => {
                       placeholder="Search tasks..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                      className="bg-background"
                     />
                   </div>
                 </div>
@@ -96,7 +97,7 @@ export const TemplatesPage: React.FC = () => {
                     <Button
                       key={rate.id}
                       variant={selectedTaskId === rate.id ? "default" : "outline"}
-                      className="h-auto py-3 justify-start"
+                      className={`h-auto py-3 justify-start ${selectedTaskId === rate.id ? 'bg-primary text-primary-foreground' : 'bg-muted/50 text-foreground hover:bg-muted'}`}
                       onClick={() => setSelectedTaskId(rate.id)}
                     >
                       <div className="text-left">
