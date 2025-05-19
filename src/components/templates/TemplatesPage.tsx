@@ -10,7 +10,7 @@ import { TaskTemplate } from '../task/TaskTemplate';
 import { TemplateManager } from '../task/TemplateManager';
 import { getAllProductivityRates } from '@/data/productivityRates';
 import { IndustryTemplatesPage } from './IndustryTemplatesPage';
-import { Plus, Search, Clock } from 'lucide-react';
+import { Plus, Search, Clock, Minus, Ruler, SquareMeter } from 'lucide-react';
 import { useTaskContext } from '../area/task/TaskContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -19,6 +19,7 @@ export const TemplatesPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("_all");
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
+  const [taskMeasurements, setTaskMeasurements] = useState<Record<string, { quantity: number, unitType: 'sqm' | 'units' }>>({});
   const { toast } = useToast();
   
   const allRates = getAllProductivityRates();
@@ -38,12 +39,41 @@ export const TemplatesPage: React.FC = () => {
   });
 
   // Get task context for managing tasks
-  const { handleTaskSelection, selectedTasks } = useTaskContext();
+  const { handleTaskSelection, selectedTasks, handleQuantityChange } = useTaskContext();
+
+  // Initialize task measurements from selected tasks on component mount
+  useEffect(() => {
+    const initialMeasurements: Record<string, { quantity: number, unitType: 'sqm' | 'units' }> = {};
+    
+    selectedTasks.forEach(task => {
+      initialMeasurements[task.taskId] = {
+        quantity: task.quantity || 1,
+        unitType: task.unitType || 'sqm'
+      };
+    });
+    
+    setTaskMeasurements(initialMeasurements);
+  }, []);
 
   // Function to handle adding a task
   const handleAddTask = (taskId: string) => {
+    // Initialize measurement for this task if not exists
+    if (!taskMeasurements[taskId]) {
+      setTaskMeasurements(prev => ({
+        ...prev,
+        [taskId]: { quantity: 1, unitType: 'sqm' }
+      }));
+    }
+    
+    // Add to selected tasks
     handleTaskSelection(taskId, true);
     setSelectedTaskId(taskId);
+    
+    // Apply quantity if available
+    if (taskMeasurements[taskId]) {
+      handleQuantityChange(taskId, taskMeasurements[taskId].quantity);
+    }
+    
     toast({
       title: "Task Added",
       description: `Task has been added to your template.`
@@ -60,6 +90,32 @@ export const TemplatesPage: React.FC = () => {
       title: "Task Removed",
       description: `Task has been removed from your template.`
     });
+  };
+
+  // Handle quantity change for a task
+  const handleTaskQuantityChange = (taskId: string, quantity: number) => {
+    setTaskMeasurements(prev => ({
+      ...prev,
+      [taskId]: { ...prev[taskId], quantity }
+    }));
+    
+    handleQuantityChange(taskId, quantity);
+  };
+
+  // Handle unit type change for a task
+  const handleUnitTypeChange = (taskId: string, unitType: 'sqm' | 'units') => {
+    setTaskMeasurements(prev => ({
+      ...prev,
+      [taskId]: { ...prev[taskId], unitType }
+    }));
+    
+    // You may need to create a function in TaskContext to handle unit type changes
+    const taskIndex = selectedTasks.findIndex(t => t.taskId === taskId);
+    if (taskIndex >= 0) {
+      const updatedTasks = [...selectedTasks];
+      updatedTasks[taskIndex] = { ...updatedTasks[taskIndex], unitType };
+      // Update context with updated tasks or add a specific handler
+    }
   };
 
   // Check if task is already selected
@@ -131,7 +187,7 @@ export const TemplatesPage: React.FC = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                  {filteredRates.slice(0, 9).map(rate => {
+                  {filteredRates.slice(0, 12).map(rate => {
                     const isSelected = isTaskSelected(rate.id);
                     return (
                       <Button
@@ -145,9 +201,9 @@ export const TemplatesPage: React.FC = () => {
                               : 'bg-muted/50 text-foreground hover:bg-muted'
                         }`}
                         onClick={() => {
-                          if (isSelected) {
-                            handleRemoveTask(rate.id);
-                          } else {
+                          setSelectedTaskId(rate.id);
+                          // Only select if not already selected
+                          if (!isSelected) {
                             handleAddTask(rate.id);
                           }
                         }}
@@ -156,11 +212,13 @@ export const TemplatesPage: React.FC = () => {
                           <p className="font-medium">{rate.task}</p>
                           <p className="text-xs text-muted-foreground">{rate.category}</p>
                         </div>
-                        {isSelected && (
-                          <div className="ml-2 bg-primary/20 text-primary rounded-full p-1">
+                        <div className="ml-2 bg-primary/20 text-primary rounded-full p-1">
+                          {isSelected ? (
+                            <Minus className="h-4 w-4" />
+                          ) : (
                             <Plus className="h-4 w-4" />
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </Button>
                     );
                   })}
@@ -193,31 +251,82 @@ export const TemplatesPage: React.FC = () => {
                 <CardContent>
                   <div className="space-y-3">
                     {selectedTasks.map(task => (
-                      <div key={task.taskId} className="flex justify-between items-center bg-background p-3 rounded-md">
-                        <div>
-                          <p className="font-medium">{task.name || task.taskId}</p>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                            <Clock className="h-3 w-3" />
-                            {task.timeRequired ? 
-                              `${task.timeRequired.toFixed(2)} hours per task` : 
-                              'Set quantity to calculate time'}
+                      <div key={task.taskId} className="flex flex-col gap-2 bg-background p-3 rounded-md">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="font-medium">{task.name || task.taskId}</p>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                              <Clock className="h-3 w-3" />
+                              {task.timeRequired ? 
+                                `${task.timeRequired.toFixed(2)} hours per task` : 
+                                'Set quantity to calculate time'}
+                            </div>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleRemoveTask(task.taskId)}
+                          >
+                            <span className="sr-only">Remove task</span>
+                            ×
+                          </Button>
+                        </div>
+                        
+                        {/* Add measurements input */}
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                          <div>
+                            <Label 
+                              htmlFor={`quantity-${task.taskId}`} 
+                              className="flex items-center gap-1 text-xs text-muted-foreground mb-1"
+                            >
+                              <Ruler className="h-3 w-3" /> Quantity
+                            </Label>
+                            <Input
+                              id={`quantity-${task.taskId}`}
+                              type="number"
+                              value={taskMeasurements[task.taskId]?.quantity || 1}
+                              onChange={(e) => handleTaskQuantityChange(task.taskId, parseFloat(e.target.value) || 0)}
+                              className="h-8 text-sm"
+                              min={0}
+                              step={1}
+                            />
+                          </div>
+                          <div>
+                            <Label 
+                              htmlFor={`unit-${task.taskId}`}
+                              className="flex items-center gap-1 text-xs text-muted-foreground mb-1"
+                            >
+                              <SquareMeter className="h-3 w-3" /> Unit Type
+                            </Label>
+                            <Select
+                              value={taskMeasurements[task.taskId]?.unitType || 'sqm'}
+                              onValueChange={(value) => handleUnitTypeChange(task.taskId, value as 'sqm' | 'units')}
+                            >
+                              <SelectTrigger 
+                                id={`unit-${task.taskId}`} 
+                                className="h-8 text-sm"
+                              >
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="sqm">Square Meters</SelectItem>
+                                <SelectItem value="units">Units/Count</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => handleRemoveTask(task.taskId)}
-                        >
-                          <span className="sr-only">Remove task</span>
-                          ×
-                        </Button>
                       </div>
                     ))}
                   </div>
                 </CardContent>
-                <CardFooter>
-                  <Button className="w-full">Save as Template</Button>
+                <CardFooter className="flex justify-between">
+                  <Button variant="outline" onClick={() => {
+                    selectedTasks.forEach(task => handleRemoveTask(task.taskId));
+                  }}>
+                    Clear All
+                  </Button>
+                  <Button>Save as Template</Button>
                 </CardFooter>
               </Card>
             )}

@@ -11,6 +11,7 @@ import { useTaskContext } from './area/task/TaskContext';
 import { useCostContext } from '@/contexts/CostContext';
 import { MonthlyHoursDisplay } from './labor/MonthlyHoursDisplay';
 import { ContractedRateInput } from './labor/ContractedRateInput';
+import { getAwardRate, EmploymentType as DBEmploymentType, ShiftType } from '@/services/awardRatesService';
 
 interface LaborCostsProps {
   onLaborCostChange: (costs: { 
@@ -18,6 +19,7 @@ interface LaborCostsProps {
     employmentType: 'contracted' | 'direct';
     awardLevel?: number;
     shiftType?: string;
+    employmentAwardType?: string;
     onCosts?: OnCostsState;
   }) => void;
 }
@@ -53,7 +55,8 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
   const [employmentType, setEmploymentType] = useState<'contracted' | 'direct'>('contracted');
   const [contractedRate, setContractedRate] = useState<number>(38);
   const [awardLevel, setAwardLevel] = useState<number>(1);
-  const [shiftType, setShiftType] = useState<string>('standard');
+  const [shiftType, setShiftType] = useState<string>("mon-fri-day");
+  const [employmentAwardType, setEmploymentAwardType] = useState<string>("full-time");
   const [onCosts, setOnCosts] = useState<OnCostsState>(defaultOnCosts);
   const [awardIncrease, setAwardIncrease] = useState<number>(0);
 
@@ -80,6 +83,13 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
     updateLaborCosts(value);
   };
 
+  const handleEmploymentAwardTypeChange = (value: string) => {
+    setEmploymentAwardType(value);
+    if (employmentType === 'direct') {
+      updateLaborCosts();
+    }
+  };
+
   const handleContractedRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value) || 0;
     setContractedRate(value);
@@ -96,7 +106,7 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
     return baseRate * (1 + (awardIncrease / 100));
   };
 
-  const updateLaborCosts = (type: 'contracted' | 'direct' = employmentType) => {
+  const updateLaborCosts = async (type: 'contracted' | 'direct' = employmentType) => {
     if (type === 'contracted') {
       updateLaborRate(contractedRate);
       onLaborCostChange({
@@ -104,18 +114,42 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
         employmentType: type
       });
     } else {
-      const selectedLevel = cleaningAwardLevels.find(level => level.level === awardLevel);
-      const baseRate = selectedLevel?.payRates[shiftType as keyof typeof selectedLevel.payRates] || 0;
-      const adjustedRate = calculateAdjustedRate(baseRate);
-      
-      updateLaborRate(adjustedRate);
-      onLaborCostChange({
-        hourlyRate: adjustedRate,
-        employmentType: type,
-        awardLevel,
-        shiftType,
-        onCosts
-      });
+      try {
+        // Fetch rate from database
+        const baseRate = await getAwardRate(
+          awardLevel, 
+          employmentAwardType as DBEmploymentType, 
+          shiftType as ShiftType
+        );
+        
+        const adjustedRate = calculateAdjustedRate(baseRate);
+        
+        updateLaborRate(adjustedRate);
+        onLaborCostChange({
+          hourlyRate: adjustedRate,
+          employmentType: type,
+          awardLevel,
+          shiftType,
+          employmentAwardType,
+          onCosts
+        });
+      } catch (error) {
+        console.error("Error updating labor costs:", error);
+        // Fallback to old method
+        const selectedLevel = cleaningAwardLevels.find(level => level.level === awardLevel);
+        const baseRate = selectedLevel?.payRates[shiftType as keyof typeof selectedLevel.payRates] || 0;
+        const adjustedRate = calculateAdjustedRate(baseRate);
+        
+        updateLaborRate(adjustedRate);
+        onLaborCostChange({
+          hourlyRate: adjustedRate,
+          employmentType: type,
+          awardLevel,
+          shiftType,
+          employmentAwardType,
+          onCosts
+        });
+      }
     }
   };
 
@@ -176,8 +210,10 @@ export const LaborCosts: React.FC<LaborCostsProps> = ({ onLaborCostChange }) => 
                 <DirectEmploymentOptions
                   awardLevel={awardLevel}
                   shiftType={shiftType}
+                  employmentType={employmentAwardType}
                   onAwardLevelChange={handleAwardLevelChange}
                   onShiftTypeChange={handleShiftTypeChange}
+                  onEmploymentTypeChange={handleEmploymentAwardTypeChange}
                 />
                 <AwardIncreaseManager
                   currentIncrease={awardIncrease}

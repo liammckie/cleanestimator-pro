@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      cleaning_award_rates: {
+        Row: {
+          created_at: string | null
+          effective_date: string
+          employment_type: string
+          hourly_rate: number
+          id: string
+          level: number
+          shift_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          effective_date?: string
+          employment_type: string
+          hourly_rate: number
+          id?: string
+          level: number
+          shift_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          effective_date?: string
+          employment_type?: string
+          hourly_rate?: number
+          id?: string
+          level?: number
+          shift_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       industry_productivity_rates: {
         Row: {
           area_name: string
@@ -98,7 +131,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_cleaning_award_rate: {
+        Args: {
+          p_level: number
+          p_employment_type: string
+          p_shift_type: string
+          p_date?: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
