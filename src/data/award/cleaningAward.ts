@@ -196,14 +196,14 @@ export const standardOnCosts = [
   { name: "Workers' Compensation Insurance", percentage: 2.5 },
   { name: "Payroll Tax", percentage: 4.85 },
   { name: "Portable Long Service Leave", percentage: 1.8 },
-  { name: "Annual Leave & Loading", percentage: 8.33 },
+  { name: "Annual Leave & Loading", percentage: 8.44 },
   { name: "Sick/Personal Leave Provision", percentage: 3.85 },
   { name: "Uniform & PPE", percentage: 0.5 },
   { name: "Recruitment & Training", percentage: 1.5 },
   { name: "Admin & Payroll Costs", percentage: 2.0 },
 ];
 
-export const TOTAL_ONCOST_PERCENTAGE = 37.33;
+export const TOTAL_ONCOST_PERCENTAGE = 37.44; // Updated sum of all percentages
 export const SUPERANNUATION_RATE = 0.12; // 12.0%
 export const CASUAL_LOADING = 0.25; // 25%
 

@@ -45,7 +45,7 @@ export const TemplatesPage: React.FC = () => {
     const initialMeasurements: Record<string, { quantity: number, unitType: 'sqm' | 'units' }> = {};
     
     selectedTasks.forEach(task => {
-      initialMeasurements[task.taskId] = {
+      initialMeasurements[task.taskId || ''] = {
         quantity: task.quantity || 1,
         unitType: task.unitType || 'sqm'
       };

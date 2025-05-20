@@ -70,7 +70,7 @@ export const PaySummary: React.FC<PaySummaryProps> = ({ calculation }) => {
                 <span className="text-foreground">${calculation.basePayRate.toFixed(2)}/hr</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">On-costs ({TOTAL_ONCOST_PERCENTAGE}%):</span>
+                <span className="text-muted-foreground">On-costs ({TOTAL_ONCOST_PERCENTAGE.toFixed(2)}%):</span>
                 <span className="text-foreground">${(calculation.basePayRate * TOTAL_ONCOST_PERCENTAGE / 100).toFixed(2)}/hr</span>
               </div>
               <div className="flex justify-between items-center font-bold">

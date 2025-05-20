@@ -26,26 +26,26 @@ interface LaborCostsProps {
 
 const defaultOnCosts: OnCostsState = {
   statutoryOnCosts: [
-    { name: 'Superannuation Guarantee', rate: 11.5, isEnabled: true, category: 'statutory', isMandatory: true },
-    { name: 'Workers Compensation', rate: 5, isEnabled: true, category: 'statutory', isMandatory: true },
-    { name: 'Payroll Tax', rate: 4.75, isEnabled: true, category: 'statutory', isMandatory: true },
-    { name: 'Leave Entitlements', rate: 8.33, isEnabled: true, category: 'statutory', isMandatory: true },
+    { name: 'Superannuation Guarantee', rate: 12.0, isEnabled: true, category: 'statutory', isMandatory: true },
+    { name: 'Workers Compensation', rate: 2.5, isEnabled: true, category: 'statutory', isMandatory: true },
+    { name: 'Payroll Tax', rate: 4.85, isEnabled: true, category: 'statutory', isMandatory: true },
+    { name: 'Annual Leave & Loading', rate: 8.44, isEnabled: true, category: 'statutory', isMandatory: true },
+    { name: 'Sick/Personal Leave', rate: 3.85, isEnabled: true, category: 'statutory', isMandatory: true },
+    { name: 'Portable Long Service Leave', rate: 1.8, isEnabled: true, category: 'statutory', isMandatory: true },
   ],
   employmentOnCosts: [
-    { name: 'Casual Loading', rate: 25, isEnabled: false, category: 'employment' },
-    { name: 'Training Allowance', rate: 2, isEnabled: false, category: 'employment' },
+    { name: 'Uniform & PPE', rate: 0.5, isEnabled: true, category: 'employment' },
+    { name: 'Training Allowance', rate: 1.5, isEnabled: false, category: 'employment' },
   ],
   recruitmentOnCosts: [
-    { name: 'Recruitment & Advertising', rate: 3, isEnabled: false, category: 'recruitment' },
-    { name: 'Training & Induction', rate: 2, isEnabled: false, category: 'recruitment' },
+    { name: 'Recruitment & Training', rate: 1.5, isEnabled: true, category: 'recruitment' },
+    { name: 'Administrative & Payroll Costs', rate: 2.0, isEnabled: true, category: 'recruitment' },
   ],
   overheadOnCosts: [
-    { name: 'Uniforms & PPE', rate: 2, isEnabled: false, category: 'overhead' },
-    { name: 'Equipment & Tools', rate: 3, isEnabled: false, category: 'overhead' },
+    { name: 'Equipment & Tools', rate: 2.0, isEnabled: false, category: 'overhead' },
   ],
   miscellaneousOnCosts: [
-    { name: 'Insurance', rate: 2, isEnabled: false, category: 'miscellaneous' },
-    { name: 'Administrative Costs', rate: 3, isEnabled: false, category: 'miscellaneous' },
+    { name: 'Insurance', rate: 1.0, isEnabled: false, category: 'miscellaneous' },
   ],
 };
 
