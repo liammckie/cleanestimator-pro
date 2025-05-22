@@ -10,6 +10,18 @@ import { RatesManagementPage } from './components/rates/RatesManagementPage';
 import { TemplatesPage } from './components/templates/TemplatesPage';
 import { TaskProvider } from './components/area/task/TaskContext';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { WorkflowProvider } from './contexts/WorkflowContext';
+import { WorkflowLayout } from './components/workflow/WorkflowLayout';
+import { SiteSetupStep } from './components/workflow/SiteSetupStep';
+import { ScopeDefinitionStep } from './components/workflow/ScopeDefinitionStep';
+import { TaskManagementStep } from './components/workflow/TaskManagementStep';
+import { LaborCostsStep } from './components/workflow/LaborCostsStep';
+import { EquipmentStep } from './components/workflow/EquipmentStep';
+import { ContractStep } from './components/workflow/ContractStep';
+import { SummaryStep } from './components/workflow/SummaryStep';
+import { ReviewStep } from './components/workflow/ReviewStep';
+import { WorkflowProjects } from './components/workflow/WorkflowProjects';
+import { LoadWorkflow } from './components/workflow/LoadWorkflow';
 
 function App() {
   const [sites, setSites] = useState([]);
@@ -36,9 +48,10 @@ function App() {
         <TaskProvider>
           <CostProvider>
             <RatesProvider>
-              <MainNavigation />
               <Routes>
-                <Route path="/" element={
+                {/* Legacy routes */}
+                <Route path="/legacy" element={<>
+                  <MainNavigation />
                   <MainContent 
                     sites={sites}
                     onSitesChange={setSites}
@@ -52,9 +65,40 @@ function App() {
                     monthlyRevenue={monthlyRevenue}
                     overhead={overhead}
                   />
-                } />
+                </>} />
                 <Route path="/rates" element={<RatesManagementPage />} />
                 <Route path="/templates" element={<TemplatesPage />} />
+                
+                {/* Workflow routes */}
+                <Route path="/" element={<Navigate to="/workflow/projects" replace />} />
+                
+                <Route path="/workflow/projects" element={
+                  <WorkflowProvider>
+                    <WorkflowProjects />
+                  </WorkflowProvider>
+                } />
+                
+                <Route path="/workflow/continue/:id" element={
+                  <WorkflowProvider>
+                    <LoadWorkflow />
+                  </WorkflowProvider>
+                } />
+                
+                <Route path="/workflow" element={
+                  <WorkflowProvider>
+                    <WorkflowLayout />
+                  </WorkflowProvider>
+                }>
+                  <Route path="site-setup" element={<SiteSetupStep />} />
+                  <Route path="scope" element={<ScopeDefinitionStep />} />
+                  <Route path="tasks" element={<TaskManagementStep />} />
+                  <Route path="labor" element={<LaborCostsStep />} />
+                  <Route path="equipment" element={<EquipmentStep />} />
+                  <Route path="contract" element={<ContractStep />} />
+                  <Route path="summary" element={<SummaryStep />} />
+                  <Route path="review" element={<ReviewStep />} />
+                </Route>
+                
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </RatesProvider>
