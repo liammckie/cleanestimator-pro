@@ -43,6 +43,8 @@ export const ScopeDefinitionStep: React.FC = () => {
           variant="outline"
           size="lg"
           className="flex items-center"
+          id="previous-step-button"
+          name="previous-step-button"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Previous Step
@@ -53,6 +55,8 @@ export const ScopeDefinitionStep: React.FC = () => {
           variant="default"
           size="lg" 
           className="flex items-center"
+          id="next-step-button"
+          name="next-step-button"
         >
           Next Step
           <ArrowRight className="ml-2 h-4 w-4" />

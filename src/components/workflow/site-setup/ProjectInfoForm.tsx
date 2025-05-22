@@ -22,6 +22,7 @@ export const ProjectInfoForm: React.FC<ProjectInfoFormProps> = ({
         <Label htmlFor="project-name">Project Name</Label>
         <Input
           id="project-name"
+          name="project-name"
           value={projectName}
           onChange={(e) => onProjectNameChange(e.target.value)}
           className="mt-1"
@@ -33,6 +34,7 @@ export const ProjectInfoForm: React.FC<ProjectInfoFormProps> = ({
         <Label htmlFor="client-name">Client Name</Label>
         <Input
           id="client-name"
+          name="client-name"
           value={clientName}
           onChange={(e) => onClientNameChange(e.target.value)}
           className="mt-1"
