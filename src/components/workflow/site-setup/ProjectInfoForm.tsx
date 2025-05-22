@@ -27,6 +27,7 @@ export const ProjectInfoForm: React.FC<ProjectInfoFormProps> = ({
           onChange={(e) => onProjectNameChange(e.target.value)}
           className="mt-1"
           placeholder="Enter project name"
+          aria-label="Project name"
         />
       </div>
       
@@ -39,6 +40,7 @@ export const ProjectInfoForm: React.FC<ProjectInfoFormProps> = ({
           onChange={(e) => onClientNameChange(e.target.value)}
           className="mt-1"
           placeholder="Enter client name"
+          aria-label="Client name"
         />
       </div>
     </div>

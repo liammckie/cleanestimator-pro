@@ -26,7 +26,7 @@ export const SitesList: React.FC<SitesListProps> = ({
 }) => {
   return (
     <div className="mt-6">
-      <h3 className="text-lg font-medium mb-4">Sites</h3>
+      <h3 className="text-lg font-medium mb-4" id="sites-heading">Sites</h3>
       
       {sites.map((site, index) => (
         <SiteCard
@@ -48,9 +48,10 @@ export const SitesList: React.FC<SitesListProps> = ({
         className="mt-2 flex items-center"
         id="add-site-button"
         name="add-site-button"
+        aria-labelledby="add-site-button-label"
       >
         <Plus className="h-4 w-4 mr-1" />
-        Add Another Site
+        <span id="add-site-button-label">Add Another Site</span>
       </Button>
     </div>
   );
