@@ -24,20 +24,22 @@ export const CostProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Calculate labor costs from tasks and rates
-    const laborCost = selectedTasks.reduce((total, task) => {
-      const taskRate = task.laborRate || laborRate;
-      const monthlyHours = task.timeRequired * task.frequency.timesPerMonth;
-      return total + (monthlyHours * taskRate);
-    }, 0);
-    
-    setTotalLaborCost(laborCost);
-    
-    console.log('COST_CONTEXT: Updated calculations:', {
-      laborCost,
-      totalWeeklyHours,
-      totalMonthlyHours,
-      selectedTasksCount: selectedTasks.length
-    });
+    if (selectedTasks && selectedTasks.length > 0) {
+      const laborCost = selectedTasks.reduce((total, task) => {
+        const taskRate = task.laborRate || laborRate;
+        const monthlyHours = task.timeRequired * task.frequency.timesPerMonth;
+        return total + (monthlyHours * taskRate);
+      }, 0);
+      
+      setTotalLaborCost(laborCost);
+      
+      console.log('COST_CONTEXT: Updated calculations:', {
+        laborCost,
+        totalWeeklyHours,
+        totalMonthlyHours,
+        selectedTasksCount: selectedTasks.length
+      });
+    }
   }, [selectedTasks, laborRate, totalWeeklyHours, totalMonthlyHours]);
 
   const updateLaborCost = (cost: number) => {
