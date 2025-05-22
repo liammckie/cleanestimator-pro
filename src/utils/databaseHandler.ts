@@ -7,8 +7,8 @@ interface TableColumns {
   [key: string]: any;
 }
 
-// Define the type for table names
-type TableName = 'industry_productivity_rates' | 'periodic_cleaning_services' | 'cleaning_workflows' | 'system_errors' | 'system_health_logs';
+// Define the type for table names - only include existing tables
+type TableName = 'cleaning_workflows' | 'industry_productivity_rates' | 'periodic_cleaning_services' | 'cleaning_award_rates';
 
 /**
  * Fetches all records from a specified table
@@ -31,7 +31,7 @@ export const fetchAllRecords = async (tableName: TableName) => {
     }
     
     return { data, error: null };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Error in fetchAllRecords for ${tableName}:`, error);
     errorTracker.trackError(
       `Exception in fetchAllRecords for ${tableName}: ${error.message}`,
@@ -70,7 +70,7 @@ export const fetchRecordById = async (tableName: TableName, id: string) => {
     }
     
     return { data, error: null };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Error in fetchRecordById for ${tableName} with ID ${id}:`, error);
     errorTracker.trackError(
       `Exception in fetchRecordById for ${tableName} with ID ${id}: ${error.message}`,
@@ -111,7 +111,7 @@ export const createRecord = async (tableName: TableName, record: TableColumns) =
     }
     
     return { data, error: null };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Error in createRecord for ${tableName}:`, error);
     errorTracker.trackError(
       `Exception in createRecord for ${tableName}: ${error.message}`,
@@ -156,7 +156,7 @@ export const updateRecord = async (
     }
     
     return { data, error: null };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Error in updateRecord for ${tableName} with ID ${id}:`, error);
     errorTracker.trackError(
       `Exception in updateRecord for ${tableName} with ID ${id}: ${error.message}`,
@@ -194,7 +194,7 @@ export const deleteRecord = async (tableName: TableName, id: string) => {
     }
     
     return { success: true, error: null };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Error in deleteRecord for ${tableName} with ID ${id}:`, error);
     errorTracker.trackError(
       `Exception in deleteRecord for ${tableName} with ID ${id}: ${error.message}`,
@@ -225,7 +225,7 @@ export const runDatabaseHealthCheck = async () => {
     }
     
     return { data, error: null };
-  } catch (error) {
+  } catch (error: any) {
     errorTracker.trackError(
       `Exception in runDatabaseHealthCheck: ${error.message}`,
       'high',

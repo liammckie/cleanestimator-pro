@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { memo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Building, Clock } from "lucide-react";
 
@@ -8,12 +9,15 @@ interface TimeSummaryCardsProps {
   monthlyHours: number;
 }
 
-export const TimeSummaryCards: React.FC<TimeSummaryCardsProps> = ({
+export const TimeSummaryCards: React.FC<TimeSummaryCardsProps> = memo(({
   siteCount,
   weeklyHours,
   monthlyHours
 }) => {
-  console.log('TimeSummaryCards rendering with:', { weeklyHours, monthlyHours });
+  // Use useEffect to log only once during component mount
+  React.useEffect(() => {
+    console.log('TimeSummaryCards mounted with:', { weeklyHours, monthlyHours });
+  }, []);
   
   return (
     <>
@@ -44,4 +48,7 @@ export const TimeSummaryCards: React.FC<TimeSummaryCardsProps> = ({
       </Card>
     </>
   );
-};
+});
+
+// Add display name for debugging
+TimeSummaryCards.displayName = 'TimeSummaryCards';

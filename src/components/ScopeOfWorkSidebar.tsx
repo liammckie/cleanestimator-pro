@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Clock } from "lucide-react";
 import { Site } from '@/data/types/site';
@@ -13,7 +13,8 @@ interface ScopeOfWorkSidebarProps {
   sites?: Site[];
 }
 
-export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
+// Use memo to prevent unnecessary re-renders
+export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = memo(({
   sites = []
 }) => {
   const { 
@@ -27,11 +28,14 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
   } = useTaskContext();
   const { toast } = useToast();
 
-  console.log('ScopeOfWorkSidebar rendering with tasks:', {
-    selectedTasks: selectedTasks.length,
-    totalWeeklyHours,
-    totalMonthlyHours
-  });
+  // Only log once during development, not on every render
+  React.useEffect(() => {
+    console.log('ScopeOfWorkSidebar mounted with tasks:', {
+      selectedTasks: selectedTasks.length,
+      totalWeeklyHours,
+      totalMonthlyHours
+    });
+  }, []);
 
   const handleRemoveTask = (taskId: string, siteId?: string) => {
     handleTaskSelection(taskId, false, siteId);
@@ -42,14 +46,16 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
   };
 
   // Group tasks by site
-  const tasksBySite = selectedTasks.reduce((acc, task) => {
-    const siteName = task.siteName || 'Default Site';
-    if (!acc[siteName]) {
-      acc[siteName] = [];
-    }
-    acc[siteName].push(task);
-    return acc;
-  }, {} as Record<string, typeof selectedTasks>);
+  const tasksBySite = React.useMemo(() => {
+    return selectedTasks.reduce((acc, task) => {
+      const siteName = task.siteName || 'Default Site';
+      if (!acc[siteName]) {
+        acc[siteName] = [];
+      }
+      acc[siteName].push(task);
+      return acc;
+    }, {} as Record<string, typeof selectedTasks>);
+  }, [selectedTasks]);
 
   return (
     <div className="w-[300px] shrink-0 border-l bg-background">
@@ -100,4 +106,7 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = ({
       </ScrollArea>
     </div>
   );
-};
+});
+
+// Add display name for debugging
+ScopeOfWorkSidebar.displayName = 'ScopeOfWorkSidebar';
