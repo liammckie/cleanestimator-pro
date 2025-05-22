@@ -41,7 +41,14 @@ export const SitesList: React.FC<SitesListProps> = ({
         />
       ))}
       
-      <Button type="button" onClick={onAddSite} variant="outline" className="mt-2 flex items-center">
+      <Button 
+        type="button" 
+        onClick={onAddSite} 
+        variant="outline" 
+        className="mt-2 flex items-center"
+        id="add-site-button"
+        name="add-site-button"
+      >
         <Plus className="h-4 w-4 mr-1" />
         Add Another Site
       </Button>

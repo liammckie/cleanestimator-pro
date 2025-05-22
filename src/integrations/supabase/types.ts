@@ -156,6 +156,38 @@ export type Database = {
         }
         Relationships: []
       }
+      workflow_change_log: {
+        Row: {
+          changed_at: string | null
+          id: string
+          new_data: Json | null
+          old_data: Json | null
+          workflow_id: string
+        }
+        Insert: {
+          changed_at?: string | null
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          workflow_id: string
+        }
+        Update: {
+          changed_at?: string | null
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_workflow"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "cleaning_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
