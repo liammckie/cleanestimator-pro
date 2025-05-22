@@ -42,11 +42,11 @@ class ErrorBoundary extends Component<Props, State> {
       error.stack,
       {
         componentStack: errorInfo.componentStack,
-        location: window.location.href
+        location: typeof window !== 'undefined' ? window.location.href : 'unknown'
       }
     );
     
-    // You can log the error to an error reporting service
+    // Log the error to console
     console.error('ErrorBoundary caught an error', error, errorInfo);
   }
 

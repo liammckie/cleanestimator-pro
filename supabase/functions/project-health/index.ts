@@ -27,6 +27,20 @@ interface SystemHealthError {
   details?: any;
 }
 
+// In-memory error storage since we don't have an actual table yet
+const errorStore: Array<{
+  id: string;
+  message: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  component: string;
+  stack_trace?: string;
+  metadata?: any;
+  resolved: boolean;
+  created_at: string;
+  resolved_at?: string | null;
+  resolution_notes?: string | null;
+}> = [];
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -52,10 +66,10 @@ serve(async (req) => {
 
     // Check if this is a specific action request
     if (reqBody && (reqBody as any).action === 'getErrors') {
-      // Simulate returning error logs since the table doesn't exist yet
+      // Return error logs from memory store
       return new Response(
         JSON.stringify({
-          errors: []
+          errors: errorStore.filter(e => !(reqBody as any).onlyUnresolved || !e.resolved)
         }),
         { 
           headers: { 
@@ -67,10 +81,86 @@ serve(async (req) => {
     }
     
     if (reqBody && (reqBody as any).action === 'resolveError') {
-      // Simulate resolving an error since the table doesn't exist yet
+      const errorId = (reqBody as any).errorId;
+      
+      // Find and resolve the error in memory store
+      const errorIndex = errorStore.findIndex(e => e.id === errorId);
+      if (errorIndex >= 0) {
+        errorStore[errorIndex].resolved = true;
+        errorStore[errorIndex].resolved_at = new Date().toISOString();
+        errorStore[errorIndex].resolution_notes = (reqBody as any).notes || 'Marked as resolved';
+      }
+      
       return new Response(
         JSON.stringify({
-          success: true
+          success: errorIndex >= 0
+        }),
+        { 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      );
+    }
+    
+    if (reqBody && (reqBody as any).action === 'logError') {
+      const errorData = (reqBody as any).errorData;
+      
+      // Add error to memory store
+      const errorId = Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
+      errorStore.push({
+        id: errorId,
+        message: errorData.message,
+        severity: errorData.priority || 'medium',
+        component: errorData.source || 'unknown',
+        stack_trace: errorData.stack,
+        metadata: errorData.context,
+        resolved: false,
+        created_at: new Date().toISOString()
+      });
+      
+      // Limit store size to prevent memory issues
+      if (errorStore.length > 100) {
+        errorStore.shift();
+      }
+      
+      return new Response(
+        JSON.stringify({
+          success: true,
+          errorId
+        }),
+        { 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      );
+    }
+    
+    if (reqBody && (reqBody as any).action === 'updateError') {
+      const errorId = (reqBody as any).errorId;
+      const updates = (reqBody as any).updates;
+      
+      // Find and update the error in memory store
+      const errorIndex = errorStore.findIndex(e => e.id === errorId);
+      if (errorIndex >= 0) {
+        if (updates.resolved !== undefined) {
+          errorStore[errorIndex].resolved = updates.resolved;
+          if (updates.resolved) {
+            errorStore[errorIndex].resolved_at = new Date().toISOString();
+          }
+        }
+        
+        if (updates.status !== undefined) {
+          errorStore[errorIndex].resolution_notes = `Status changed to: ${updates.status}`;
+        }
+      }
+      
+      return new Response(
+        JSON.stringify({
+          success: errorIndex >= 0
         }),
         { 
           headers: { 
@@ -81,6 +171,7 @@ serve(async (req) => {
       );
     }
 
+    // Default: health check
     // Check database connectivity and critical tables
     const healthChecks: SystemHealthCheck = {
       timestamp: new Date().toISOString(),
@@ -178,8 +269,6 @@ serve(async (req) => {
         timestamp: new Date().toISOString()
       });
     }
-
-    // No need to log to database as the system_health_logs table doesn't exist yet
 
     return new Response(
       JSON.stringify(healthChecks),

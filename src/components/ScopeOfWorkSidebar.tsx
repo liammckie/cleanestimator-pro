@@ -1,5 +1,5 @@
 
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Clock } from "lucide-react";
 import { Site } from '@/data/types/site';
@@ -35,6 +35,7 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = memo(({
       totalWeeklyHours,
       totalMonthlyHours
     });
+    // Empty dependency array so this only runs once on mount
   }, []);
 
   const handleRemoveTask = (taskId: string, siteId?: string) => {
@@ -45,8 +46,8 @@ export const ScopeOfWorkSidebar: React.FC<ScopeOfWorkSidebarProps> = memo(({
     });
   };
 
-  // Group tasks by site
-  const tasksBySite = React.useMemo(() => {
+  // Group tasks by site - use useMemo to prevent recalculation on every render
+  const tasksBySite = useMemo(() => {
     return selectedTasks.reduce((acc, task) => {
       const siteName = task.siteName || 'Default Site';
       if (!acc[siteName]) {

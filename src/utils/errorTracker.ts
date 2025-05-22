@@ -72,36 +72,38 @@ class ErrorTracker {
     this.errors.push(error);
     this.saveErrors();
     
-    // Try to log to Supabase if available
-    this.logErrorToSupabase(error).catch(e => console.error('Failed to log error to Supabase:', e));
+    // Log to edge function instead of direct database operations
+    this.logErrorToSystem(error).catch(e => console.error('Failed to log error to system:', e));
     
     return id;
   }
 
-  private async logErrorToSupabase(error: TrackedError): Promise<void> {
+  private async logErrorToSystem(error: TrackedError): Promise<void> {
     try {
       // Only attempt to log if we're in a browser environment and Supabase is available
       if (typeof window !== 'undefined' && supabase) {
-        const { data, error: supabaseError } = await supabase
-          .from('system_errors')
-          .insert([{
-            error_id: error.id,
-            message: error.message,
-            stack: error.stack,
-            priority: error.priority,
-            source: error.source,
-            status: error.status,
-            resolved: error.resolved,
-            timestamp: error.timestamp,
-            context: error.context || {}
-          }]);
+        const { data, error: logError } = await supabase.functions.invoke('project-health', {
+          body: { 
+            action: 'logError',
+            errorData: {
+              message: error.message,
+              stack: error.stack,
+              priority: error.priority,
+              source: error.source,
+              status: error.status,
+              resolved: error.resolved,
+              timestamp: error.timestamp,
+              context: error.context || {}
+            }
+          }
+        });
           
-        if (supabaseError) {
-          console.error('Failed to log error to Supabase:', supabaseError);
+        if (logError) {
+          console.error('Failed to log error to system:', logError);
         }
       }
     } catch (e) {
-      console.error('Exception logging error to Supabase:', e);
+      console.error('Exception logging error to system:', e);
     }
   }
 
@@ -112,9 +114,9 @@ class ErrorTracker {
       this.errors[errorIndex].status = status;
       this.saveErrors();
       
-      // Update in Supabase if available
-      this.updateErrorInSupabase(id, { status }).catch(e => 
-        console.error('Failed to update error status in Supabase:', e)
+      // Update via edge function
+      this.updateErrorInSystem(id, { status }).catch(e => 
+        console.error('Failed to update error status in system:', e)
       );
       
       return true;
@@ -131,11 +133,11 @@ class ErrorTracker {
       this.errors[errorIndex].status = 'resolved';
       this.saveErrors();
       
-      // Update in Supabase if available
-      this.updateErrorInSupabase(id, { 
+      // Update via edge function
+      this.updateErrorInSystem(id, { 
         resolved: true,
         status: 'resolved'
-      }).catch(e => console.error('Failed to resolve error in Supabase:', e));
+      }).catch(e => console.error('Failed to resolve error in system:', e));
       
       toast({
         title: "Issue Resolved",
@@ -148,21 +150,24 @@ class ErrorTracker {
     return false;
   }
 
-  private async updateErrorInSupabase(id: string, updates: Partial<TrackedError>): Promise<void> {
+  private async updateErrorInSystem(id: string, updates: Partial<TrackedError>): Promise<void> {
     try {
       // Only attempt to update if we're in a browser environment and Supabase is available
       if (typeof window !== 'undefined' && supabase) {
-        const { data, error: supabaseError } = await supabase
-          .from('system_errors')
-          .update(updates)
-          .eq('error_id', id);
+        const { data, error: updateError } = await supabase.functions.invoke('project-health', {
+          body: { 
+            action: 'updateError',
+            errorId: id,
+            updates
+          }
+        });
           
-        if (supabaseError) {
-          console.error('Failed to update error in Supabase:', supabaseError);
+        if (updateError) {
+          console.error('Failed to update error in system:', updateError);
         }
       }
     } catch (e) {
-      console.error('Exception updating error in Supabase:', e);
+      console.error('Exception updating error in system:', e);
     }
   }
 
@@ -171,7 +176,9 @@ class ErrorTracker {
       .sort((a, b) => {
         // Sort by priority (high to low)
         const priorityOrder = { high: 3, medium: 2, low: 1 };
-        return priorityOrder[b.priority] - priorityOrder[a.priority];
+        const priorityA = priorityOrder[a.priority] || 0;
+        const priorityB = priorityOrder[b.priority] || 0;
+        return priorityB - priorityA;
       });
   }
 

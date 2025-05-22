@@ -17,6 +17,7 @@ export const TimeSummaryCards: React.FC<TimeSummaryCardsProps> = memo(({
   // Use useEffect to log only once during component mount
   React.useEffect(() => {
     console.log('TimeSummaryCards mounted with:', { weeklyHours, monthlyHours });
+    // Empty dependency array to ensure this only runs once
   }, []);
   
   return (
