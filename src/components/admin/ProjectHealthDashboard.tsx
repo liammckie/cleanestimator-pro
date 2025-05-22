@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from '@/components/ui/badge';
-import { runDatabaseHealthCheck } from '@/utils/databaseHandler';
+import { runDatabaseHealthCheck } from '@/utils/database';
 import { 
   AlertCircle, 
   CheckCircle2, 
