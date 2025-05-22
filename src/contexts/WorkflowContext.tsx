@@ -5,7 +5,7 @@ import { Site } from '@/data/types/site';
 import { SelectedTask } from '@/components/area/task/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { WorkflowInsert, WorkflowUpdate } from '@/utils/workflowTypes';
+import { WorkflowInsert, WorkflowUpdate, WorkflowProject } from '@/utils/workflowTypes';
 
 export type WorkflowStepId = 'site-setup' | 'scope-definition' | 'task-management' | 'labor-costs' | 'equipment' | 'contract' | 'summary' | 'review';
 
@@ -30,6 +30,7 @@ export interface WorkflowData {
   selectedTasks: SelectedTask[];
   projectName?: string;
   clientName?: string;
+  createdBy?: string;
 }
 
 interface WorkflowContextType {
@@ -44,6 +45,7 @@ interface WorkflowContextType {
   loadProgress: (id: string) => Promise<void>;
   saveWorkflowId?: string;
   setWorkflowName: (name: string) => void;
+  removeSite: (siteId: string) => void;
 }
 
 const defaultWorkflowData: WorkflowData = {
@@ -60,6 +62,7 @@ const defaultWorkflowData: WorkflowData = {
   selectedTasks: [],
   projectName: 'New Cleaning Project',
   clientName: '',
+  createdBy: '',
 };
 
 const WorkflowContext = createContext<WorkflowContextType | undefined>(undefined);
@@ -145,7 +148,7 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const nextStep = () => {
     const currentIndex = findStepIndex(currentStep);
     if (currentIndex < steps.length - 1) {
-      const nextStepId = steps[currentIndex + 1].id;
+      const nextStepId = steps[currentIndex + 1].id as WorkflowStepId;
       setCurrentStep(nextStepId);
       navigate(steps[currentIndex + 1].path);
     }
@@ -154,7 +157,7 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const previousStep = () => {
     const currentIndex = findStepIndex(currentStep);
     if (currentIndex > 0) {
-      const prevStepId = steps[currentIndex - 1].id;
+      const prevStepId = steps[currentIndex - 1].id as WorkflowStepId;
       setCurrentStep(prevStepId);
       navigate(steps[currentIndex - 1].path);
     }
@@ -174,6 +177,13 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setWorkflowData(prev => ({
       ...prev,
       projectName: name
+    }));
+  };
+  
+  const removeSite = (siteId: string) => {
+    setWorkflowData(prev => ({
+      ...prev,
+      sites: prev.sites.filter(site => site.id !== siteId)
     }));
   };
 
@@ -247,8 +257,13 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       if (data) {
         setSaveWorkflowId(data.id);
-        setWorkflowData(data.workflow_data);
-        setCurrentStep(data.current_step);
+        
+        // Handle the data loading properly by ensuring proper types
+        const loadedData = data.workflow_data as WorkflowData;
+        setWorkflowData(loadedData);
+        
+        // Ensure the current_step is cast as a WorkflowStepId
+        setCurrentStep(data.current_step as WorkflowStepId);
         
         // Navigate to the correct step
         const stepToNavigate = steps.find(step => step.id === data.current_step);
@@ -292,7 +307,8 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveProgress,
       loadProgress,
       saveWorkflowId,
-      setWorkflowName
+      setWorkflowName,
+      removeSite
     }}>
       {children}
     </WorkflowContext.Provider>

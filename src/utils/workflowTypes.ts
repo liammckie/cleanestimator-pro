@@ -12,6 +12,7 @@ export interface WorkflowProject {
   created_at: string;
   updated_at: string;
   workflow_data?: any;
+  created_by?: string;
 }
 
 // Type for the insert operation
@@ -20,6 +21,7 @@ export interface WorkflowInsert {
   client_name?: string;
   workflow_data: any;
   current_step: WorkflowStepId;
+  created_by?: string;
 }
 
 // Type for the update operation
@@ -29,4 +31,5 @@ export interface WorkflowUpdate {
   workflow_data?: any;
   current_step?: WorkflowStepId;
   updated_at?: string;
+  created_by?: string;
 }

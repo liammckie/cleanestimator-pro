@@ -11,7 +11,7 @@ export const LoadWorkflow: React.FC = () => {
     if (id) {
       loadProgress(id);
     }
-  }, [id]);
+  }, [id, loadProgress]);
 
   // Return an empty div or redirect to home page since loadProgress will navigate to the proper step
   return <div>Loading workflow...</div>;
