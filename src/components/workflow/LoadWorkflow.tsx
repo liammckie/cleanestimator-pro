@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useWorkflow } from '@/contexts/WorkflowContext';
+import { Spinner } from "@/components/ui/spinner";
 
 export const LoadWorkflow: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +14,13 @@ export const LoadWorkflow: React.FC = () => {
     }
   }, [id, loadProgress]);
 
-  // Return an empty div or redirect to home page since loadProgress will navigate to the proper step
-  return <div>Loading workflow...</div>;
+  // Return a loading indicator while the workflow is being loaded
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <div className="text-center">
+        <Spinner className="h-8 w-8 mb-4" />
+        <p className="text-lg text-muted-foreground">Loading workflow...</p>
+      </div>
+    </div>
+  );
 };

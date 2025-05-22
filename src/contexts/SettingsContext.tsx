@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from 'react';
 
 interface SettingsContextType {
@@ -9,7 +10,7 @@ interface SettingsContextType {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [awardIncrease, setAwardIncrease] = useState(0);
+  const [awardIncrease, setAwardIncrease] = useState<number>(0);
 
   const updateLaborCosts = (hourlyRate: number) => {
     return hourlyRate * (1 + (awardIncrease / 100));

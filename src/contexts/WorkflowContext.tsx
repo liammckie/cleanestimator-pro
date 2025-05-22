@@ -259,8 +259,8 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setSaveWorkflowId(data.id);
         
         // Handle the data loading properly by ensuring proper types
-        const loadedData = data.workflow_data as WorkflowData;
-        setWorkflowData(loadedData);
+        const loadedData = data.workflow_data as unknown as WorkflowData;
+        setWorkflowData(loadedData || defaultWorkflowData);
         
         // Ensure the current_step is cast as a WorkflowStepId
         setCurrentStep(data.current_step as WorkflowStepId);
