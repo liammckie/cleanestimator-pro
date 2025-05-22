@@ -1,13 +1,43 @@
 
+import { 
+  LayoutDashboard, Database, FileText, LayoutList, Calendar,
+  Settings, DatabaseBackup
+} from "lucide-react";
+
 export const menuOptions = [
-  { id: 'sites', label: 'Site Manager', icon: 'layout' },
-  { id: 'scope', label: 'Scope of Work', icon: 'check-square' },
-  { id: 'task-management', label: 'Task Management', icon: 'list' },
-  { id: 'labor', label: 'Labor Costs', icon: 'user' },
-  { id: 'equipment', label: 'Equipment', icon: 'wrench' },
-  { id: 'roster', label: 'Roster', icon: 'calendar' },
-  { id: 'contract', label: 'Contract', icon: 'check-square' },
-  { id: 'summary', label: 'Summary', icon: 'globe' },
-  { id: 'settings', label: 'Settings', icon: 'settings' },
-  { id: 'overview', label: 'Overview', icon: 'layout' }
+  {
+    title: "Dashboard",
+    href: "/",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Scope of Work",
+    href: "/scope",
+    icon: FileText,
+  },
+  {
+    title: "Task Database",
+    href: "/task-management",
+    icon: Database,
+  },
+  {
+    title: "Rates Management",
+    href: "/rates",
+    icon: DatabaseBackup,
+  },
+  {
+    title: "Templates",
+    href: "/templates",
+    icon: LayoutList,
+  },
+  {
+    title: "Roster",
+    href: "/roster",
+    icon: Calendar,
+  },
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: Settings,
+  },
 ];
