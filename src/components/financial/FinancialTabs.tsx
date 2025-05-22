@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LaborCosts } from '@/components/LaborCosts';
 import { ProfitLoss } from '@/components/ProfitLoss';
 import { ContractData } from '@/components/ContractData';
@@ -17,6 +18,8 @@ interface FinancialTabsProps {
   setContractDetails: (details: any) => void;
   taskCosts: TaskCostBreakdown[];
   onMarginChange: (margin: number) => number;
+  activeTab?: string;
+  onTabChange?: (value: string) => void;
 }
 
 export const FinancialTabs: React.FC<FinancialTabsProps> = ({
@@ -30,12 +33,14 @@ export const FinancialTabs: React.FC<FinancialTabsProps> = ({
   setContractDetails,
   taskCosts,
   onMarginChange,
+  activeTab = "labor",
+  onTabChange,
 }) => {
   // Calculate total labor hours from task costs
   const totalLaborHours = taskCosts.reduce((total, task) => total + task.timeRequired, 0);
 
   return (
-    <>
+    <Tabs value={activeTab} onValueChange={onTabChange}>
       <TabsContent value="labor" className="space-y-6">
         <LaborCosts 
           onLaborCostChange={setLaborCosts}
@@ -65,6 +70,6 @@ export const FinancialTabs: React.FC<FinancialTabsProps> = ({
           onMarginChange={onMarginChange}
         />
       </TabsContent>
-    </>
+    </Tabs>
   );
 };

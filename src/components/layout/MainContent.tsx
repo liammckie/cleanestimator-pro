@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { TabsContent } from "@/components/ui/tabs";
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SiteManager } from '@/components/SiteManager';
 import { EquipmentCosts } from '@/components/EquipmentCosts';
 import { RosterManager } from '@/components/roster/RosterManager';
@@ -48,6 +48,7 @@ export const MainContent: React.FC<MainContentProps> = ({
 }) => {
   const { awardIncrease, setAwardIncrease } = useSettings();
   const { selectedTasks } = useTaskContext();
+  const [activeTab, setActiveTab] = useState('sites');
   
   const { 
     handleUpdateSite, 
@@ -68,8 +69,11 @@ export const MainContent: React.FC<MainContentProps> = ({
     }
   };
 
+  // Determine if the current tab is a financial tab
+  const isFinancialTab = ['labor', 'contract', 'summary'].includes(activeTab);
+
   return (
-    <>
+    <Tabs value={activeTab} onValueChange={setActiveTab}>
       <TabsContent value="sites" className="space-y-6">
         <SiteManager onSitesChange={onSitesChange} />
       </TabsContent>
@@ -85,18 +89,24 @@ export const MainContent: React.FC<MainContentProps> = ({
         <TaskManagementPage />
       </TabsContent>
 
-      <FinancialTabs
-        laborCosts={laborCosts}
-        setLaborCosts={setLaborCosts}
-        monthlyRevenue={monthlyRevenue}
-        overhead={overhead}
-        costBreakdown={costBreakdown}
-        equipmentCosts={equipmentCosts}
-        contractDetails={contractDetails}
-        setContractDetails={setContractDetails}
-        taskCosts={taskCosts}
-        onMarginChange={handleMarginChange}
-      />
+      {isFinancialTab && (
+        <TabsContent value={activeTab}>
+          <FinancialTabs
+            laborCosts={laborCosts}
+            setLaborCosts={setLaborCosts}
+            monthlyRevenue={monthlyRevenue}
+            overhead={overhead}
+            costBreakdown={costBreakdown}
+            equipmentCosts={equipmentCosts}
+            contractDetails={contractDetails}
+            setContractDetails={setContractDetails}
+            taskCosts={taskCosts}
+            onMarginChange={handleMarginChange}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+        </TabsContent>
+      )}
 
       <TabsContent value="equipment" className="space-y-6">
         <EquipmentCosts onEquipmentCostChange={setEquipmentCosts} />
@@ -117,6 +127,6 @@ export const MainContent: React.FC<MainContentProps> = ({
       <TabsContent value="overview" className="space-y-6">
         <SiteOverview sites={sites} />
       </TabsContent>
-    </>
+    </Tabs>
   );
 };
