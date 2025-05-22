@@ -22,6 +22,8 @@ import { SummaryStep } from './components/workflow/SummaryStep';
 import { ReviewStep } from './components/workflow/ReviewStep';
 import { WorkflowProjects } from './components/workflow/WorkflowProjects';
 import { LoadWorkflow } from './components/workflow/LoadWorkflow';
+import { ProtectedRoute } from './components/routing/ProtectedRoute';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 function App() {
   const [sites, setSites] = useState([]);
@@ -44,67 +46,75 @@ function App() {
   
   return (
     <Router>
-      <SettingsProvider>
-        <TaskProvider>
-          <CostProvider>
-            <RatesProvider>
-              <Routes>
-                {/* Legacy routes */}
-                <Route path="/legacy" element={<>
-                  <MainNavigation />
-                  <MainContent 
-                    sites={sites}
-                    onSitesChange={setSites}
-                    laborCosts={laborCosts}
-                    setLaborCosts={setLaborCosts}
-                    equipmentCosts={equipmentCosts}
-                    setEquipmentCosts={setEquipmentCosts}
-                    contractDetails={contractDetails}
-                    setContractDetails={setContractDetails}
-                    costBreakdown={costBreakdown}
-                    monthlyRevenue={monthlyRevenue}
-                    overhead={overhead}
-                  />
-                </>} />
-                <Route path="/rates" element={<RatesManagementPage />} />
-                <Route path="/templates" element={<TemplatesPage />} />
-                
-                {/* Workflow routes */}
-                <Route path="/" element={<Navigate to="/workflow/projects" replace />} />
-                
-                <Route path="/workflow/projects" element={
-                  <WorkflowProvider>
-                    <WorkflowProjects />
-                  </WorkflowProvider>
-                } />
-                
-                <Route path="/workflow/continue/:id" element={
-                  <WorkflowProvider>
-                    <LoadWorkflow />
-                  </WorkflowProvider>
-                } />
-                
-                <Route path="/workflow" element={
-                  <WorkflowProvider>
-                    <WorkflowLayout />
-                  </WorkflowProvider>
-                }>
-                  <Route path="site-setup" element={<SiteSetupStep />} />
-                  <Route path="scope" element={<ScopeDefinitionStep />} />
-                  <Route path="tasks" element={<TaskManagementStep />} />
-                  <Route path="labor" element={<LaborCostsStep />} />
-                  <Route path="equipment" element={<EquipmentStep />} />
-                  <Route path="contract" element={<ContractStep />} />
-                  <Route path="summary" element={<SummaryStep />} />
-                  <Route path="review" element={<ReviewStep />} />
-                </Route>
-                
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </RatesProvider>
-          </CostProvider>
-        </TaskProvider>
-      </SettingsProvider>
+      <ErrorBoundary>
+        <SettingsProvider>
+          <TaskProvider>
+            <CostProvider>
+              <RatesProvider>
+                <Routes>
+                  {/* Legacy routes */}
+                  <Route path="/legacy" element={<>
+                    <MainNavigation />
+                    <MainContent 
+                      sites={sites}
+                      onSitesChange={setSites}
+                      laborCosts={laborCosts}
+                      setLaborCosts={setLaborCosts}
+                      equipmentCosts={equipmentCosts}
+                      setEquipmentCosts={setEquipmentCosts}
+                      contractDetails={contractDetails}
+                      setContractDetails={setContractDetails}
+                      costBreakdown={costBreakdown}
+                      monthlyRevenue={monthlyRevenue}
+                      overhead={overhead}
+                    />
+                  </>} />
+                  <Route path="/rates" element={<RatesManagementPage />} />
+                  <Route path="/templates" element={<TemplatesPage />} />
+                  
+                  {/* Workflow routes */}
+                  <Route path="/" element={<Navigate to="/workflow/projects" replace />} />
+                  
+                  <Route path="/workflow/projects" element={
+                    <ProtectedRoute>
+                      <WorkflowProvider>
+                        <WorkflowProjects />
+                      </WorkflowProvider>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/workflow/continue/:id" element={
+                    <ProtectedRoute>
+                      <WorkflowProvider>
+                        <LoadWorkflow />
+                      </WorkflowProvider>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/workflow" element={
+                    <ProtectedRoute>
+                      <WorkflowProvider>
+                        <WorkflowLayout />
+                      </WorkflowProvider>
+                    </ProtectedRoute>
+                  }>
+                    <Route path="site-setup" element={<SiteSetupStep />} />
+                    <Route path="scope" element={<ScopeDefinitionStep />} />
+                    <Route path="tasks" element={<TaskManagementStep />} />
+                    <Route path="labor" element={<LaborCostsStep />} />
+                    <Route path="equipment" element={<EquipmentStep />} />
+                    <Route path="contract" element={<ContractStep />} />
+                    <Route path="summary" element={<SummaryStep />} />
+                    <Route path="review" element={<ReviewStep />} />
+                  </Route>
+                  
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </RatesProvider>
+            </CostProvider>
+          </TaskProvider>
+        </SettingsProvider>
+      </ErrorBoundary>
     </Router>
   )
 }

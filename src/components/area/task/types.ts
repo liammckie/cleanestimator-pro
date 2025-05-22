@@ -6,13 +6,20 @@ export interface TaskFrequency {
 
 export interface SelectedTask {
   id: string;
+  taskId?: string; // For backward compatibility
   quantity: number;
   timeRequired: number;
-  taskId?: string; // For backward compatibility
   frequency: TaskFrequency;
   productivityOverride?: number;
   siteId?: string; // Track which site this task belongs to
   taskName?: string; // Store task name for better UI display
+  // Additional properties
+  selectedTool?: string;
+  laborRate?: number;
+  siteName?: string;
+  name?: string;
+  unitType?: 'sqm' | 'units';
+  defaultTool?: string;
 }
 
 export interface Task {
@@ -25,6 +32,23 @@ export interface Task {
   unitOfMeasure?: string;
   taskType?: string;
   // Add other properties as needed
+}
+
+export interface AreaData {
+  squareMeters: number;
+  spaceType: string;
+  industryType: string;
+  selectedTasks: {
+    taskId?: string;
+    quantity: number;
+    timeRequired: number;
+    frequency: TaskFrequency;
+    productivityOverride?: number;
+    selectedTool?: string;
+    laborRate?: number;
+  }[];
+  totalTime: number;
+  totalLaborCost?: number;
 }
 
 export interface TaskContextType {

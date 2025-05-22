@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, ArrowRight, Save, CheckCircle } from 'lucide-react';
 import { WorkflowSidebar } from './WorkflowSidebar';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 
 export const WorkflowLayout: React.FC = () => {
   const { 
@@ -85,9 +86,11 @@ export const WorkflowLayout: React.FC = () => {
               <p className="text-muted-foreground">{steps[currentStepIndex]?.description}</p>
             </div>
 
-            {/* Content area */}
+            {/* Content area with error boundary */}
             <Card className="p-6">
-              <Outlet />
+              <ErrorBoundary>
+                <Outlet />
+              </ErrorBoundary>
             </Card>
 
             {/* Navigation buttons */}
