@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useWorkflow } from '@/contexts/WorkflowContext';
 import { Input } from '@/components/ui/input';
@@ -36,6 +35,11 @@ export const SiteSetupStep: React.FC = () => {
     }
   }, []);
 
+  // Keep sites in sync with workflowData
+  useEffect(() => {
+    setSites(workflowData.sites);
+  }, [workflowData.sites]);
+
   const addSite = () => {
     const newSite = {
       id: uuidv4(),
@@ -57,7 +61,9 @@ export const SiteSetupStep: React.FC = () => {
       }
     };
     
-    setSites([...sites, newSite]);
+    const updatedSites = [...sites, newSite];
+    setSites(updatedSites);
+    updateWorkflowData({ sites: updatedSites });
   };
 
   const handleRemoveSite = (siteId: string) => {
@@ -70,10 +76,7 @@ export const SiteSetupStep: React.FC = () => {
       return;
     }
     
-    const updatedSites = sites.filter(site => site.id !== siteId);
-    setSites(updatedSites);
     removeSite(siteId);
-    
     toast({
       title: "Site removed",
       description: "Site has been removed from your project."
@@ -87,6 +90,7 @@ export const SiteSetupStep: React.FC = () => {
       [field]: value
     };
     setSites(updatedSites);
+    updateWorkflowData({ sites: updatedSites });
   };
 
   const updateSiteAddress = (index: number, field: string, value: string) => {
@@ -99,6 +103,7 @@ export const SiteSetupStep: React.FC = () => {
       }
     };
     setSites(updatedSites);
+    updateWorkflowData({ sites: updatedSites });
   };
 
   const updateSiteIndustry = (index: number, value: string) => {
@@ -111,20 +116,16 @@ export const SiteSetupStep: React.FC = () => {
       }
     };
     setSites(updatedSites);
-  };
-
-  const handleSave = () => {
-    updateWorkflowData({ 
-      sites,
-      projectName,
-      clientName
-    });
+    updateWorkflowData({ sites: updatedSites });
   };
 
   useEffect(() => {
-    // Auto-save when any data changes
-    handleSave();
-  }, [sites, projectName, clientName]);
+    // Update project and client name in workflow data
+    updateWorkflowData({ 
+      projectName,
+      clientName
+    });
+  }, [projectName, clientName]);
 
   return (
     <div className="space-y-6">

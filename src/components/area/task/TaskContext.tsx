@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { SelectedTask, TaskContextType } from './types';
 import { useUnifiedTaskCalculations } from '@/hooks/useUnifiedTaskCalculations';
+import { useWorkflow } from '@/contexts/WorkflowContext';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
@@ -23,6 +24,15 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     defaultLaborRate
   });
 
+  // Check for workflow context to integrate with it
+  let workflowContext = null;
+  try {
+    workflowContext = useWorkflow();
+  } catch (e) {
+    // The provider is not inside a WorkflowProvider, which is fine
+    console.log('TASK_FLOW: Not within WorkflowProvider context');
+  }
+
   // Use the unified task calculations hook
   const {
     selectedTasks,
@@ -37,27 +47,38 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     totalMonthlyHours
   } = useUnifiedTaskCalculations(onTasksChange, defaultLaborRate);
 
-  // Initialize with initial tasks if provided
+  // Initialize with workflow tasks if available, otherwise use initialTasks
   useEffect(() => {
-    if (initialTasks && initialTasks.length > 0) {
+    if (workflowContext?.workflowData?.selectedTasks?.length > 0) {
+      setSelectedTasks(workflowContext.workflowData.selectedTasks);
+    } else if (initialTasks && initialTasks.length > 0) {
       setSelectedTasks(initialTasks);
     }
   }, []);
 
   // Load tasks from localStorage on mount
   useEffect(() => {
-    const savedTasks = localStorage.getItem('selected-tasks');
-    if (savedTasks) {
-      try {
-        const parsedTasks = JSON.parse(savedTasks);
-        if (Array.isArray(parsedTasks) && parsedTasks.length > 0) {
-          setSelectedTasks(parsedTasks);
+    if (!workflowContext) {
+      const savedTasks = localStorage.getItem('selected-tasks');
+      if (savedTasks) {
+        try {
+          const parsedTasks = JSON.parse(savedTasks);
+          if (Array.isArray(parsedTasks) && parsedTasks.length > 0) {
+            setSelectedTasks(parsedTasks);
+          }
+        } catch (error) {
+          console.error('TASK_FLOW: Error parsing saved tasks:', error);
         }
-      } catch (error) {
-        console.error('TASK_FLOW: Error parsing saved tasks:', error);
       }
     }
   }, []);
+
+  // Sync with workflow context if available
+  useEffect(() => {
+    if (workflowContext && selectedTasks.length > 0) {
+      workflowContext.updateWorkflowData({ selectedTasks });
+    }
+  }, [selectedTasks, workflowContext]);
 
   // Handle template application event
   useEffect(() => {
@@ -87,7 +108,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
     };
   }, [handleQuantityChange, handleFrequencyChange]);
 
-  // Save tasks to localStorage when they change
+  // Save tasks to localStorage when they change (if not in workflow context)
   useEffect(() => {
     console.log('TASK_FLOW: Context value updated:', {
       selectedTasksCount: selectedTasks.length,
@@ -95,11 +116,13 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({
       totalMonthlyHours
     });
     
-    // Save to localStorage
-    localStorage.setItem('selected-tasks', JSON.stringify(selectedTasks));
-    console.log('TASK_FLOW: Tasks saved to localStorage:', {
-      taskCount: selectedTasks.length
-    });
+    // Save to localStorage if not in workflow context
+    if (!workflowContext) {
+      localStorage.setItem('selected-tasks', JSON.stringify(selectedTasks));
+      console.log('TASK_FLOW: Tasks saved to localStorage:', {
+        taskCount: selectedTasks.length
+      });
+    }
   }, [selectedTasks, totalWeeklyHours, totalMonthlyHours]);
 
   const contextValue: TaskContextType = {

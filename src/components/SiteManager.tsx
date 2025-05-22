@@ -7,53 +7,75 @@ import { useTaskContext } from './area/task/TaskContext';
 
 interface SiteManagerProps {
   onSitesChange: (sites: Site[]) => void;
+  sites?: Site[];
 }
 
-export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange }) => {
+export const SiteManager: React.FC<SiteManagerProps> = ({ onSitesChange, sites: initialSites = [] }) => {
   const { selectedTasks } = useTaskContext();
-  const [sites, setSites] = useState<Site[]>([
-    {
-      id: uuidv4(),
-      name: 'New Site',
-      client: '',
-      daysPerWeek: 5,
-      address: {
-        street: '',
-        suburb: '',
-        state: '',
-        postcode: ''
-      },
-      area: {
-        squareMeters: 0,
-        spaceType: 'office',
-        industryType: 'corporate',
-        selectedTasks: [],
-        totalTime: 0
-      }
+  const [sites, setSites] = useState<Site[]>(initialSites);
+
+  // Initialize sites if none are provided
+  useEffect(() => {
+    if (initialSites.length > 0) {
+      setSites(initialSites);
+    } else if (sites.length === 0) {
+      const defaultSite: Site = {
+        id: uuidv4(),
+        name: 'New Site',
+        client: '',
+        daysPerWeek: 5,
+        address: {
+          street: '',
+          suburb: '',
+          state: '',
+          postcode: ''
+        },
+        area: {
+          squareMeters: 0,
+          spaceType: 'office',
+          industryType: 'corporate',
+          selectedTasks: [],
+          totalTime: 0
+        }
+      };
+      setSites([defaultSite]);
+      onSitesChange([defaultSite]);
     }
-  ]);
+  }, [initialSites]);
 
   // Update sites when selectedTasks change
   useEffect(() => {
     if (selectedTasks.length > 0 && sites.length > 0) {
-      const updatedSites = [...sites];
-      // Assign tasks to the first site for simplicity
-      updatedSites[0] = {
-        ...updatedSites[0],
-        area: {
-          ...updatedSites[0].area,
-          selectedTasks: selectedTasks.map(task => ({
-            taskId: task.taskId,
-            quantity: task.quantity,
-            timeRequired: task.timeRequired,
-            frequency: task.frequency,
-            productivityOverride: task.productivityOverride
-          })),
-          totalTime: selectedTasks.reduce((total, task) => {
-            return total + (task.timeRequired * task.frequency.timesPerMonth);
-          }, 0)
-        }
-      };
+      // Create a map to group tasks by siteId
+      const tasksBySite = selectedTasks.reduce((acc, task) => {
+        const siteId = task.siteId || sites[0].id; // Default to first site if no siteId
+        if (!acc[siteId]) acc[siteId] = [];
+        acc[siteId].push(task);
+        return acc;
+      }, {} as Record<string, typeof selectedTasks>);
+      
+      // Update each site with its tasks
+      const updatedSites = sites.map(site => {
+        const siteTasks = tasksBySite[site.id] || [];
+        const totalTime = siteTasks.reduce((total, task) => 
+          total + (task.timeRequired * task.frequency.timesPerMonth), 0);
+          
+        return {
+          ...site,
+          area: {
+            ...site.area,
+            selectedTasks: siteTasks.map(task => ({
+              taskId: task.id,
+              quantity: task.quantity,
+              timeRequired: task.timeRequired,
+              frequency: task.frequency,
+              productivityOverride: task.productivityOverride
+            })),
+            totalTime
+          }
+        };
+      });
+      
       setSites(updatedSites);
       onSitesChange(updatedSites);
     }

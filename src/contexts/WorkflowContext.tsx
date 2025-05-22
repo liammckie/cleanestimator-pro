@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Site } from '@/data/types/site';
@@ -163,11 +162,27 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  // This function now handles updating tasks along with site data
   const updateWorkflowData = (data: Partial<WorkflowData>) => {
-    setWorkflowData(prev => ({
-      ...prev,
-      ...data
-    }));
+    setWorkflowData(prev => {
+      // Handle special case for adding/replacing selected tasks
+      if (data.selectedTasks) {
+        // Create unique task IDs to avoid duplicates
+        const existingTaskIds = new Set(prev.selectedTasks.map(task => task.id));
+        const newTasks = data.selectedTasks.filter(task => !existingTaskIds.has(task.id));
+        
+        return {
+          ...prev,
+          ...data,
+          selectedTasks: [...prev.selectedTasks, ...newTasks]
+        };
+      }
+      
+      return {
+        ...prev,
+        ...data
+      };
+    });
 
     // Auto-save whenever data is updated
     saveProgress();
@@ -180,11 +195,27 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }));
   };
   
+  // Improved removeSite to also clean up associated tasks
   const removeSite = (siteId: string) => {
-    setWorkflowData(prev => ({
-      ...prev,
-      sites: prev.sites.filter(site => site.id !== siteId)
-    }));
+    setWorkflowData(prev => {
+      // Filter out the site to remove
+      const updatedSites = prev.sites.filter(site => site.id !== siteId);
+      
+      // Filter out tasks associated with the removed site
+      const updatedTasks = prev.selectedTasks.filter(task => {
+        // Keep tasks that are not associated with the site or don't have siteId property
+        return !task.siteId || task.siteId !== siteId;
+      });
+      
+      return {
+        ...prev,
+        sites: updatedSites,
+        selectedTasks: updatedTasks
+      };
+    });
+    
+    // Auto-save after removing a site
+    saveProgress();
   };
 
   const saveProgress = async () => {

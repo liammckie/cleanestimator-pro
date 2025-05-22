@@ -1,48 +1,40 @@
+
 export interface TaskFrequency {
   timesPerWeek: number;
   timesPerMonth: number;
 }
 
 export interface SelectedTask {
-  taskId: string;
-  siteId?: string;
-  siteName?: string;
+  id: string;
   quantity: number;
   timeRequired: number;
+  taskId?: string; // For backward compatibility
   frequency: TaskFrequency;
   productivityOverride?: number;
-  selectedTool?: string;
-  laborRate?: number;
-  name?: string;
-  defaultTool?: string;
-  unitType?: 'sqm' | 'units';
+  siteId?: string; // Track which site this task belongs to
+  taskName?: string; // Store task name for better UI display
+}
+
+export interface Task {
+  id: string;
+  taskName?: string;
+  category?: string;
+  description?: string;
+  defaultQuantity?: number;
+  defaultTime?: number;
+  unitOfMeasure?: string;
+  taskType?: string;
+  // Add other properties as needed
 }
 
 export interface TaskContextType {
   selectedTasks: SelectedTask[];
-  handleTaskSelection: (taskId: string, isSelected: boolean, siteId?: string, siteName?: string) => void;
+  handleTaskSelection: (taskId: string, selected: boolean, siteId?: string, taskName?: string) => void;
   handleQuantityChange: (taskId: string, quantity: number) => void;
-  handleFrequencyChange: (taskId: string, timesPerWeek: number) => void;
-  handleToolChange: (taskId: string, tool: string) => void;
-  handleLaborRateChange: (taskId: string, rate: number) => void;
-  handleProductivityOverride: (taskId: string, override: number) => void;
+  handleFrequencyChange: (taskId: string, frequency: TaskFrequency | number) => void;
+  handleToolChange?: (taskId: string, toolType: string) => void;
+  handleLaborRateChange?: (taskId: string, laborRate: number) => void;
+  handleProductivityOverride?: (taskId: string, productivityRate: number) => void;
   totalWeeklyHours: number;
   totalMonthlyHours: number;
-}
-
-export interface AreaData {
-  squareMeters: number;
-  spaceType: string;
-  industryType: string;
-  selectedTasks: Array<{
-    taskId: string;
-    quantity: number;
-    timeRequired: number;
-    frequency: TaskFrequency;
-    productivityOverride?: number;
-    selectedTool?: string;
-    laborRate?: number;
-  }>;
-  totalTime: number;
-  totalLaborCost: number;
 }
