@@ -1,7 +1,9 @@
+
 import { SelectedTask, TaskFrequency } from './types';
 import { getRateById } from '@/data/rates/ratesManager';
 import { validateTaskData } from '@/utils/taskValidation';
 import { calculateTaskTime } from '@/hooks/useTaskTimes';
+import { v4 as uuidv4 } from 'uuid';
 
 export const createNewTask = (
   taskId: string,
@@ -10,6 +12,7 @@ export const createNewTask = (
 ): SelectedTask => {
   const rate = getRateById(taskId);
   return {
+    id: uuidv4(), // Added required id property
     taskId,
     siteId,
     siteName,

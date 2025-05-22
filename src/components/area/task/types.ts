@@ -6,7 +6,7 @@ export interface TaskFrequency {
 
 export interface SelectedTask {
   id: string;
-  taskId?: string; // For backward compatibility
+  taskId: string; // Changed from optional to required
   quantity: number;
   timeRequired: number;
   frequency: TaskFrequency;

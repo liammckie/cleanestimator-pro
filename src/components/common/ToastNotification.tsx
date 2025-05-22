@@ -26,7 +26,7 @@ export const showNotification = (type: NotificationType, options: NotificationOp
     description,
     variant: type === 'error' ? 'destructive' : 'default',
     duration,
-    icon: iconMap[type],
+    // Remove the invalid 'icon' property
   });
 };
 

@@ -1,10 +1,10 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { SelectedTask, AreaData, TaskFrequency } from '@/components/area/task/types';
 import { calculateTaskProductivity } from '@/utils/productivityCalculations';
 import { TIME_CONSTANTS } from '@/utils/constants';
 import { toast } from '@/components/ui/use-toast';
 import { getRateById } from '@/data/rates/ratesManager';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Unified hook for managing task calculations and operations
@@ -123,6 +123,7 @@ export const useUnifiedTaskCalculations = (
       }
 
       const newTask: SelectedTask = {
+        id: uuidv4(), // Add required id property
         taskId,
         siteId,
         siteName,

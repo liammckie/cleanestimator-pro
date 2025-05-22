@@ -1,7 +1,9 @@
+
 import { useCallback } from 'react';
 import { SelectedTask } from '@/components/area/task/types';
 import { toast } from '@/components/ui/use-toast';
 import { getRateById } from '@/data/rates/ratesManager';
+import { v4 as uuidv4 } from 'uuid';
 
 export const useTaskOperations = (
   selectedTasks: SelectedTask[],
@@ -45,6 +47,7 @@ export const useTaskOperations = (
       }
 
       const newTask: SelectedTask = {
+        id: uuidv4(), // Add required id property
         taskId,
         siteId,
         siteName,

@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { TaskSelector } from '../task/TaskSelector';
 import { TaskList } from '../TaskList';
 import { useTaskContext } from './task/TaskContext';
+import { SelectedTask } from './task/types';
 
 interface TaskManagerProps {
   category: string;
@@ -19,7 +21,18 @@ export const TaskManager: React.FC<TaskManagerProps> = ({
     handleToolChange
   } = useTaskContext();
 
+  // Extract just the taskId from each selected task
   const selectedTaskIds = selectedTasks.map(task => task.taskId);
+
+  // Convert selectedTasks to the appropriate format for TaskList
+  const formattedTasks = selectedTasks.map(task => ({
+    taskId: task.taskId,
+    quantity: task.quantity,
+    timeRequired: task.timeRequired,
+    frequency: task.frequency,
+    productivityOverride: task.productivityOverride,
+    selectedTool: task.selectedTool
+  }));
 
   return (
     <div className="space-y-4">
@@ -31,7 +44,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({
       {selectedTasks.length > 0 && (
         <TaskList
           category={category}
-          selectedTasks={selectedTasks}
+          selectedTasks={formattedTasks}
           onTaskSelection={handleTaskSelection}
           onQuantityChange={handleQuantityChange}
           onFrequencyChange={handleFrequencyChange}
