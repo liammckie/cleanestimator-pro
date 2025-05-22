@@ -193,8 +193,12 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       };
     });
 
-    // Auto-save whenever data is updated
-    saveProgress();
+    // Auto-save whenever data is updated, but with a slight delay to avoid too many requests
+    const delayedSave = setTimeout(() => {
+      saveProgress();
+    }, 1000);
+
+    return () => clearTimeout(delayedSave);
   };
 
   const setWorkflowName = (name: string) => {
@@ -229,8 +233,11 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const saveProgress = async () => {
     try {
+      console.log("Attempting to save workflow progress...");
+      
       if (!saveWorkflowId) {
-        // Create new workflow
+        // Create new workflow with improved error handling
+        console.log("Creating new workflow...");
         const workflowInsert: WorkflowInsert = {
           project_name: workflowData.projectName || 'New Cleaning Project',
           client_name: workflowData.clientName || '',
@@ -244,9 +251,28 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           .select('id')
           .single();
           
-        if (error) throw error;
+        if (error) {
+          console.error('Error creating workflow:', error);
+          
+          // Handle RLS policy errors specifically
+          if (error.code === '42501') {
+            toast({
+              title: "Permission denied",
+              description: "You don't have permission to save workflows. Please check your database permissions.",
+              variant: "destructive"
+            });
+          } else {
+            toast({
+              title: "Save failed",
+              description: `Could not save your progress: ${error.message}`,
+              variant: "destructive"
+            });
+          }
+          return;
+        }
         
         if (data?.id) {
+          console.log("Workflow created with ID:", data.id);
           setSaveWorkflowId(data.id);
           toast({
             title: "Workflow created",
@@ -254,7 +280,8 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           });
         }
       } else {
-        // Update existing workflow
+        // Update existing workflow with improved error handling
+        console.log("Updating existing workflow:", saveWorkflowId);
         const workflowUpdate: WorkflowUpdate = {
           project_name: workflowData.projectName,
           client_name: workflowData.clientName || '',
@@ -268,18 +295,37 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           .update(workflowUpdate)
           .eq('id', saveWorkflowId);
           
-        if (error) throw error;
+        if (error) {
+          console.error('Error updating workflow:', error);
+          
+          // Handle RLS policy errors specifically
+          if (error.code === '42501') {
+            toast({
+              title: "Permission denied",
+              description: "You don't have permission to update this workflow. Please check your database permissions.",
+              variant: "destructive"
+            });
+          } else {
+            toast({
+              title: "Save failed",
+              description: `Could not update your progress: ${error.message}`,
+              variant: "destructive"
+            });
+          }
+          return;
+        }
         
+        console.log("Workflow updated successfully");
         toast({
           title: "Progress saved",
           description: "Your workflow has been updated."
         });
       }
-    } catch (error) {
-      console.error('Error saving workflow:', error);
+    } catch (error: any) {
+      console.error('Exception in saveProgress:', error);
       toast({
         title: "Save failed",
-        description: "Could not save your progress.",
+        description: "An unexpected error occurred while saving your progress.",
         variant: "destructive"
       });
     }
@@ -287,15 +333,35 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const loadProgress = async (id: string) => {
     try {
+      console.log("Loading workflow:", id);
       const { data, error } = await supabase
         .from('cleaning_workflows')
         .select('*')
         .eq('id', id)
         .single();
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading workflow:', error);
+        
+        // Handle RLS policy errors specifically
+        if (error.code === '42501') {
+          toast({
+            title: "Permission denied",
+            description: "You don't have permission to load this workflow. Please check your database permissions.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Load failed",
+            description: `Could not load your workflow: ${error.message}`,
+            variant: "destructive"
+          });
+        }
+        return;
+      }
       
       if (data) {
+        console.log("Workflow loaded:", data);
         setSaveWorkflowId(data.id);
         
         // Handle the data loading properly by ensuring proper types
@@ -316,11 +382,11 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           description: `Loaded: ${data.project_name}`
         });
       }
-    } catch (error) {
-      console.error('Error loading workflow:', error);
+    } catch (error: any) {
+      console.error('Exception in loadProgress:', error);
       toast({
         title: "Load failed",
-        description: "Could not load your workflow.",
+        description: "An unexpected error occurred while loading your workflow.",
         variant: "destructive"
       });
     }

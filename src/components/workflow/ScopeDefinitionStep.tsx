@@ -14,12 +14,14 @@ export const ScopeDefinitionStep: React.FC = () => {
   const { selectedTasks } = useTaskContext();
   
   const handleSitesChange = (updatedSites: Site[]) => {
+    console.log("Sites updated in ScopeDefinitionStep:", updatedSites.length);
     updateWorkflowData({ sites: updatedSites });
   };
 
   // Sync task data between contexts
   useEffect(() => {
     if (selectedTasks.length > 0) {
+      console.log("Syncing selected tasks to workflow context:", selectedTasks.length);
       updateWorkflowData({ selectedTasks });
     }
   }, [selectedTasks, updateWorkflowData]);
