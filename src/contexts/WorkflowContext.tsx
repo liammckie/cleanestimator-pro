@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Site } from '@/data/types/site';
@@ -6,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { WorkflowInsert, WorkflowUpdate, WorkflowProject } from '@/utils/workflowTypes';
 
-export type WorkflowStepId = 'site-setup' | 'scope-definition' | 'task-management' | 'labor-costs' | 'equipment' | 'contract' | 'summary' | 'review';
+export type WorkflowStepId = 'projects' | 'site-setup' | 'scope-definition' | 'task-management' | 'labor-costs' | 'equipment' | 'contract' | 'summary' | 'review';
 
 export interface WorkflowStep {
   id: WorkflowStepId;
@@ -103,7 +104,11 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       label: 'Labor Costs',
       description: 'Configure labor rates and costs',
       path: '/workflow/labor',
-      isComplete: !!workflowData.laborCosts.hourlyRate,
+      // Only mark as complete if hourly rate is set AND employmentType is set
+      isComplete: !!workflowData.laborCosts.hourlyRate && 
+                  (workflowData.laborCosts.employmentType === 'direct' || 
+                   workflowData.laborCosts.employmentType === 'contracted') &&
+                  !!workflowData.laborCosts.onCosts,
       isActive: currentStep === 'labor-costs'
     },
     {
@@ -119,7 +124,11 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       label: 'Contract Details',
       description: 'Set contract length and terms',
       path: '/workflow/contract',
-      isComplete: !!workflowData.contractDetails.lengthYears,
+      // Check for complete contract details including CPI increases
+      isComplete: !!workflowData.contractDetails.lengthYears && 
+                  !!workflowData.contractDetails.cpiIncreases &&
+                  (workflowData.contractDetails.lengthYears === 1 || 
+                   (workflowData.contractDetails.cpiIncreases.yearOne !== undefined)),
       isActive: currentStep === 'contract'
     },
     {
