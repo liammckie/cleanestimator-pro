@@ -32,8 +32,8 @@ function App() {
   
   return (
     <Router>
-      <TaskProvider>
-        <SettingsProvider>
+      <SettingsProvider>
+        <TaskProvider>
           <CostProvider>
             <RatesProvider>
               <MainNavigation />
@@ -59,8 +59,8 @@ function App() {
               </Routes>
             </RatesProvider>
           </CostProvider>
-        </SettingsProvider>
-      </TaskProvider>
+        </TaskProvider>
+      </SettingsProvider>
     </Router>
   )
 }

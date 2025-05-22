@@ -74,6 +74,19 @@ export const MainContent: React.FC<MainContentProps> = ({
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <TabsList className="mb-4">
+        <TabsTrigger value="sites">Sites</TabsTrigger>
+        <TabsTrigger value="scope">Scope</TabsTrigger>
+        <TabsTrigger value="task-management">Task Management</TabsTrigger>
+        <TabsTrigger value="labor">Labor</TabsTrigger>
+        <TabsTrigger value="contract">Contract</TabsTrigger>
+        <TabsTrigger value="summary">Summary</TabsTrigger>
+        <TabsTrigger value="equipment">Equipment</TabsTrigger>
+        <TabsTrigger value="roster">Roster</TabsTrigger>
+        <TabsTrigger value="settings">Settings</TabsTrigger>
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+      </TabsList>
+
       <TabsContent value="sites" className="space-y-6">
         <SiteManager onSitesChange={onSitesChange} />
       </TabsContent>

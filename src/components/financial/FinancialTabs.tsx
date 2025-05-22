@@ -39,37 +39,51 @@ export const FinancialTabs: React.FC<FinancialTabsProps> = ({
   // Calculate total labor hours from task costs
   const totalLaborHours = taskCosts.reduce((total, task) => total + task.timeRequired, 0);
 
-  return (
-    <Tabs value={activeTab} onValueChange={onTabChange}>
-      <TabsContent value="labor" className="space-y-6">
-        <LaborCosts 
-          onLaborCostChange={setLaborCosts}
-        />
-      </TabsContent>
+  // For financial tabs, we're using the parent tabs structure
+  // and just rendering the appropriate content based on activeTab
+  
+  const renderContent = () => {
+    switch (activeTab) {
+      case "labor":
+        return (
+          <div className="space-y-6">
+            <LaborCosts 
+              onLaborCostChange={setLaborCosts}
+            />
+          </div>
+        );
+      case "contract":
+        return (
+          <div className="space-y-6">
+            <ContractData onContractChange={setContractDetails} />
+            <ContractForecast
+              baseRevenue={monthlyRevenue}
+              laborCost={costBreakdown.totalMonthlyCost}
+              equipmentCost={equipmentCosts.monthly}
+              overhead={overhead}
+              contractLength={contractDetails.lengthYears}
+              cpiIncreases={contractDetails.cpiIncreases}
+            />
+          </div>
+        );
+      case "summary":
+        return (
+          <div className="space-y-6">
+            <ProfitLoss
+              revenue={monthlyRevenue}
+              laborCost={costBreakdown.totalMonthlyCost}
+              equipmentCost={equipmentCosts.monthly}
+              overhead={overhead}
+              totalLaborHours={totalLaborHours}
+              selectedTasks={taskCosts}
+              onMarginChange={onMarginChange}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
-      <TabsContent value="contract" className="space-y-6">
-        <ContractData onContractChange={setContractDetails} />
-        <ContractForecast
-          baseRevenue={monthlyRevenue}
-          laborCost={costBreakdown.totalMonthlyCost}
-          equipmentCost={equipmentCosts.monthly}
-          overhead={overhead}
-          contractLength={contractDetails.lengthYears}
-          cpiIncreases={contractDetails.cpiIncreases}
-        />
-      </TabsContent>
-
-      <TabsContent value="summary" className="space-y-6">
-        <ProfitLoss
-          revenue={monthlyRevenue}
-          laborCost={costBreakdown.totalMonthlyCost}
-          equipmentCost={equipmentCosts.monthly}
-          overhead={overhead}
-          totalLaborHours={totalLaborHours}
-          selectedTasks={taskCosts}
-          onMarginChange={onMarginChange}
-        />
-      </TabsContent>
-    </Tabs>
-  );
+  return renderContent();
 };

@@ -20,7 +20,8 @@ export const CostProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [laborRate, setLaborRate] = useState(38);
   
   // Get task data from the shared TaskContext
-  const { selectedTasks, totalWeeklyHours, totalMonthlyHours } = useTaskContext();
+  const taskContext = useTaskContext();
+  const { selectedTasks, totalWeeklyHours, totalMonthlyHours } = taskContext;
 
   useEffect(() => {
     // Calculate labor costs from tasks and rates
