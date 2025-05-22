@@ -24,6 +24,7 @@ import { WorkflowProjects } from './components/workflow/WorkflowProjects';
 import { LoadWorkflow } from './components/workflow/LoadWorkflow';
 import { ProtectedRoute } from './components/routing/ProtectedRoute';
 import ErrorBoundary from './components/common/ErrorBoundary';
+import AdminDashboard from './components/admin/AdminDashboard';
 
 function App() {
   const [sites, setSites] = useState([]);
@@ -71,6 +72,7 @@ function App() {
                   </>} />
                   <Route path="/rates" element={<RatesManagementPage />} />
                   <Route path="/templates" element={<TemplatesPage />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
                   
                   {/* Workflow routes */}
                   <Route path="/" element={<Navigate to="/workflow/projects" replace />} />
@@ -119,4 +121,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

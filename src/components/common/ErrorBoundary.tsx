@@ -3,6 +3,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { errorTracker } from '@/utils/errorTracker';
 
 interface Props {
   children: ReactNode;
@@ -32,6 +33,18 @@ class ErrorBoundary extends Component<Props, State> {
       error,
       errorInfo
     });
+    
+    // Track the error in our error tracking system
+    errorTracker.trackError(
+      error.message || 'Unknown error in component',
+      'high',
+      'client',
+      error.stack,
+      {
+        componentStack: errorInfo.componentStack,
+        location: window.location.href
+      }
+    );
     
     // You can log the error to an error reporting service
     console.error('ErrorBoundary caught an error', error, errorInfo);

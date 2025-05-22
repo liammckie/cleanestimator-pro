@@ -1,1 +1,5 @@
+
 project_id = "ilihnrkwgpuoukdfndxr"
+
+[functions.project-health]
+verify_jwt = true

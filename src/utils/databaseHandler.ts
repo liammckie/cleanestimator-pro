@@ -1,5 +1,6 @@
 
 import { supabase } from "../integrations/supabase/client";
+import { errorTracker } from "./errorTracker";
 
 // Define a more specific type that matches the structure expected by Supabase
 interface TableColumns {
@@ -7,7 +8,7 @@ interface TableColumns {
 }
 
 // Define the type for table names
-type TableName = 'industry_productivity_rates' | 'periodic_cleaning_services';
+type TableName = 'industry_productivity_rates' | 'periodic_cleaning_services' | 'cleaning_workflows' | 'system_errors' | 'system_health_logs';
 
 /**
  * Fetches all records from a specified table
@@ -20,12 +21,24 @@ export const fetchAllRecords = async (tableName: TableName) => {
     
     if (error) {
       console.error(`Error fetching ${tableName}:`, error);
+      errorTracker.trackError(
+        `Error fetching ${tableName}: ${error.message}`,
+        'medium',
+        'database',
+        error.stack
+      );
       return { data: null, error };
     }
     
     return { data, error: null };
   } catch (error) {
     console.error(`Error in fetchAllRecords for ${tableName}:`, error);
+    errorTracker.trackError(
+      `Exception in fetchAllRecords for ${tableName}: ${error.message}`,
+      'high',
+      'database',
+      error.stack
+    );
     return { data: null, error };
   }
 };
@@ -47,12 +60,24 @@ export const fetchRecordById = async (tableName: TableName, id: string) => {
     
     if (error) {
       console.error(`Error fetching ${tableName} with ID ${id}:`, error);
+      errorTracker.trackError(
+        `Error fetching ${tableName} with ID ${id}: ${error.message}`,
+        'medium',
+        'database',
+        error.stack
+      );
       return { data: null, error };
     }
     
     return { data, error: null };
   } catch (error) {
     console.error(`Error in fetchRecordById for ${tableName} with ID ${id}:`, error);
+    errorTracker.trackError(
+      `Exception in fetchRecordById for ${tableName} with ID ${id}: ${error.message}`,
+      'high',
+      'database',
+      error.stack
+    );
     return { data: null, error };
   }
 };
@@ -75,12 +100,26 @@ export const createRecord = async (tableName: TableName, record: TableColumns) =
     
     if (error) {
       console.error(`Error creating record in ${tableName}:`, error);
+      errorTracker.trackError(
+        `Error creating record in ${tableName}: ${error.message}`,
+        'medium',
+        'database',
+        error.stack,
+        { record }
+      );
       return { data: null, error };
     }
     
     return { data, error: null };
   } catch (error) {
     console.error(`Error in createRecord for ${tableName}:`, error);
+    errorTracker.trackError(
+      `Exception in createRecord for ${tableName}: ${error.message}`,
+      'high',
+      'database',
+      error.stack,
+      { record }
+    );
     return { data: null, error };
   }
 };
@@ -106,12 +145,26 @@ export const updateRecord = async (
     
     if (error) {
       console.error(`Error updating record in ${tableName} with ID ${id}:`, error);
+      errorTracker.trackError(
+        `Error updating record in ${tableName} with ID ${id}: ${error.message}`,
+        'medium',
+        'database',
+        error.stack,
+        { updates }
+      );
       return { data: null, error };
     }
     
     return { data, error: null };
   } catch (error) {
     console.error(`Error in updateRecord for ${tableName} with ID ${id}:`, error);
+    errorTracker.trackError(
+      `Exception in updateRecord for ${tableName} with ID ${id}: ${error.message}`,
+      'high',
+      'database',
+      error.stack,
+      { updates }
+    );
     return { data: null, error };
   }
 };
@@ -131,12 +184,54 @@ export const deleteRecord = async (tableName: TableName, id: string) => {
     
     if (error) {
       console.error(`Error deleting record from ${tableName} with ID ${id}:`, error);
+      errorTracker.trackError(
+        `Error deleting record from ${tableName} with ID ${id}: ${error.message}`,
+        'medium',
+        'database',
+        error.stack
+      );
       return { success: false, error };
     }
     
     return { success: true, error: null };
   } catch (error) {
     console.error(`Error in deleteRecord for ${tableName} with ID ${id}:`, error);
+    errorTracker.trackError(
+      `Exception in deleteRecord for ${tableName} with ID ${id}: ${error.message}`,
+      'high',
+      'database',
+      error.stack
+    );
     return { success: false, error };
+  }
+};
+
+/**
+ * Runs a health check on the database and tables
+ * @returns A promise containing the health check results
+ */
+export const runDatabaseHealthCheck = async () => {
+  try {
+    const { data, error } = await supabase.functions.invoke('project-health');
+    
+    if (error) {
+      errorTracker.trackError(
+        `Error running database health check: ${error.message}`,
+        'high',
+        'network',
+        error.stack
+      );
+      return { data: null, error };
+    }
+    
+    return { data, error: null };
+  } catch (error) {
+    errorTracker.trackError(
+      `Exception in runDatabaseHealthCheck: ${error.message}`,
+      'high',
+      'network',
+      error.stack
+    );
+    return { data: null, error };
   }
 };
