@@ -25,6 +25,7 @@ import { LoadWorkflow } from './components/workflow/LoadWorkflow';
 import { ProtectedRoute } from './components/routing/ProtectedRoute';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import AdminDashboard from './components/admin/AdminDashboard';
+import { TooltipProvider } from "./components/ui/tooltip";
 
 function App() {
   const [sites, setSites] = useState([]);
@@ -46,9 +47,10 @@ function App() {
   const [overhead, setOverhead] = useState(0);
   
   return (
-    <Router>
-      <ErrorBoundary>
-        <SettingsProvider>
+    <TooltipProvider>
+      <Router>
+        <ErrorBoundary>
+          <SettingsProvider>
           <TaskProvider>
             <CostProvider>
               <RatesProvider>
@@ -115,9 +117,10 @@ function App() {
               </RatesProvider>
             </CostProvider>
           </TaskProvider>
-        </SettingsProvider>
-      </ErrorBoundary>
-    </Router>
+          </SettingsProvider>
+        </ErrorBoundary>
+      </Router>
+    </TooltipProvider>
   )
 }
 
