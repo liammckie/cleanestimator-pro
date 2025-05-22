@@ -9,6 +9,7 @@ import { RatesProvider } from './contexts/RatesContext';
 import { RatesManagementPage } from './components/rates/RatesManagementPage';
 import { TemplatesPage } from './components/templates/TemplatesPage';
 import { TaskProvider } from './components/area/task/TaskContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 
 function App() {
   const [sites, setSites] = useState([]);
@@ -32,31 +33,33 @@ function App() {
   return (
     <Router>
       <TaskProvider>
-        <CostProvider>
-          <RatesProvider>
-            <MainNavigation />
-            <Routes>
-              <Route path="/" element={
-                <MainContent 
-                  sites={sites}
-                  onSitesChange={setSites}
-                  laborCosts={laborCosts}
-                  setLaborCosts={setLaborCosts}
-                  equipmentCosts={equipmentCosts}
-                  setEquipmentCosts={setEquipmentCosts}
-                  contractDetails={contractDetails}
-                  setContractDetails={setContractDetails}
-                  costBreakdown={costBreakdown}
-                  monthlyRevenue={monthlyRevenue}
-                  overhead={overhead}
-                />
-              } />
-              <Route path="/rates" element={<RatesManagementPage />} />
-              <Route path="/templates" element={<TemplatesPage />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </RatesProvider>
-        </CostProvider>
+        <SettingsProvider>
+          <CostProvider>
+            <RatesProvider>
+              <MainNavigation />
+              <Routes>
+                <Route path="/" element={
+                  <MainContent 
+                    sites={sites}
+                    onSitesChange={setSites}
+                    laborCosts={laborCosts}
+                    setLaborCosts={setLaborCosts}
+                    equipmentCosts={equipmentCosts}
+                    setEquipmentCosts={setEquipmentCosts}
+                    contractDetails={contractDetails}
+                    setContractDetails={setContractDetails}
+                    costBreakdown={costBreakdown}
+                    monthlyRevenue={monthlyRevenue}
+                    overhead={overhead}
+                  />
+                } />
+                <Route path="/rates" element={<RatesManagementPage />} />
+                <Route path="/templates" element={<TemplatesPage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </RatesProvider>
+          </CostProvider>
+        </SettingsProvider>
       </TaskProvider>
     </Router>
   )
