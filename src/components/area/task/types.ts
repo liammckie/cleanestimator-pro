@@ -1,4 +1,3 @@
-
 export interface TaskFrequency {
   timesPerWeek: number;
   timesPerMonth: number;
@@ -16,6 +15,7 @@ export interface SelectedTask {
   laborRate?: number;
   name?: string;
   defaultTool?: string;
+  unitType?: 'sqm' | 'units';
 }
 
 export interface TaskContextType {
