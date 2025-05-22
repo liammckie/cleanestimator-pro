@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { v4 as uuidv4 } from 'uuid';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const industryTypes = [
@@ -22,7 +22,7 @@ const industryTypes = [
 ];
 
 export const SiteSetupStep: React.FC = () => {
-  const { workflowData, updateWorkflowData, removeSite } = useWorkflow();
+  const { workflowData, updateWorkflowData, removeSite, nextStep } = useWorkflow();
   const [projectName, setProjectName] = useState(workflowData.projectName || '');
   const [clientName, setClientName] = useState(workflowData.clientName || '');
   const [sites, setSites] = useState(workflowData.sites);
@@ -126,6 +126,16 @@ export const SiteSetupStep: React.FC = () => {
       clientName
     });
   }, [projectName, clientName]);
+
+  const handleNextStep = () => {
+    // Save current data before proceeding
+    updateWorkflowData({
+      projectName,
+      clientName,
+      sites
+    });
+    nextStep();
+  };
 
   return (
     <div className="space-y-6">
@@ -262,6 +272,18 @@ export const SiteSetupStep: React.FC = () => {
         <Button type="button" onClick={addSite} variant="outline" className="mt-2 flex items-center">
           <Plus className="h-4 w-4 mr-1" />
           Add Another Site
+        </Button>
+      </div>
+      
+      <div className="mt-8 flex justify-end">
+        <Button
+          onClick={handleNextStep}
+          variant="default"
+          size="lg"
+          className="flex items-center"
+        >
+          Next Step
+          <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
     </div>
