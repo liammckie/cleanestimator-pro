@@ -42,6 +42,36 @@ export type Database = {
         }
         Relationships: []
       }
+      cleaning_workflows: {
+        Row: {
+          client_name: string | null
+          created_at: string | null
+          current_step: string
+          id: string
+          project_name: string
+          updated_at: string | null
+          workflow_data: Json
+        }
+        Insert: {
+          client_name?: string | null
+          created_at?: string | null
+          current_step?: string
+          id?: string
+          project_name: string
+          updated_at?: string | null
+          workflow_data: Json
+        }
+        Update: {
+          client_name?: string | null
+          created_at?: string | null
+          current_step?: string
+          id?: string
+          project_name?: string
+          updated_at?: string | null
+          workflow_data?: Json
+        }
+        Relationships: []
+      }
       industry_productivity_rates: {
         Row: {
           area_name: string

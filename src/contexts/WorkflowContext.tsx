@@ -5,6 +5,7 @@ import { Site } from '@/data/types/site';
 import { SelectedTask } from '@/components/area/task/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { WorkflowInsert, WorkflowUpdate } from '@/utils/workflowTypes';
 
 export type WorkflowStepId = 'site-setup' | 'scope-definition' | 'task-management' | 'labor-costs' | 'equipment' | 'contract' | 'summary' | 'review';
 
@@ -180,16 +181,16 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       if (!saveWorkflowId) {
         // Create new workflow
+        const workflowInsert: WorkflowInsert = {
+          project_name: workflowData.projectName || 'New Cleaning Project',
+          client_name: workflowData.clientName || '',
+          workflow_data: workflowData,
+          current_step: currentStep
+        };
+        
         const { data, error } = await supabase
           .from('cleaning_workflows')
-          .insert([
-            { 
-              project_name: workflowData.projectName,
-              client_name: workflowData.clientName || '',
-              workflow_data: workflowData,
-              current_step: currentStep
-            }
-          ])
+          .insert([workflowInsert])
           .select('id')
           .single();
           
@@ -204,15 +205,17 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
       } else {
         // Update existing workflow
+        const workflowUpdate: WorkflowUpdate = {
+          project_name: workflowData.projectName,
+          client_name: workflowData.clientName || '',
+          workflow_data: workflowData,
+          current_step: currentStep,
+          updated_at: new Date().toISOString()
+        };
+        
         const { error } = await supabase
           .from('cleaning_workflows')
-          .update({ 
-            project_name: workflowData.projectName,
-            client_name: workflowData.clientName || '',
-            workflow_data: workflowData,
-            current_step: currentStep,
-            updated_at: new Date().toISOString()
-          })
+          .update(workflowUpdate)
           .eq('id', saveWorkflowId);
           
         if (error) throw error;

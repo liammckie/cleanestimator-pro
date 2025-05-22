@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,15 +6,7 @@ import { Plus, Folder, ArrowRight, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-
-interface WorkflowProject {
-  id: string;
-  project_name: string;
-  client_name: string;
-  current_step: string;
-  created_at: string;
-  updated_at: string;
-}
+import { WorkflowProject } from '@/utils/workflowTypes';
 
 export const WorkflowProjects: React.FC = () => {
   const [projects, setProjects] = useState<WorkflowProject[]>([]);
@@ -33,7 +24,8 @@ export const WorkflowProjects: React.FC = () => {
         
       if (error) throw error;
       
-      setProjects(data || []);
+      console.log('Loaded projects:', data);
+      setProjects(data as WorkflowProject[] || []);
     } catch (error) {
       console.error('Error loading projects:', error);
       toast({
