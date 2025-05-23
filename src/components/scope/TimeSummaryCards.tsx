@@ -1,7 +1,8 @@
 
-import React, { memo } from 'react';
-import { Card } from "@/components/ui/card";
-import { Building, Clock } from "lucide-react";
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { Clock, ListFilter, Layers } from 'lucide-react';
+import { formatHours } from '@/utils/taskUtils';
 
 interface TimeSummaryCardsProps {
   siteCount: number;
@@ -9,47 +10,49 @@ interface TimeSummaryCardsProps {
   monthlyHours: number;
 }
 
-export const TimeSummaryCards: React.FC<TimeSummaryCardsProps> = memo(({
+export const TimeSummaryCards: React.FC<TimeSummaryCardsProps> = ({ 
   siteCount,
-  weeklyHours,
-  monthlyHours
+  weeklyHours, 
+  monthlyHours 
 }) => {
-  // Use useEffect to log only once during component mount
-  React.useEffect(() => {
-    console.log('TimeSummaryCards mounted with:', { weeklyHours, monthlyHours });
-    // Empty dependency array to ensure this only runs once
-  }, []);
-  
+  console.log('TimeSummaryCards mounted with:', {
+    weeklyHours,
+    monthlyHours
+  });
+
   return (
-    <>
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="p-4 bg-accent/50">
-          <div className="flex items-center space-x-2">
-            <Building className="w-4 h-4 text-primary" />
-            <p className="text-sm font-medium">Sites</p>
-          </div>
-          <p className="text-2xl font-bold mt-2">{siteCount}</p>
-        </Card>
-        
-        <Card className="p-4 bg-accent/50">
-          <div className="flex items-center space-x-2">
-            <Clock className="w-4 h-4 text-primary" />
-            <p className="text-sm font-medium">Weekly Hours</p>
-          </div>
-          <p className="text-2xl font-bold mt-2">{weeklyHours.toFixed(1)}</p>
-        </Card>
-      </div>
-
-      <Card className="p-4 bg-accent/50">
-        <div className="flex items-center space-x-2">
-          <Clock className="w-4 h-4 text-primary" />
-          <p className="text-sm font-medium">Monthly Hours</p>
+    <div className="grid grid-cols-2 gap-3">
+      <Card className="p-3 flex flex-col bg-primary/5 border-primary/10">
+        <div className="flex items-center gap-1 mb-2">
+          <Layers className="h-3.5 w-3.5 text-primary" />
+          <span className="text-xs font-medium text-primary">Sites</span>
         </div>
-        <p className="text-2xl font-bold mt-2">{monthlyHours.toFixed(1)}</p>
+        <span className="font-semibold text-lg">{siteCount}</span>
       </Card>
-    </>
+      
+      <Card className="p-3 flex flex-col bg-primary/5 border-primary/10">
+        <div className="flex items-center gap-1 mb-2">
+          <ListFilter className="h-3.5 w-3.5 text-primary" />
+          <span className="text-xs font-medium text-primary">Tasks</span>
+        </div>
+        <span className="font-semibold text-lg">5</span>
+      </Card>
+      
+      <Card className="p-3 flex flex-col bg-blue-50 border-blue-100">
+        <div className="flex items-center gap-1 mb-2">
+          <Clock className="h-3.5 w-3.5 text-blue-600" />
+          <span className="text-xs font-medium text-blue-600">Weekly Hours</span>
+        </div>
+        <span className="font-semibold text-lg">{formatHours(weeklyHours)}h</span>
+      </Card>
+      
+      <Card className="p-3 flex flex-col bg-blue-50 border-blue-100">
+        <div className="flex items-center gap-1 mb-2">
+          <Clock className="h-3.5 w-3.5 text-blue-600" />
+          <span className="text-xs font-medium text-blue-600">Monthly Hours</span>
+        </div>
+        <span className="font-semibold text-lg">{formatHours(monthlyHours)}h</span>
+      </Card>
+    </div>
   );
-});
-
-// Add display name for debugging
-TimeSummaryCards.displayName = 'TimeSummaryCards';
+};
